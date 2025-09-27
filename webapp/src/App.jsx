@@ -4,15 +4,9 @@ import Home from '../src/pages/Home';
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-      
         <Routes>
           <Route path="/" element={<Home />} />
         </Routes>
-       
-      </AuthProvider>
-    </ThemeProvider>
   );
 };
 
