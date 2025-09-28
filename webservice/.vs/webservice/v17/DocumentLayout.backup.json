@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "D:\\Projects\\EVConnect\\webservice\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\data\\dbconnect.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:data\\dbconnect.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\controllers\\stationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:controllers\\stationcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Title": "StationController.cs",
+              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\controllers\\StationController.cs",
+              "RelativeDocumentMoniker": "controllers\\StationController.cs",
+              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\controllers\\StationController.cs",
+              "RelativeToolTip": "controllers\\StationController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-21T11:20:23.94Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "DBConnect.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\data\\DBConnect.cs",
-              "RelativeDocumentMoniker": "data\\DBConnect.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\data\\DBConnect.cs",
-              "RelativeToolTip": "data\\DBConnect.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAAA2wDgAAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-21T11:20:07.257Z",
+              "WhenOpened": "2025-09-28T05:13:50.441Z",
               "EditorCaption": ""
             }
           ]
