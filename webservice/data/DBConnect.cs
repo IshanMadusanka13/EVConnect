@@ -22,8 +22,8 @@ namespace webservice.data
 
                 _database = client.GetDatabase("EVChargingDB");
 
-                var result = client.GetDatabase("evstation").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
-                Console.WriteLine("Pinged your deployment. You successfully connected to MongoDB!");
+                var result = client.GetDatabase("EVChargingDB").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
+                Console.WriteLine("Successfully connected to MongoDB!");
 
             }
             catch (Exception ex)
@@ -38,6 +38,7 @@ namespace webservice.data
         public IMongoCollection<Station> Stations => _database.GetCollection<Station>("Stations");
         public IMongoCollection<Booking> Bookings => _database.GetCollection<Booking>("Bookings");
         public IMongoCollection<Slot> Slots => _database.GetCollection<Slot>("Slots");
+        public IMongoCollection<StationSchedule> StationSchedules => _database.GetCollection<StationSchedule>("StationSchedules");
 
     }
 }

@@ -15,7 +15,7 @@ namespace webservice.models
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public DateTime BookingDateTime { get; set; }
-        public string Status { get; set; } // "Pending", "Confirmed", "Active", "Completed", "Cancelled", "NoShow"
+        public string Status { get; set; }
         public decimal EnergyConsumed { get; set; }
         public decimal Cost { get; set; }
         public string QRCodeData { get; set; }
@@ -23,7 +23,7 @@ namespace webservice.models
         public DateTime? QRScanTime { get; set; }
         public bool IsCancelled { get; set; }
         public DateTime? CancellationDate { get; set; }
-        public string CancelledBy { get; set; } // "EVOwner", "StationOperator"
+        public string CancelledBy { get; set; } 
         public string CancellationReason { get; set; }
 
     }
