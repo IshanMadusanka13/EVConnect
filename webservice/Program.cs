@@ -9,7 +9,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "EVCONNECT Backend Started!");
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())

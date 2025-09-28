@@ -39,4 +39,3 @@ D:\Projects\EVConnect\webservice\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger
 D:\Projects\EVConnect\webservice\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Projects\EVConnect\webservice\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Projects\EVConnect\webservice\obj\Debug\net9.0\webservice.MvcApplicationPartsAssemblyInfo.cs
-D:\Projects\EVConnect\webservice\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
