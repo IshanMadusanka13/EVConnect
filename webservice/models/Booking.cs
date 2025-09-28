@@ -9,25 +9,23 @@ namespace webservice.models
     public class Booking
     {
         public string Id { get; set; }
-        public string EVOwnerId { get; set; }
         public string StationId { get; set; }
         public string SlotId { get; set; }
+        public DateTime ReservationDate { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public DateTime BookingDateTime { get; set; }
+        public string Status { get; set; } // "Pending", "Confirmed", "Active", "Completed", "Cancelled", "NoShow"
+        public decimal EnergyConsumed { get; set; }
+        public decimal Cost { get; set; }
+        public string QRCodeData { get; set; }
+        public bool QRCodeScanned { get; set; }
+        public DateTime? QRScanTime { get; set; }
+        public bool IsCancelled { get; set; }
+        public DateTime? CancellationDate { get; set; }
+        public string CancelledBy { get; set; } // "EVOwner", "StationOperator"
+        public string CancellationReason { get; set; }
 
-        public DateTime ReservationDateTime { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string Status { get; set; }
-
-        public string QRCode { get; set; }
-        public decimal? PaymentAmount { get; set; }
-        public string? PaymentStatus { get; set; }
-        public string? PaymentMethod { get; set; }
-
-        public DateTime? ApprovedAt { get; set; }
-        public string? ApprovedBy { get; set; }
-        public DateTime? CancelledAt { get; set; }
-        public string? CancelledBy { get; set; }
-        public DateTime? CompletedAt { get; set; }
-        public string? Notes { get; set; }
     }
 
 }
