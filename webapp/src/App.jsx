@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from '../src/pages/Home';
+import BookingManagement from '../src/pages/BookingManagement';
 
 const App = () => {
   return (
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<BookingManagement />} />
         </Routes>
   );
 };
