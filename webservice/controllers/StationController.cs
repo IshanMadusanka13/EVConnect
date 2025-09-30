@@ -10,7 +10,12 @@ namespace webservice.controllers
     [Route("api/[controller]")]
     public class StationController : ControllerBase
     {
-        private readonly StationService _service = new StationService();
+        private readonly StationService _service;
+
+        public StationController(StationService service)
+        {
+            _service = service;
+        }
 
         [HttpGet]
         public async Task<ActionResult<List<Station>>> GetAll()
@@ -30,6 +35,7 @@ namespace webservice.controllers
         [HttpPost]
         public async Task<ActionResult<Station>> Create([FromBody] Station station)
         {
+            Console.WriteLine("Request for create Station!");
             var created = await _service.CreateStationAsync(station);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
