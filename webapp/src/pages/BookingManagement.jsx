@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, Search, Filter, Plus, X, ChevronDown, Bell, Sun, Moon, User, Home, Users, BarChart3, Settings, LogOut, Edit, Trash2, Eye, QrCode, AlertCircle, Check, Zap, Battery, Navigation, TrendingUp, Activity, Star, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  Calendar, Clock, MapPin, Search, Filter, Plus, X, ChevronDown, Bell, Star, ChevronRight,
+  Zap, Battery, Navigation, TrendingUp, Activity, Check, AlertCircle
+} from 'lucide-react';
+import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
 
 const BookingManagement = () => {
+  const { darkMode, getColor } = useContext(ThemeContext);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
@@ -92,22 +96,22 @@ const BookingManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Confirmed': return 'from-emerald-400 to-teal-500';
-      case 'Pending': return 'from-amber-400 to-orange-500';
-      case 'Completed': return 'from-blue-400 to-indigo-500';
-      case 'Cancelled': return 'from-red-400 to-pink-500';
-      default: return 'from-gray-400 to-slate-500';
+      case 'Confirmed': return getColor('status.confirmed');
+      case 'Pending': return getColor('status.pending');
+      case 'Completed': return getColor('status.completed');
+      case 'Cancelled': return getColor('status.cancelled');
+      default: return getColor('status.default');
     }
   };
 
   const getChargerIcon = (type) => {
-    return type === 'DC Fast' ? 
-      <Zap className="w-5 h-5 text-orange-400" /> : 
-      <Battery className="w-5 h-5 text-emerald-400" />;
+    return type === 'DC Fast' ?
+      <Zap className={`w-5 h-5 ${getColor('charger.dc')}`} /> :
+      <Battery className={`w-5 h-5 ${getColor('charger.ac')}`} />;
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-slate-950' : 'bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50'}`}>
+    <div className={`min-h-screen transition-colors duration-500 ${getColor('background.primary')}`}>
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${darkMode ? 'bg-blue-600' : 'bg-blue-400'} animate-pulse`}></div>
@@ -115,25 +119,25 @@ const BookingManagement = () => {
         <div className={`absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-3xl opacity-10 ${darkMode ? 'bg-pink-600' : 'bg-pink-400'} animate-pulse`} style={{ animationDelay: '2s' }}></div>
       </div>
 
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar />
 
       {/* Main Content */}
       <div className="relative pt-24 pb-8 px-4 max-w-7xl mx-auto">
         {/* Header with Gradient */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
-            <div className={`px-3 py-1 rounded-full ${darkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-700'} text-sm font-medium`}>
+            <div className={`px-3 py-1 rounded-full ${getColor('background.accent')} ${getColor('text.accent')} text-sm font-medium`}>
               Dashboard
             </div>
-            <ChevronRight className={`w-4 h-4 ${darkMode ? 'text-slate-600' : 'text-slate-400'}`} />
-            <div className={`px-3 py-1 rounded-full ${darkMode ? 'bg-purple-500/20 text-purple-400' : 'bg-purple-100 text-purple-700'} text-sm font-medium`}>
+            <ChevronRight className={`w-4 h-4 ${getColor('text.tertiary')}`} />
+            <div className={`px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 text-sm font-medium`}>
               Bookings
             </div>
           </div>
-          <h1 className={`text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-4xl font-bold mb-2 ${getColor('text.primary')}`}>
             Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">Bookings</span>
           </h1>
-          <p className={`text-lg ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-lg ${getColor('text.secondary')}`}>
             Manage all your EV charging reservations in one place
           </p>
         </div>
@@ -150,7 +154,7 @@ const BookingManagement = () => {
             return (
               <div
                 key={index}
-                className={`group relative overflow-hidden rounded-2xl ${darkMode ? 'bg-slate-900/50' : 'bg-white'} backdrop-blur-sm border ${darkMode ? 'border-slate-800' : 'border-slate-200'} p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}
+                className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
@@ -163,8 +167,8 @@ const BookingManagement = () => {
                       {stat.change}
                     </span>
                   </div>
-                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'} mb-1`}>{stat.label}</p>
-                  <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{stat.value}</p>
+                  <p className={`text-sm ${getColor('text.secondary')} mb-1`}>{stat.label}</p>
+                  <p className={`text-3xl font-bold ${getColor('text.primary')}`}>{stat.value}</p>
                 </div>
               </div>
             );
@@ -172,24 +176,25 @@ const BookingManagement = () => {
         </div>
 
         {/* Filters Section */}
-        <div className={`${darkMode ? 'bg-slate-900/50' : 'bg-white'} backdrop-blur-sm rounded-2xl border ${darkMode ? 'border-slate-800' : 'border-slate-200'} p-6 mb-6`}>
+        <div className={`${getColor('background.card')} backdrop-blur-sm rounded-2xl border ${getColor('border.primary')} p-6 mb-6`}>
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
-                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')}`} />
                 <input
                   type="text"
                   placeholder="Search bookings..."
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className={`pl-12 pr-4 py-3 rounded-xl border ${darkMode ? 'border-slate-700 bg-slate-800 text-white placeholder-slate-500' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full md:w-80`}
+                  className={`pl-12 pr-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full md:w-80`}
+                  placeholder-className={darkMode ? 'placeholder-slate-500' : 'placeholder-slate-400'}
                 />
               </div>
 
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className={`px-4 py-3 rounded-xl border ${darkMode ? 'border-slate-700 bg-slate-800 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
               >
                 <option value="all">All Status</option>
                 <option value="confirmed">Confirmed</option>
@@ -200,7 +205,7 @@ const BookingManagement = () => {
               <select
                 value={filters.dateRange}
                 onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-                className={`px-4 py-3 rounded-xl border ${darkMode ? 'border-slate-700 bg-slate-800 text-white' : 'border-slate-200 bg-slate-50 text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -225,7 +230,7 @@ const BookingManagement = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className={`${darkMode ? 'bg-slate-900/50' : 'bg-white'} rounded-2xl p-6 animate-pulse border ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <div key={i} className={`${getColor('background.card')} rounded-2xl p-6 animate-pulse border ${getColor('border.primary')}`}>
                 <div className={`h-4 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded w-3/4 mb-4`}></div>
                 <div className={`h-3 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded w-1/2 mb-3`}></div>
                 <div className={`h-3 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded w-2/3 mb-3`}></div>
@@ -238,13 +243,13 @@ const BookingManagement = () => {
             {bookings.map((booking, index) => (
               <div
                 key={booking.id}
-                className={`group relative overflow-hidden rounded-2xl ${darkMode ? 'bg-slate-900/50' : 'bg-white'} backdrop-blur-sm border ${darkMode ? 'border-slate-800' : 'border-slate-200'} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
+                className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
                 style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => setSelectedBooking(booking)}
               >
                 {/* Gradient Border Effect */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${getStatusColor(booking.status)} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
-                
+
                 {/* Status Badge */}
                 <div className="absolute top-4 right-4 z-10">
                   <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getStatusColor(booking.status)} text-white text-xs font-semibold shadow-lg`}>
@@ -255,12 +260,12 @@ const BookingManagement = () => {
                 <div className="relative p-6">
                   {/* Station Info */}
                   <div className="mb-4">
-                    <h3 className={`font-bold text-xl mb-2 ${darkMode ? 'text-white' : 'text-slate-900'} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${getStatusColor(booking.status)} transition-all`}>
+                    <h3 className={`font-bold text-xl mb-2 ${getColor('text.primary')} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${getStatusColor(booking.status)} transition-all`}>
                       {booking.stationName}
                     </h3>
                     <div className="flex items-center gap-2">
-                      <MapPin className={`w-4 h-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-                      <span className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                      <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
+                      <span className={`text-sm ${getColor('text.secondary')}`}>
                         {booking.stationId}
                       </span>
                     </div>
@@ -269,12 +274,12 @@ const BookingManagement = () => {
                   {/* Customer & Vehicle */}
                   <div className={`mb-4 p-3 rounded-xl ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Customer</span>
-                      <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{booking.customerName}</span>
+                      <span className={`text-xs ${getColor('text.tertiary')}`}>Customer</span>
+                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.customerName}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Vehicle</span>
-                      <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{booking.vehicleModel}</span>
+                      <span className={`text-xs ${getColor('text.tertiary')}`}>Vehicle</span>
+                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.vehicleModel}</span>
                     </div>
                   </div>
 
@@ -285,8 +290,8 @@ const BookingManagement = () => {
                         <Calendar className="w-4 h-4 text-white" />
                       </div>
                       <div>
-                        <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Date</p>
-                        <p className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')}`}>Date</p>
+                        <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
                           {new Date(booking.reservationDate).toLocaleDateString()}
                         </p>
                       </div>
@@ -296,8 +301,8 @@ const BookingManagement = () => {
                         <Clock className="w-4 h-4 text-white" />
                       </div>
                       <div>
-                        <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Time Slot</p>
-                        <p className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')}`}>Time Slot</p>
+                        <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
                           {booking.startTime} - {booking.endTime}
                         </p>
                       </div>
@@ -314,7 +319,7 @@ const BookingManagement = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
                         {booking.rating}
                       </span>
                     </div>
@@ -322,16 +327,16 @@ const BookingManagement = () => {
 
                   {/* Energy & Cost for Completed */}
                   {booking.status === 'Completed' && (
-                    <div className={`mt-4 pt-4 border-t ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                    <div className={`mt-4 pt-4 border-t ${getColor('border.primary')}`}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Energy</p>
-                          <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                          <p className={`text-xs ${getColor('text.tertiary')}`}>Energy</p>
+                          <p className={`text-lg font-bold ${getColor('text.primary')}`}>
                             {booking.energyConsumed} kWh
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>Cost</p>
+                          <p className={`text-xs ${getColor('text.tertiary')}`}>Cost</p>
                           <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
                             ${booking.cost}
                           </p>
@@ -343,7 +348,7 @@ const BookingManagement = () => {
 
                 {/* Hover Arrow */}
                 <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ChevronRight className={`w-5 h-5 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`} />
+                  <ChevronRight className={`w-5 h-5 ${getColor('text.secondary')}`} />
                 </div>
               </div>
             ))}
@@ -358,15 +363,15 @@ const BookingManagement = () => {
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
             onClick={() => setSelectedBooking(null)}
           ></div>
-          <div className={`relative ${darkMode ? 'bg-slate-900' : 'bg-white'} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
-            <div className={`sticky top-0 ${darkMode ? 'bg-slate-900' : 'bg-white'} z-10 p-6 border-b ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+          <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
+            <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
               <div className="flex items-center justify-between">
-                <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>
                   Booking Details
                 </h2>
                 <button
                   onClick={() => setSelectedBooking(null)}
-                  className={`p-2 rounded-xl ${darkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'} transition-colors`}
+                  className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -385,22 +390,22 @@ const BookingManagement = () => {
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'} mb-1`}>Customer</p>
-                  <p className={`font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{selectedBooking.customerName}</p>
+                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Customer</p>
+                  <p className={`font-semibold ${getColor('text.primary')}`}>{selectedBooking.customerName}</p>
                 </div>
                 <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'} mb-1`}>Vehicle</p>
-                  <p className={`font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{selectedBooking.vehicleModel}</p>
+                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Vehicle</p>
+                  <p className={`font-semibold ${getColor('text.primary')}`}>{selectedBooking.vehicleModel}</p>
                 </div>
                 <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'} mb-1`}>Date</p>
-                  <p className={`font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Date</p>
+                  <p className={`font-semibold ${getColor('text.primary')}`}>
                     {new Date(selectedBooking.reservationDate).toLocaleDateString()}
                   </p>
                 </div>
                 <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-600'} mb-1`}>Time</p>
-                  <p className={`font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Time</p>
+                  <p className={`font-semibold ${getColor('text.primary')}`}>
                     {selectedBooking.startTime} - {selectedBooking.endTime}
                   </p>
                 </div>
@@ -409,16 +414,16 @@ const BookingManagement = () => {
               {/* Charging Summary */}
               {selectedBooking.status === 'Completed' && (
                 <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
-                  <h3 className={`font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}>Charging Summary</h3>
+                  <h3 className={`font-bold mb-4 ${getColor('text.primary')}`}>Charging Summary</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Energy</p>
-                      <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <p className={`text-sm ${getColor('text.secondary')}`}>Energy</p>
+                      <p className={`text-3xl font-bold ${getColor('text.primary')}`}>
                         {selectedBooking.energyConsumed} <span className="text-lg">kWh</span>
                       </p>
                     </div>
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Cost</p>
+                      <p className={`text-sm ${getColor('text.secondary')}`}>Cost</p>
                       <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
                         ${selectedBooking.cost}
                       </p>
@@ -457,14 +462,15 @@ const BookingManagement = () => {
 
       {/* Create Booking Modal */}
       {showCreateModal && (
-        <CreateBookingModal onClose={() => setShowCreateModal(false)} darkMode={darkMode} />
+        <CreateBookingModal onClose={() => setShowCreateModal(false)} />
       )}
     </div>
   );
 };
 
 // Create Booking Modal Component
-const CreateBookingModal = ({ onClose, darkMode }) => {
+const CreateBookingModal = ({ onClose }) => {
+  const { darkMode, getColor } = useContext(ThemeContext);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     stationId: '',
@@ -482,7 +488,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
   ];
 
   const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', 
+    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
     '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
   ];
 
@@ -497,7 +503,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
-      <div className={`relative ${darkMode ? 'bg-slate-900' : 'bg-white'} rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-slideUp border ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+      <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[100vh] overflow-hidden animate-slideUp border ${getColor('border.primary')}`}>
         {/* Animated Header */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8">
           <div className="absolute inset-0 bg-black/20"></div>
@@ -511,29 +517,35 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
-            
+
             {/* Progress Steps */}
-            <div className="flex items-center justify-between mb-4">
-              {[1, 2, 3, 4].map((s) => (
-                <div key={s} className="flex items-center flex-1">
-                  <div className={`relative w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
-                    step >= s ? 'bg-white text-blue-600 scale-110' : 'bg-white/30 text-white'
-                  }`}>
-                    {step > s ? <Check className="w-6 h-6" /> : s}
+            <div className="mb-2">
+              <div className="flex items-center justify-between">
+                {[1, 2, 3, 4].map((s) => (
+                  <div key={s} className="flex items-center flex-1 last:flex-none">
+                    <div className={`relative w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${step >= s ? 'bg-white text-blue-600 scale-110' : 'bg-white/30 text-white'
+                      }`}>
+                      {step > s ? <Check className="w-6 h-6" /> : s}
+                    </div>
+                    {s < 4 && (
+                      <div className={`flex-1 h-2 mx-2 rounded-full transition-all duration-300 ${step > s ? 'bg-white' : 'bg-white/30'
+                        }`}></div>
+                    )}
                   </div>
-                  {s < 4 && (
-                    <div className={`flex-1 h-2 mx-2 rounded-full transition-all duration-300 ${
-                      step > s ? 'bg-white' : 'bg-white/30'
-                    }`}></div>
-                  )}
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              {['Station', 'Date & Time', 'Slot', 'Confirm'].map((label, idx) => (
+                <div key={label} className="flex items-center flex-1 last:flex-none">
+                  <span className={`text-white text-sm font-medium w-12 text-center ${step === idx + 1 ? 'font-bold' : 'opacity-70'
+                    }`}>
+                    {label}
+                  </span>
+                  {idx < 3 && <div className="flex-1 mx-2"></div>}
                 </div>
               ))}
-            </div>
-            <div className="flex justify-between text-white text-sm font-medium">
-              <span className={step === 1 ? 'font-bold' : 'opacity-70'}>Station</span>
-              <span className={step === 2 ? 'font-bold' : 'opacity-70'}>Date & Time</span>
-              <span className={step === 3 ? 'font-bold' : 'opacity-70'}>Slot</span>
-              <span className={step === 4 ? 'font-bold' : 'opacity-70'}>Confirm</span>
             </div>
           </div>
         </div>
@@ -543,38 +555,37 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
           {/* Step 1: Select Station */}
           {step === 1 && (
             <div className="animate-fadeIn space-y-4">
-              <h3 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Charging Station
               </h3>
               {stations.map((station) => (
                 <div
                   key={station.id}
                   onClick={() => setFormData({ ...formData, stationId: station.id })}
-                  className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
-                    formData.stationId === station.id
-                      ? `border-blue-500 ${darkMode ? 'bg-blue-500/10' : 'bg-blue-50'} scale-105`
-                      : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
-                  }`}
+                  className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${formData.stationId === station.id
+                    ? `border-blue-500 ${darkMode ? 'bg-blue-500/10' : 'bg-blue-50'} scale-105`
+                    : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <h4 className={`text-xl font-bold mb-2 ${getColor('text.primary')}`}>
                         {station.name}
                       </h4>
                       <div className="flex items-center gap-2 mb-3">
-                        <MapPin className={`w-4 h-4 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`} />
-                        <span className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                        <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
+                        <span className={`text-sm ${getColor('text.secondary')}`}>
                           {station.address}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                          <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
                             {station.rating}
                           </span>
                         </div>
-                        <div className={`px-3 py-1 rounded-full ${darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'} text-sm font-semibold`}>
+                        <div className={`px-3 py-1 rounded-full ${getColor('background.success')} ${getColor('text.success')} text-sm font-semibold`}>
                           {station.available} slots available
                         </div>
                       </div>
@@ -591,10 +602,10 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
           {/* Step 2: Select Date & Time */}
           {step === 2 && (
             <div className="animate-fadeIn">
-              <h3 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Pick Your Schedule
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
                   <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
@@ -605,7 +616,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     min={new Date().toISOString().split('T')[0]}
-                    className={`w-full px-6 py-4 rounded-xl border-2 ${darkMode ? 'border-slate-700 bg-slate-800 text-white' : 'border-slate-200 bg-white text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
+                    className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
                   />
                 </div>
 
@@ -617,7 +628,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                     <select
                       value={formData.startTime}
                       onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                      className={`w-full px-6 py-4 rounded-xl border-2 ${darkMode ? 'border-slate-700 bg-slate-800 text-white' : 'border-slate-200 bg-white text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
+                      className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
                     >
                       <option value="">Select time</option>
                       {timeSlots.map((time) => (
@@ -632,7 +643,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                     <select
                       value={formData.endTime}
                       onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                      className={`w-full px-6 py-4 rounded-xl border-2 ${darkMode ? 'border-slate-700 bg-slate-800 text-white' : 'border-slate-200 bg-white text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
+                      className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
                     >
                       <option value="">Select time</option>
                       {timeSlots.map((time) => (
@@ -649,27 +660,25 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       onClick={() => setFormData({ ...formData, chargerType: 'AC' })}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
-                        formData.chargerType === 'AC'
-                          ? 'border-emerald-500 bg-emerald-500/10 scale-105'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
-                      }`}
+                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'AC'
+                        ? 'border-emerald-500 bg-emerald-500/10 scale-105'
+                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                        }`}
                     >
                       <Battery className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
-                      <p className={`text-lg font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>AC Charging</p>
-                      <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Standard • 7-22 kW</p>
+                      <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>AC Charging</p>
+                      <p className={`text-sm ${getColor('text.secondary')}`}>Standard • 7-22 kW</p>
                     </button>
                     <button
                       onClick={() => setFormData({ ...formData, chargerType: 'DC Fast' })}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
-                        formData.chargerType === 'DC Fast'
-                          ? 'border-orange-500 bg-orange-500/10 scale-105'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
-                      }`}
+                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC Fast'
+                        ? 'border-orange-500 bg-orange-500/10 scale-105'
+                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                        }`}
                     >
                       <Zap className="w-12 h-12 mx-auto mb-3 text-orange-500" />
-                      <p className={`text-lg font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>DC Fast</p>
-                      <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Rapid • 50-350 kW</p>
+                      <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>DC Fast</p>
+                      <p className={`text-sm ${getColor('text.secondary')}`}>Rapid • 50-350 kW</p>
                     </button>
                   </div>
                 </div>
@@ -680,7 +689,7 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
           {/* Step 3: Select Slot */}
           {step === 3 && (
             <div className="animate-fadeIn">
-              <h3 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Slot
               </h3>
               <div className="grid grid-cols-4 gap-4 mb-6">
@@ -692,42 +701,39 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                       key={slot}
                       disabled={!isAvailable}
                       onClick={() => isAvailable && setFormData({ ...formData, slotId: `SL00${slot}` })}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${
-                        isSelected
-                          ? 'border-blue-500 bg-blue-500/10 scale-105'
-                          : isAvailable
+                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${isSelected
+                        ? 'border-blue-500 bg-blue-500/10 scale-105'
+                        : isAvailable
                           ? darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                           : darkMode ? 'border-slate-800 bg-slate-800/50 opacity-50' : 'border-slate-100 bg-slate-100 opacity-50'
-                      } ${!isAvailable && 'cursor-not-allowed'}`}
+                        } ${!isAvailable && 'cursor-not-allowed'}`}
                     >
-                      <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-blue-500'
-                          : isAvailable
+                      <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center ${isSelected
+                        ? 'bg-blue-500'
+                        : isAvailable
                           ? darkMode ? 'bg-emerald-500/20' : 'bg-emerald-100'
                           : darkMode ? 'bg-slate-700' : 'bg-slate-200'
-                      }`}>
+                        }`}>
                         {isAvailable ? (
                           <Zap className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-emerald-500'}`} />
                         ) : (
                           <X className={`w-8 h-8 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
                         )}
                       </div>
-                      <p className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-slate-900'}`}>Slot {slot}</p>
-                      <p className={`text-sm mt-1 ${
-                        isAvailable ? 'text-emerald-500 font-semibold' : darkMode ? 'text-slate-500' : 'text-slate-400'
-                      }`}>
+                      <p className={`font-bold text-lg ${getColor('text.primary')}`}>Slot {slot}</p>
+                      <p className={`text-sm mt-1 ${isAvailable ? 'text-emerald-500 font-semibold' : darkMode ? 'text-slate-500' : 'text-slate-400'
+                        }`}>
                         {isAvailable ? 'Available' : 'Occupied'}
                       </p>
                     </button>
                   );
                 })}
               </div>
-              
-              <div className={`p-4 rounded-xl ${darkMode ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-blue-50 border border-blue-200'}`}>
+
+              <div className={`p-4 rounded-xl ${getColor('background.info')} ${getColor('border.info')}`}>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                  <p className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                  <p className={`text-sm ${getColor('text.info')}`}>
                     Your selected slot will be reserved for {formData.startTime} - {formData.endTime}
                   </p>
                 </div>
@@ -738,20 +744,20 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
           {/* Step 4: Review & Confirm */}
           {step === 4 && (
             <div className="animate-fadeIn">
-              <h3 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Review Your Booking
               </h3>
-              
+
               <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-slate-50 to-slate-100'} space-y-4 mb-6`}>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-                  <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Station</span>
-                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Station</span>
+                  <span className={`font-bold text-lg ${getColor('text.primary')}`}>
                     {stations.find(s => s.id === formData.stationId)?.name}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-                  <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Date</span>
-                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Date</span>
+                  <span className={`font-bold text-lg ${getColor('text.primary')}`}>
                     {formData.date && new Date(formData.date).toLocaleDateString('en-US', {
                       weekday: 'short',
                       month: 'short',
@@ -760,14 +766,14 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-                  <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Time</span>
-                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Time</span>
+                  <span className={`font-bold text-lg ${getColor('text.primary')}`}>
                     {formData.startTime} - {formData.endTime}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
-                  <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Charger Type</span>
-                  <span className={`font-bold text-lg flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Charger Type</span>
+                  <span className={`font-bold text-lg flex items-center gap-2 ${getColor('text.primary')}`}>
                     {formData.chargerType === 'AC' ? (
                       <Battery className="w-5 h-5 text-emerald-500" />
                     ) : (
@@ -777,14 +783,14 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-3">
-                  <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Slot</span>
-                  <span className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Slot</span>
+                  <span className={`font-bold text-lg ${getColor('text.primary')}`}>
                     {formData.slotId}
                   </span>
                 </div>
-                <div className={`pt-4 mt-4 border-t-2 ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
+                <div className={`pt-4 mt-4 border-t-2 ${getColor('border.primary')}`}>
                   <div className="flex items-center justify-between">
-                    <span className={`text-lg font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Estimated Cost</span>
+                    <span className={`text-lg font-medium ${getColor('text.secondary')}`}>Estimated Cost</span>
                     <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
                       $18.50
                     </span>
@@ -792,10 +798,10 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl ${darkMode ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-amber-50 border border-amber-200'}`}>
+              <div className={`p-4 rounded-xl ${getColor('background.warning')} ${getColor('border.warning')}`}>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div className={`text-sm ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>
+                  <div className={`text-sm ${getColor('text.warning')}`}>
                     <p className="font-semibold mb-2">Booking Policy</p>
                     <ul className="space-y-1">
                       <li>• Free cancellation up to 12 hours before</li>
@@ -810,8 +816,8 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className={`border-t ${darkMode ? 'border-slate-800' : 'border-slate-200'} p-6`}>
-          <div className="flex gap-3">
+        <div className={`border-t ${getColor('border.primary')} p-6`}>
+          <div className="flex gap-3 ">
             {step > 1 && (
               <button
                 onClick={prevStep}
@@ -850,71 +856,4 @@ const CreateBookingModal = ({ onClose, darkMode }) => {
   );
 };
 
-// Custom Styles
-const styles = `
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-
-  .animate-slideUp {
-    animation: slideUp 0.4s ease-out forwards;
-  }
-
-  .animate-scaleIn {
-    animation: scaleIn 0.3s ease-out forwards;
-  }
-
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to bottom, #2563eb, #7c3aed);
-  }
-`;
-
-export default function App() {
-  return (
-    <>
-      <style>{styles}</style>
-      <BookingManagement />
-    </>
-  );
-}
+export default BookingManagement;

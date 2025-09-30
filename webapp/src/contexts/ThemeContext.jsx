@@ -1,4 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
+// src/contexts/ThemeContext.jsx
+import React, { createContext, useState, useEffect, useMemo } from 'react';
+import { colors, getThemeColor } from '../theme/colors';
 
 export const ThemeContext = createContext();
 
@@ -43,9 +45,21 @@ export const ThemeProvider = ({ children }) => {
       localStorage.setItem('theme', 'light');
     }
   };
+
+  // Create a color helper function
+  const getColor = (colorPath) => getThemeColor(darkMode ? 'dark' : 'light', colorPath);
+  
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    darkMode, 
+    toggleTheme, 
+    setTheme,
+    colors: darkMode ? colors.dark : colors.light,
+    getColor
+  }), [darkMode]);
   
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
