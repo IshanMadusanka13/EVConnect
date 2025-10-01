@@ -18,7 +18,7 @@ export default function UserManagementPage() {
   // Load users from backend
   useEffect(() => {
     axios
-      .get("http://localhost:5116/api/users")
+      .get("http://localhost:5116/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -32,15 +32,15 @@ export default function UserManagementPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5116/api/users", {
-        EmployeeId: form.EmployeeId,
-        FirstName: form.FirstName,
-        LastName: form.LastName,
-        PhoneNumber: form.PhoneNumber,
-        Email: form.Email,
-        Password: form.Password,
-        Role: form.Role,
-        IsActive: form.IsActive,
+      const res = await axios.post("http://localhost:5116/users/register", {
+        employeeId: form.EmployeeId,
+        firstName: form.FirstName,
+        lastName: form.LastName,
+        phoneNumber: form.PhoneNumber,
+        email: form.Email,
+        password: form.Password,
+        role: form.Role,
+        isActive: form.IsActive,
       });
 
       setUsers([...users, res.data]);
