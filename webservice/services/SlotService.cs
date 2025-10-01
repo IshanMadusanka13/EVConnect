@@ -44,57 +44,10 @@ namespace webservice.services
             return await _slots.Find(s => s.ChargerType == chargerType).ToListAsync();
         }
 
-        public async Task<List<Slot>> CreateSlotAsync(CreateSlotRequest createSlotRequest)
+        public async Task<Slot> CreateSlotAsync(Slot slot)
         {
-            var createdSlots = new List<Slot>();
-
-            var existingSlots = await _slots.Find(s => s.StationId == createSlotRequest.StationId)
-                                             .ToListAsync();
-
-            int nextSlotNumber = 1;
-            if (existingSlots.Any())
-            {
-                var maxSlotNumber = existingSlots
-                    .Select(s => int.Parse(s.SlotNumber.Replace("SLOT", "")))
-                    .Max();
-                nextSlotNumber = maxSlotNumber + 1;
-            }
-
-            for (int i = 0; i < createSlotRequest.AcCount; i++)
-            {
-                var slot = new Slot
-                {
-                    SlotId = Guid.NewGuid().ToString(),
-                    SlotNumber = $"SLOT{nextSlotNumber:D3}",
-                    ChargerType = "AC",
-                    ChargingRate = createSlotRequest.AcRate,
-                    IsOperational = true,
-                    StationId = createSlotRequest.StationId
-                };
-
-                await _slots.InsertOneAsync(slot);
-                createdSlots.Add(slot);
-                nextSlotNumber++;
-            }
-
-            for (int i = 0; i < createSlotRequest.DcCount; i++)
-            {
-                var slot = new Slot
-                {
-                    SlotId = Guid.NewGuid().ToString(),
-                    SlotNumber = $"SLOT{nextSlotNumber:D3}",
-                    ChargerType = "DC",
-                    ChargingRate = createSlotRequest.DcRate,
-                    IsOperational = true,
-                    StationId = createSlotRequest.StationId
-                };
-
-                await _slots.InsertOneAsync(slot);
-                createdSlots.Add(slot);
-                nextSlotNumber++;
-            }
-
-            return createdSlots;
+            await _slots.InsertOneAsync(slot);
+            return slot;
         }
 
         public async Task<bool> UpdateSlotAsync(string id, Slot slot)

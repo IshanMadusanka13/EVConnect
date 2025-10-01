@@ -11,7 +11,6 @@ namespace webservice.models
     public string SlotId { get; set; }
     public string SlotNumber { get; set; }
     public string ChargerType { get; set; }
-    public decimal ChargingRate { get; set; }
     public bool IsOperational { get; set; }
     public string StationId { get; set; }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using webservice.data;
+using webservice.dto;
 using webservice.models;
 
 namespace webservice.services
@@ -53,34 +54,97 @@ namespace webservice.services
             }
         }
 
-        public async Task<Station> CreateStationAsync(Station station)
+        public async Task<Station> CreateStationAsync(CreateStationRequest request)
         {
-            var lastStation = await _stations
-                .Find(s => s.Id != null && s.Id.StartsWith("ST"))
-                .SortByDescending(s => s.Id)
-                .FirstOrDefaultAsync();
-
-            Console.WriteLine(station.StationName);
-
-            int nextNumber = 1;
-            if (lastStation != null && int.TryParse(lastStation.Id.Substring(2), out int lastNumber))
-            {
-                nextNumber = lastNumber + 1;
-            }
-
-            station.Id = $"ST{nextNumber:D3}";
-            station.IsActive = true;
-
-            _logger.LogInformation($"Creating station: {station.StationName} ({station.Id})");
+            _logger.LogInformation("Creating new station");
             try
             {
+                var lastStation = await _stations
+                    .Find(s => s.Id != null && s.Id.StartsWith("ST"))
+                    .SortByDescending(s => s.Id)
+                    .FirstOrDefaultAsync();
+
+                int nextNumber = 1;
+                if (lastStation != null && int.TryParse(lastStation.Id.Substring(2), out int lastNumber))
+                {
+                    nextNumber = lastNumber + 1;
+                }
+
+                var station = new Station
+                {
+                    Id = $"ST{nextNumber:D3}",
+                    StationName = request.StationName,
+                    Address = request.Address,
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
+                    AcChargingRate = request.AcChargingRate,
+                    DcChargingRate = request.DcChargingRate,
+                    IsActive = true,
+                    OperatorId = request.OperatorId
+                };
+
                 await _stations.InsertOneAsync(station);
-                _logger.LogInformation($"Station created: {station.Id}");
+                _logger.LogInformation($"Station created with id: {station.Id}");
+
+                // Create slots for the station
+                var slotService = new SlotService();
+                int acCount = (int)request.AcCount;
+                int dcCount = (int)request.DcCount;
+                int slotNumber = 1;
+                var slotTasks = new List<Task>();
+                for (int i = 0; i < acCount; i++)
+                {
+                    var slot = new Slot
+                    {
+                        SlotId = station.Id + $"-SLOT{slotNumber:D3}",
+                        SlotNumber = $"SLOT{slotNumber:D3}",
+                        StationId = station.Id,
+                        ChargerType = "AC",
+                        IsOperational = true
+                    };
+                    slotTasks.Add(slotService.CreateSlotAsync(slot));
+                    slotNumber++;
+                }
+                for (int i = 0; i < dcCount; i++)
+                {
+                    var slot = new Slot
+                    {
+                        SlotId = station.Id + $"-SLOT{slotNumber:D3}",
+                        SlotNumber = $"SLOT{slotNumber:D3}",
+                        StationId = station.Id,
+                        ChargerType = "DC",
+                        IsOperational = true
+                    };
+                    slotTasks.Add(slotService.CreateSlotAsync(slot));
+                    slotNumber++;
+                }
+                await Task.WhenAll(slotTasks);
+
+                // Add station schedules if provided
+                if (request.Schedules != null && request.Schedules.Count > 0)
+                {
+                    var scheduleService = new StationScheduleService();
+                    var scheduleTasks = new List<Task>();
+                    foreach (var schedule in request.Schedules)
+                    {
+                        var stationSchedule = new StationSchedule
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            StationId = station.Id,
+                            DayOfWeek = schedule.DayOfWeek,
+                            OpeningTime = schedule.OpeningTime,
+                            ClosingTime = schedule.ClosingTime
+                        };
+                        scheduleTasks.Add(scheduleService.CreateStationScheduleAsync(stationSchedule));
+                    }
+                    await Task.WhenAll(scheduleTasks);
+                }
+
                 return station;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error creating station: {station.Id}");
+                _logger.LogError(ex, "Error creating station");
                 throw;
             }
         }

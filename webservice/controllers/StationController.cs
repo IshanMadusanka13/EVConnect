@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using webservice.dto;
 using webservice.models;
 using webservice.services;
 
@@ -33,11 +34,11 @@ namespace webservice.controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Station>> Create([FromBody] Station station)
+        public async Task<ActionResult<Station>> Create([FromBody] CreateStationRequest station)
         {
             Console.WriteLine("Request for create Station!");
             var created = await _service.CreateStationAsync(station);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return Ok(created);
         }
 
         [HttpPut("{id}")]

@@ -116,9 +116,9 @@ const StationManagement = () => {
                 )}
             </div>
 
-            {showCreateModal && (
+            {showCreateModal ? (
                 <CreateStationModal onClose={() => setShowCreateModal(false)} onCreate={handleCreateStation} />
-            )}
+            ) : null}
 
             {selectedStation && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
@@ -162,68 +162,95 @@ const StationManagement = () => {
 const CreateStationModal = ({ onClose, onCreate }) => {
     const { darkMode, getColor } = useContext(ThemeContext);
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({
+    const [stationForm, setStationForm] = useState({
         stationName: '',
         address: '',
-        OperatorId: '',
+        operatorId: '',
         latitude: '',
-        longitude: ''
+        longitude: '',
+        acChargingRate: '',
+        dcChargingRate: '',
+        acCount: '',
+        dcCount: '',
+        schedules: []
     });
-    const [stationId, setStationId] = useState('');
     const [showMap, setShowMap] = useState(false);
     const [slotData, setSlotData] = useState({ acCount: '', dcCount: '', acRate: '', dcRate: '' });
-    const [scheduleData, setScheduleData] = useState([]);
     const [scheduleStep, setScheduleStep] = useState({ dayOfWeek: '', openingTime: '', closingTime: '' });
 
     // Step 1: Station Details
     const handleMapPick = (lat, lng) => {
-        setFormData({ ...formData, latitude: lat, longitude: lng });
+        setStationForm(prev => ({ ...prev, latitude: lat, longitude: lng }));
         setShowMap(false);
     };
 
     const handleDetailsSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.stationName || !formData.address || !formData.latitude || !formData.longitude || !formData.OperatorId) return;
-        // Send station details to BE
-        const created = await api.addStation(formData);
-        if (created && created.id) setStationId(created.id);
         setStep(2);
     };
 
     // Step 2: Slot Details
     const handleSlotSubmit = async (e) => {
         e.preventDefault();
-        if (!stationId) return;
-        await api.addStationSlot({
-            stationId,
+        setStationForm(prev => ({
+            ...prev,
             acCount: slotData.acCount,
             dcCount: slotData.dcCount,
-            acRate: slotData.acRate,
-            dcRate: slotData.dcRate
-        });
+            acChargingRate: slotData.acRate,
+            dcChargingRate: slotData.dcRate
+        }));
         setStep(3);
     };
 
     // Step 3: Schedule Details
     const handleScheduleAdd = (e) => {
         e.preventDefault();
-        if (!stationId || !scheduleStep.dayOfWeek || !scheduleStep.openingTime || !scheduleStep.closingTime) return;
-        setScheduleData([...scheduleData, {
-            stationId,
-            dayOfWeek: scheduleStep.dayOfWeek,
-            openingTime: scheduleStep.openingTime,
-            closingTime: scheduleStep.closingTime
-        }]);
+        if (!scheduleStep.dayOfWeek || !scheduleStep.openingTime || !scheduleStep.closingTime) return;
+        setStationForm(prev => ({
+            ...prev,
+            schedules: [
+                ...prev.schedules,
+                {
+                    dayOfWeek: scheduleStep.dayOfWeek,
+                    openingTime: scheduleStep.openingTime,
+                    closingTime: scheduleStep.closingTime
+                }
+            ]
+        }));
         setScheduleStep({ dayOfWeek: '', openingTime: '', closingTime: '' });
     };
 
     const handleScheduleSubmit = async (e) => {
         e.preventDefault();
-        for (const sched of scheduleData) {
-            await api.addStationSchedule(sched);
+        // Prepare payload matching CreateStationRequest DTO
+        const payload = {
+            StationName: stationForm.stationName,
+            Address: stationForm.address,
+            Latitude: parseFloat(stationForm.latitude),
+            Longitude: parseFloat(stationForm.longitude),
+            OperatorId: stationForm.operatorId,
+            AcChargingRate: parseFloat(stationForm.acChargingRate),
+            DcChargingRate: parseFloat(stationForm.dcChargingRate),
+            AcCount: parseInt(stationForm.acCount),
+            DcCount: parseInt(stationForm.dcCount),
+            Schedules: stationForm.schedules.map(s => ({
+                DayOfWeek: s.dayOfWeek,
+                OpeningTime: s.openingTime,
+                ClosingTime: s.closingTime
+            }))
+        };
+        try {
+            console.log('Submitting payload:', payload);
+            const res = await api.addStation(payload);
+            if (res && res.id) {
+                onCreate();
+                onClose();
+            } else {
+                alert('Failed to create station');
+            }
+        } catch (err) {
+            alert('Error creating station');
         }
-        // Refresh station list and close modal
-        await onCreate();
     };
 
     return (
@@ -245,8 +272,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                 <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Station Name</label>
                                 <input
                                     type="text"
-                                    value={formData.stationName}
-                                    onChange={e => setFormData({ ...formData, stationName: e.target.value })}
+                                    value={stationForm.stationName}
+                                    onChange={e => setStationForm(prev => ({ ...prev, stationName: e.target.value }))}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                                     required
                                 />
@@ -255,8 +282,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                 <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Address</label>
                                 <input
                                     type="text"
-                                    value={formData.address}
-                                    onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                    value={stationForm.address}
+                                    onChange={e => setStationForm(prev => ({ ...prev, address: e.target.value }))}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                                     required
                                 />
@@ -265,8 +292,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                 <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>OperatorId</label>
                                 <input
                                     type="text"
-                                    value={formData.OperatorId}
-                                    onChange={e => setFormData({ ...formData, OperatorId: e.target.value })}
+                                    value={stationForm.operatorId}
+                                    onChange={e => setStationForm(prev => ({ ...prev, operatorId: e.target.value }))}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                                     required
                                 />
@@ -276,8 +303,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Latitude</label>
                                     <input
                                         type="number"
-                                        value={formData.latitude}
-                                        onChange={e => setFormData({ ...formData, latitude: e.target.value })}
+                                        value={stationForm.latitude}
+                                        onChange={e => setStationForm(prev => ({ ...prev, latitude: e.target.value }))}
                                         className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                                         required
                                         step="any"
@@ -288,8 +315,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Longitude</label>
                                     <input
                                         type="number"
-                                        value={formData.longitude}
-                                        onChange={e => setFormData({ ...formData, longitude: e.target.value })}
+                                        value={stationForm.longitude}
+                                        onChange={e => setStationForm(prev => ({ ...prev, longitude: e.target.value }))}
                                         className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
                                         required
                                         step="any"
@@ -335,7 +362,7 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                 />
                             </div>
                             <div>
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Number of DC Chargers</label>
+                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Number of DC Charges</label>
                                 <input
                                     type="number"
                                     value={slotData.dcCount}
@@ -370,7 +397,6 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     value={scheduleStep.dayOfWeek}
                                     onChange={e => setScheduleStep({ ...scheduleStep, dayOfWeek: e.target.value })}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
                                 >
                                     <option value="">Select Day</option>
                                     {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
@@ -385,7 +411,6 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     value={scheduleStep.openingTime}
                                     onChange={e => setScheduleStep({ ...scheduleStep, openingTime: e.target.value })}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
                                 />
                             </div>
                             <div className="mb-4">
@@ -395,7 +420,6 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     value={scheduleStep.closingTime}
                                     onChange={e => setScheduleStep({ ...scheduleStep, closingTime: e.target.value })}
                                     className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
                                 />
                             </div>
                             <button
@@ -406,9 +430,9 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                 Add Schedule
                             </button>
                             <div className="mb-4">
-                                {scheduleData.length > 0 && (
+                                {stationForm.schedules.length > 0 && (
                                     <ul className="list-disc pl-6">
-                                        {scheduleData.map((sched, idx) => (
+                                        {stationForm.schedules.map((sched, idx) => (
                                             <li key={idx} className={`text-sm ${getColor('text.primary')}`}>
                                                 {sched.dayOfWeek}: {sched.openingTime} - {sched.closingTime}
                                             </li>
