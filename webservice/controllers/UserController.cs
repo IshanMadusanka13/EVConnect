@@ -9,7 +9,7 @@ using System.Text;
 namespace webservice.controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("users")]
     public class UsersController : ControllerBase
     {
         private readonly DBConnect _db;

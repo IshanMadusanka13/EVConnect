@@ -4,21 +4,21 @@ import axios from "axios";
 export default function UserManagementPage() {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
-    employeeId: "",
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    role: "StationOperator",
-    isActive: true,
+    EmployeeId: "",
+    FirstName: "",
+    LastName: "",
+    PhoneNumber: "",
+    Email: "",
+    Password: "",
+   // ConfirmPassword: "",
+    Role: "StationOperator",
+    IsActive: true,
   });
 
   // Load users from backend
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users")
+      .get("http://localhost:5116/api/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -26,36 +26,36 @@ export default function UserManagementPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (form.password !== form.confirmPassword) {
+    if (form.Password !== form.ConfirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/users/register",
-        {
-          employeeId: form.employeeId,
-          firstName: form.firstName,
-          lastName: form.lastName,
-          phoneNumber: form.phoneNumber,
-          email: form.email,
-          password: form.password,
-          role: form.role,
-          isActive: form.isActive,
-        }
-      );
+      const res = await axios.post("http://localhost:5116/api/users", {
+        EmployeeId: form.EmployeeId,
+        FirstName: form.FirstName,
+        LastName: form.LastName,
+        PhoneNumber: form.PhoneNumber,
+        Email: form.Email,
+        Password: form.Password,
+        Role: form.Role,
+        IsActive: form.IsActive,
+      });
+
       setUsers([...users, res.data]);
+
+      // Reset form
       setForm({
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        role: "StationOperator",
-        isActive: true,
+        EmployeeId: "",
+        FirstName: "",
+        LastName: "",
+        PhoneNumber: "",
+        Email: "",
+        Password: "",
+        ConfirmPassword: "",
+        Role: "StationOperator",
+        IsActive: true,
       });
     } catch (err) {
       console.error(err);
@@ -79,8 +79,8 @@ export default function UserManagementPage() {
           <input
             type="text"
             placeholder="Employee ID"
-            value={form.employeeId}
-            onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
+            value={form.EmployeeId}
+            onChange={(e) => setForm({ ...form, EmployeeId: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -88,8 +88,8 @@ export default function UserManagementPage() {
           <input
             type="text"
             placeholder="First Name"
-            value={form.firstName}
-            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+            value={form.FirstName}
+            onChange={(e) => setForm({ ...form, FirstName: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -97,8 +97,8 @@ export default function UserManagementPage() {
           <input
             type="text"
             placeholder="Last Name"
-            value={form.lastName}
-            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+            value={form.LastName}
+            onChange={(e) => setForm({ ...form, LastName: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -106,8 +106,8 @@ export default function UserManagementPage() {
           <input
             type="text"
             placeholder="Phone Number"
-            value={form.phoneNumber}
-            onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+            value={form.PhoneNumber}
+            onChange={(e) => setForm({ ...form, PhoneNumber: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -115,8 +115,8 @@ export default function UserManagementPage() {
           <input
             type="email"
             placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            value={form.Email}
+            onChange={(e) => setForm({ ...form, Email: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -124,8 +124,8 @@ export default function UserManagementPage() {
           <input
             type="password"
             placeholder="Password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            value={form.Password}
+            onChange={(e) => setForm({ ...form, Password: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
@@ -133,15 +133,15 @@ export default function UserManagementPage() {
           <input
             type="password"
             placeholder="Confirm Password"
-            value={form.confirmPassword}
-            onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+            value={form.ConfirmPassword}
+            onChange={(e) => setForm({ ...form, ConfirmPassword: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
 
           <select
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            value={form.Role}
+            onChange={(e) => setForm({ ...form, Role: e.target.value })}
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
           >
             <option value="Backoffice">Backoffice</option>
@@ -169,14 +169,14 @@ export default function UserManagementPage() {
               className="flex items-center justify-between p-4 transition-transform shadow-md rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-purple-700 dark:via-pink-700 dark:to-blue-700 hover:scale-105"
             >
               <span className="font-medium text-gray-800 dark:text-gray-100">
-                {user.firstName} {user.lastName} ({user.employeeId})
+                {user.FirstName} {user.LastName} ({user.EmployeeId})
               </span>
               <span
                 className={`px-4 py-1 rounded-full text-sm font-semibold text-white ${
-                  user.role === "Backoffice" ? "bg-red-500" : "bg-blue-500"
+                  user.Role === "Backoffice" ? "bg-red-500" : "bg-blue-500"
                 }`}
               >
-                {user.role}
+                {user.Role}
               </span>
             </li>
           ))}
