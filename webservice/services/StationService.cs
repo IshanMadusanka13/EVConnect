@@ -5,8 +5,10 @@ using MongoDB.Driver;
 using webservice.data;
 using webservice.dto;
 using webservice.models;
+using webservice.dto;
 
 namespace webservice.services
+// ...existing code...
 {
     public class StationService
     {
@@ -96,7 +98,7 @@ namespace webservice.services
                 {
                     var slot = new Slot
                     {
-                        SlotId = station.Id + $"-SLOT{slotNumber:D3}",
+                        Id = station.Id + $"-SLOT{slotNumber:D3}",
                         SlotNumber = $"SLOT{slotNumber:D3}",
                         StationId = station.Id,
                         ChargerType = "AC",
@@ -109,7 +111,7 @@ namespace webservice.services
                 {
                     var slot = new Slot
                     {
-                        SlotId = station.Id + $"-SLOT{slotNumber:D3}",
+                        Id = station.Id + $"-SLOT{slotNumber:D3}",
                         SlotNumber = $"SLOT{slotNumber:D3}",
                         StationId = station.Id,
                         ChargerType = "DC",
@@ -185,6 +187,43 @@ namespace webservice.services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error deleting station: {id}");
+                throw;
+            }
+        }
+
+        public async Task<StationDetailsResponse?> GetStationAllDetailsByIdAsync(string id)
+        {
+            _logger.LogInformation($"Fetching all details for station id: {id}");
+            try
+            {
+                var station = await GetStationByIdAsync(id);
+                if (station == null)
+                {
+                    _logger.LogWarning($"Station not found: {id}");
+                    return new StationDetailsResponse
+                    {
+                        Station = null,
+                        Slots = null,
+                        Schedules = null
+                    };
+                }
+
+                var slotService = new SlotService();
+                var slots = (await slotService.GetSlotsByStationIdAsync(id)).OrderBy(s => s.SlotNumber).ToList();
+
+                var scheduleService = new StationScheduleService();
+                var schedules = (await scheduleService.GetSchedulesByStationIdAsync(id)).OrderBy(s => s.DayOfWeek).ToList();
+
+                return new StationDetailsResponse
+                {
+                    Station = station,
+                    Slots = slots,
+                    Schedules = schedules
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error fetching all details for station id: {id}");
                 throw;
             }
         }

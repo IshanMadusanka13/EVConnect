@@ -33,6 +33,14 @@ namespace webservice.controllers
             return Ok(station);
         }
 
+        [HttpGet("all/{id}")]
+        public async Task<ActionResult<StationDetailsResponse>> GetStationAllDetailsByIdAsync(string id)
+        {
+            var station = await _service.GetStationAllDetailsByIdAsync(id);
+            if (station == null) return NotFound();
+            return Ok(station);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Station>> Create([FromBody] CreateStationRequest station)
         {

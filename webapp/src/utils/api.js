@@ -96,6 +96,10 @@ export const api = {
     fetchApi('/Station', { 
       method: 'GET'
     }),
+  getStationAllDetails: (id) => 
+    fetchApi(`/Station/all/${id}`, { 
+      method: 'GET'
+    }),
 
 };
 

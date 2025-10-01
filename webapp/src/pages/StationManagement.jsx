@@ -10,6 +10,8 @@ const StationManagement = () => {
     const [stations, setStations] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedStation, setSelectedStation] = useState(null);
+    const [stationDetails, setStationDetails] = useState(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,6 +33,20 @@ const StationManagement = () => {
         const data = await api.getAllStation();
         setStations(Array.isArray(data) ? data : []);
         setShowCreateModal(false);
+    };
+
+    // Fetch station details when a card is clicked
+    const handleCardClick = async (station) => {
+        console.log('Clicked station:', station);
+        setSelectedStation(station);
+        setDetailsLoading(true);
+        try {
+            const details = await api.getStationAllDetails(station.id || station.Id);
+            setStationDetails(details);
+        } catch (err) {
+            setStationDetails(null);
+        }
+        setDetailsLoading(false);
     };
 
     return (
@@ -94,7 +110,7 @@ const StationManagement = () => {
                                 <div
                                     key={station.id}
                                     className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
-                                    onClick={() => setSelectedStation(station)}
+                                    onClick={() => handleCardClick(station)}
                                 >
                                     <div className="relative p-6">
                                         <h3 className={`font-bold text-xl mb-2 ${getColor('text.primary')} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r from-blue-500 to-purple-500 transition-all`}>
@@ -122,34 +138,80 @@ const StationManagement = () => {
 
             {selectedStation && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setSelectedStation(null)}></div>
-                    <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { setSelectedStation(null); setStationDetails(null); }}></div>
+                    <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
                         <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
                             <div className="flex items-center justify-between">
                                 <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>Station Details</h2>
-                                <button onClick={() => setSelectedStation(null)} className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}>
+                                <button onClick={() => { setSelectedStation(null); setStationDetails(null); }} className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}>
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
                         <div className="p-6">
-                            <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500`}>
-                                <h3 className="text-2xl font-bold text-white mb-2">{selectedStation.stationName}</h3>
-                                <div className="flex items-center gap-2 text-white/90">
-                                    <MapPin className="w-4 h-4" />
-                                    <span className="text-sm">{selectedStation.address}</span>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6 mb-6">
-                                <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Latitude</p>
-                                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedStation.latitude}</p>
-                                </div>
-                                <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Longitude</p>
-                                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedStation.longitude}</p>
-                                </div>
-                            </div>
+                            {detailsLoading ? (
+                                <div className="text-center text-lg py-12 text-gray-400">Loading details...</div>
+                            ) : stationDetails ? (
+                                <>
+                                    <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex flex-col md:flex-row gap-8 items-center`}>
+                                        <div className="flex-1">
+                                            <h3 className="text-2xl font-bold text-white mb-2">{stationDetails.station?.stationName}</h3>
+                                            <div className="flex items-center gap-2 text-white/90 mb-2">
+                                                <MapPin className="w-4 h-4" />
+                                                <span className="text-sm">{stationDetails.station?.address}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1 flex justify-center items-center">
+                                            {stationDetails.station?.latitude && stationDetails.station?.longitude ? (
+                                                <div className="w-64 h-48 rounded-2xl overflow-hidden border border-white/30 bg-white">
+                                                    <MapPicker
+                                                        lat={stationDetails.station.latitude}
+                                                        lng={stationDetails.station.longitude}
+                                                        pinOnly={true}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="text-white/70">No location data</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="mb-6">
+                                        <h4 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Slots</h4>
+                                        {stationDetails.slots && stationDetails.slots.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                                {stationDetails.slots.map((slot) => (
+                                                    <div key={slot.slotId} className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className={`font-semibold ${getColor('text.primary')}`}>{slot.slotNumber}</span>
+                                                            <span className={`text-xs px-2 py-1 rounded-full ${slot.chargerType === 'AC' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{slot.chargerType}</span>
+                                                        </div>
+                                                        <div className={`text-sm ${getColor('text.secondary')}`}>Operational: {slot.isOperational ? 'Yes' : 'No'}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-400">No slots found.</div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h4 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Schedules</h4>
+                                        {stationDetails.schedules && stationDetails.schedules.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {stationDetails.schedules.map((schedule) => (
+                                                    <div key={schedule.id} className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                                                        <div className="font-semibold mb-1">{schedule.dayOfWeek}</div>
+                                                        <div className={`text-sm ${getColor('text.secondary')}`}>Open: {schedule.openingTime} - {schedule.closingTime}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-400">No schedules found.</div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center text-lg py-12 text-gray-400">No details found.</div>
+                            )}
                         </div>
                     </div>
                 </div>

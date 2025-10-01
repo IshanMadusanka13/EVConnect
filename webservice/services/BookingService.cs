@@ -99,7 +99,7 @@ namespace webservice.services
             {
                 Id = Guid.NewGuid().ToString(),
                 StationId = stationId,
-                SlotId = availableSlot.SlotId,
+                SlotId = availableSlot.Id,
                 ReservationDate = reservationDate,
                 StartTime = startTime,
                 EndTime = endTime,
@@ -178,7 +178,7 @@ namespace webservice.services
 
             // Update booking
             var update = Builders<Booking>.Update
-                .Set(b => b.SlotId, availableSlot.SlotId)
+                .Set(b => b.SlotId, availableSlot.Id)
                 .Set(b => b.ReservationDate, newReservationDate)
                 .Set(b => b.StartTime, newStartTime)
                 .Set(b => b.EndTime, newEndTime);
@@ -236,7 +236,7 @@ namespace webservice.services
 
             // Remove slots that are already booked during the requested time
             var bookedSlotIds = existingBookings.Select(b => b.SlotId).ToHashSet();
-            availableSlots = availableSlots.Where(s => !bookedSlotIds.Contains(s.SlotId)).ToList();
+            availableSlots = availableSlots.Where(s => !bookedSlotIds.Contains(s.Id)).ToList();
 
             return availableSlots;
         }
@@ -255,7 +255,7 @@ namespace webservice.services
                 
                 // Re-filter available slots excluding conflicts from other bookings
                 var allSlots = await _slotService.GetSlotsByStationIdAsync(stationId);
-                availableSlots = allSlots.Where(s => s.IsOperational && s.ChargerType == chargerType && !conflictingSlotIds.Contains(s.SlotId)).ToList();
+                availableSlots = allSlots.Where(s => s.IsOperational && s.ChargerType == chargerType && !conflictingSlotIds.Contains(s.Id)).ToList();
             }
 
             return availableSlots.FirstOrDefault();
