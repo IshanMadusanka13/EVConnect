@@ -4,9 +4,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Register MongoDB connection as singleton
 builder.Services.AddSingleton<DBConnect>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<webservice.services.StationService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5173")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
 
 // ✅ Add CORS policy for React frontend
 builder.Services.AddCors(options =>
@@ -20,6 +36,10 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowSpecificOrigin");
+
+app.UseCors("AllowSpecificOrigin");
 
 // ✅ Use CORS before controllers
 app.UseCors("AllowReactApp");

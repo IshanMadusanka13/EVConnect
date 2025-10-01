@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using webservice.data;
+using webservice.dto;
 using webservice.models;
 
 namespace webservice.services
@@ -25,7 +26,7 @@ namespace webservice.services
 
         public async Task<Slot> GetSlotByIdAsync(string id)
         {
-            return await _slots.Find(s => s.SlotId == id).FirstOrDefaultAsync();
+            return await _slots.Find(s => s.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<List<Slot>> GetSlotsByStationIdAsync(string stationId)
@@ -51,20 +52,20 @@ namespace webservice.services
 
         public async Task<bool> UpdateSlotAsync(string id, Slot slot)
         {
-            var result = await _slots.ReplaceOneAsync(s => s.SlotId == id, slot);
+            var result = await _slots.ReplaceOneAsync(s => s.Id == id, slot);
             return result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeleteSlotAsync(string id)
         {
-            var result = await _slots.DeleteOneAsync(s => s.SlotId == id);
+            var result = await _slots.DeleteOneAsync(s => s.Id == id);
             return result.DeletedCount > 0;
         }
 
         public async Task<bool> UpdateSlotOperationalStatusAsync(string id, bool isOperational)
         {
             var update = Builders<Slot>.Update.Set(s => s.IsOperational, isOperational);
-            var result = await _slots.UpdateOneAsync(s => s.SlotId == id, update);
+            var result = await _slots.UpdateOneAsync(s => s.Id == id, update);
             return result.ModifiedCount > 0;
         }
 

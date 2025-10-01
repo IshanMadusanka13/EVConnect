@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using webservice.dto;
 using webservice.models;
 using webservice.services;
 
@@ -50,10 +51,10 @@ namespace webservice.controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Slot>> Create([FromBody] Slot slot)
+        public async Task<ActionResult<List<Slot>>> Create([FromBody] Slot slot)
         {
-            var created = await _service.CreateSlotAsync(slot);
-            return CreatedAtAction(nameof(GetById), new { id = created.SlotId }, created);
+            var createdSlot = await _service.CreateSlotAsync(slot);
+            return CreatedAtAction(nameof(GetById), new { id = createdSlot.Id }, createdSlot);
         }
 
         [HttpPut("{id}")]

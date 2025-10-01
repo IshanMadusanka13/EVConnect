@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using webservice.dto;
 using webservice.models;
 using webservice.services;
 
@@ -10,7 +11,12 @@ namespace webservice.controllers
     [Route("api/[controller]")]
     public class StationController : ControllerBase
     {
-        private readonly StationService _service = new StationService();
+        private readonly StationService _service;
+
+        public StationController(StationService service)
+        {
+            _service = service;
+        }
 
         [HttpGet]
         public async Task<ActionResult<List<Station>>> GetAll()
@@ -27,11 +33,20 @@ namespace webservice.controllers
             return Ok(station);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Station>> Create([FromBody] Station station)
+        [HttpGet("all/{id}")]
+        public async Task<ActionResult<StationDetailsResponse>> GetStationAllDetailsByIdAsync(string id)
         {
+            var station = await _service.GetStationAllDetailsByIdAsync(id);
+            if (station == null) return NotFound();
+            return Ok(station);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Station>> Create([FromBody] CreateStationRequest station)
+        {
+            Console.WriteLine("Request for create Station!");
             var created = await _service.CreateStationAsync(station);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return Ok(created);
         }
 
         [HttpPut("{id}")]
