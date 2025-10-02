@@ -160,20 +160,6 @@ const StationManagement = () => {
                                                 <MapPin className="w-4 h-4" />
                                                 <span className="text-sm">{stationDetails.station?.address}</span>
                                             </div>
-                                            <div className="flex flex-wrap gap-4 mt-2">
-                                                <div className="px-3 py-1 rounded-xl bg-white/10 text-white/90 text-sm font-semibold flex items-center gap-2">
-                                                    <span>Operator:</span>
-                                                    <span className="font-bold">{stationDetails.station?.operatorId}</span>
-                                                </div>
-                                                <div className="px-3 py-1 rounded-xl bg-blue-600/20 text-blue-100 text-sm font-semibold flex items-center gap-2">
-                                                    <span>AC Rate:</span>
-                                                    <span className="font-bold">{stationDetails.station?.acChargingRate} LKR/kWh</span>
-                                                </div>
-                                                <div className="px-3 py-1 rounded-xl bg-purple-600/20 text-purple-100 text-sm font-semibold flex items-center gap-2">
-                                                    <span>DC Rate:</span>
-                                                    <span className="font-bold">{stationDetails.station?.dcChargingRate} LKR/kWh</span>
-                                                </div>
-                                            </div>
                                         </div>
                                         <div className="flex-1 flex justify-center items-center">
                                             {stationDetails.station?.latitude && stationDetails.station?.longitude ? (
@@ -189,6 +175,27 @@ const StationManagement = () => {
                                             )}
                                         </div>
                                     </div>
+                                    {/* Editable Operator and Rates above slots */}
+                                    <EditableStationDetails
+                                        station={stationDetails.station}
+                                        getColor={getColor}
+                                        darkMode={darkMode}
+                                        onUpdate={async (updatedFields) => {
+                                            try {
+                                                await api.updateStationDetails(stationDetails.station.id, updatedFields);
+                                                setStationDetails(prev => {
+                                                    if (!prev) return prev;
+                                                    return {
+                                                        ...prev,
+                                                        station: { ...prev.station, ...updatedFields }
+                                                    };
+                                                });
+                                            } catch (err) {
+                                                alert('Failed to update station details');
+                                            }
+                                        }}
+                                    />
+
                                     <div className="mb-6">
                                         <h4 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Slots</h4>
                                         {stationDetails.slots && stationDetails.slots.length > 0 ? (
@@ -678,6 +685,139 @@ function SlotCard({ slot, darkMode, getColor, onToggle }) {
                     </div>
                 </label>
             </div>
+        </div>
+    );
+}
+
+// Place this function outside the main component
+
+function EditableStationDetails({ station, getColor, darkMode, onUpdate }) {
+    const [editing, setEditing] = React.useState(false);
+    const [form, setForm] = React.useState({
+        operatorId: station?.operatorId || '',
+        acChargingRate: station?.acChargingRate || '',
+        dcChargingRate: station?.dcChargingRate || '',
+        isActive: station?.isActive ?? true
+    });
+    const [saving, setSaving] = React.useState(false);
+
+    React.useEffect(() => {
+        setForm({
+            operatorId: station?.operatorId || '',
+            acChargingRate: station?.acChargingRate || '',
+            dcChargingRate: station?.dcChargingRate || '',
+            isActive: station?.isActive ?? true
+        });
+    }, [station]);
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        await onUpdate({
+            id: station.id,
+            stationName: station.stationName,
+            address: station.address,
+            latitude: station.latitude,
+            longitude: station.longitude,
+            operatorId: form.operatorId,
+            acChargingRate: form.acChargingRate,
+            dcChargingRate: form.dcChargingRate,
+            isActive: form.isActive
+        });
+        setSaving(false);
+        setEditing(false);
+    };
+
+    return (
+        <div className={`mb-6 p-4 rounded-2xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} w-full`}>
+            {editing ? (
+                <form className="grid grid-cols-2 gap-4 w-full" onSubmit={handleSave}>
+                    {/* Operator */}
+                    <div className="flex flex-col">
+                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Operator</label>
+                        <input
+                            type="text"
+                            value={form.operatorId}
+                            onChange={e => setForm(f => ({ ...f, operatorId: e.target.value }))}
+                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                        />
+                    </div>
+                    {/* AC Rate */}
+                    <div className="flex flex-col">
+                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>AC Rate (LKR/kWh)</label>
+                        <input
+                            type="number"
+                            value={form.acChargingRate}
+                            onChange={e => setForm(f => ({ ...f, acChargingRate: e.target.value }))}
+                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                            step="any"
+                        />
+                    </div>
+                    {/* Active Toggle */}
+                    <div className="flex items-center gap-4 mt-2">
+                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Active Status:</label>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={form.isActive}
+                                onChange={e => setForm(f => ({ ...f, isActive: e.target.checked }))}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full dark:bg-gray-700 peer-checked:bg-green-500 transition-all relative">
+                                <div
+                                    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${form.isActive ? 'translate-x-5' : ''}`}
+                                    style={{ transform: form.isActive ? 'translateX(20px)' : 'none' }}
+                                ></div>
+                            </div>
+                        </label>
+                        <span className={`text-sm font-semibold ${form.isActive ? 'text-green-600' : 'text-red-600'}`}>{form.isActive ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    {/* DC Rate */}
+                    <div className="flex flex-col">
+                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>DC Rate (LKR/kWh)</label>
+                        <input
+                            type="number"
+                            value={form.dcChargingRate}
+                            onChange={e => setForm(f => ({ ...f, dcChargingRate: e.target.value }))}
+                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                            step="any"
+                        />
+                    </div>
+                    <div className="col-span-2 flex flex-col md:flex-row gap-2 justify-end mt-4">
+                        <button type="submit" disabled={saving} className="px-4 py-2 rounded bg-emerald-500 text-white font-semibold">{saving ? 'Saving...' : 'Save'}</button>
+                        <button type="button" className="px-4 py-2 rounded bg-gray-300 text-gray-700 font-semibold" onClick={() => setEditing(false)}>Cancel</button>
+                    </div>
+                </form>
+            ) : (
+                <div className="grid grid-cols-2 gap-4 w-full items-center">
+                    {/* Left column: Operator (top), Active status (bottom) */}
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className={`font-semibold ${getColor('text.primary')}`}>Operator:</span>
+                            <span className="font-bold">{station?.operatorId}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className={`font-semibold ${getColor('text.primary')}`}>Station Status:</span>
+                            <span className={`text-sm font-semibold ${station?.isActive ? 'text-green-600' : 'text-red-600'}`}>{station?.isActive ? 'Active' : 'Inactive'}</span>
+                        </div>
+                    </div>
+                    {/* Right column: AC rate (top), DC rate (bottom) */}
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className={`font-semibold ${getColor('text.primary')}`}>AC Rate:</span>
+                            <span className="font-bold">{station?.acChargingRate} LKR/kWh</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className={`font-semibold ${getColor('text.primary')}`}>DC Rate:</span>
+                            <span className="font-bold">{station?.dcChargingRate} LKR/kWh</span>
+                        </div>
+                    </div>
+                    {/* Edit Button full width */}
+                    <div className="col-span-2 flex justify-end">
+                        <button className="px-4 py-2 rounded bg-blue-500 text-white font-semibold text-sm" onClick={() => setEditing(true)}>Edit</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

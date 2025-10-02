@@ -110,6 +110,11 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(newSchedule)
     }),
+  updateStationDetails: (stationId, updatedStation) =>
+    fetchApi(`/Station/${stationId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedStation)
+    }),
 
 };
 
