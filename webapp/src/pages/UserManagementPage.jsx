@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ export default function UserManagementPage() {
     PhoneNumber: "",
     Email: "",
     Password: "",
-   // ConfirmPassword: "",
+    ConfirmPassword: "",
     Role: "StationOperator",
     IsActive: true,
   });
@@ -27,7 +28,11 @@ export default function UserManagementPage() {
     e.preventDefault();
 
     if (form.Password !== form.ConfirmPassword) {
-      alert("Passwords do not match!");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Passwords do not match!",
+      });
       return;
     }
 
@@ -45,6 +50,15 @@ export default function UserManagementPage() {
 
       setUsers([...users, res.data]);
 
+      // ✅ Sweet Alert Success
+      Swal.fire({
+        icon: "success",
+        title: "User Registered!",
+        text: `${form.FirstName} ${form.LastName} has been added successfully.`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
       // Reset form
       setForm({
         EmployeeId: "",
@@ -59,23 +73,31 @@ export default function UserManagementPage() {
       });
     } catch (err) {
       console.error(err);
-      alert("Error creating user.");
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Something went wrong while creating the user.",
+      });
     }
   };
 
   return (
     <div className="flex flex-col items-center min-h-screen py-10 bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-purple-900 dark:via-pink-900 dark:to-blue-900">
-      
       <h1 className="mb-10 text-3xl font-bold text-gray-700 dark:text-gray-200">
-        User <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">Management</span>
+        User{" "}
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+          Management
+        </span>
       </h1>
 
       <div className="w-full max-w-3xl p-8 mb-12 bg-white shadow-xl dark:bg-gray-800 rounded-2xl">
         <h2 className="mb-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
           Add New User
         </h2>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-4">
-
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 gap-4 md:grid-cols-4"
+        >
           <input
             type="text"
             placeholder="Employee ID"
@@ -134,7 +156,9 @@ export default function UserManagementPage() {
             type="password"
             placeholder="Confirm Password"
             value={form.ConfirmPassword}
-            onChange={(e) => setForm({ ...form, ConfirmPassword: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, ConfirmPassword: e.target.value })
+            }
             className="p-3 border border-gray-300 rounded-lg dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
             required
           />
