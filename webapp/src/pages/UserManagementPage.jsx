@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [form, setForm] = useState({
     EmployeeId: "",
     FirstName: "",
@@ -50,7 +51,6 @@ export default function UserManagementPage() {
 
       setUsers([...users, res.data]);
 
-      // ✅ Sweet Alert Success
       Swal.fire({
         icon: "success",
         title: "User Registered!",
@@ -59,7 +59,6 @@ export default function UserManagementPage() {
         timer: 2000,
       });
 
-      // Reset form
       setForm({
         EmployeeId: "",
         FirstName: "",
@@ -90,6 +89,7 @@ export default function UserManagementPage() {
         </span>
       </h1>
 
+      {/* Add New User Form */}
       <div className="w-full max-w-3xl p-8 mb-12 bg-white shadow-xl dark:bg-gray-800 rounded-2xl">
         <h2 className="mb-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
           Add New User
@@ -182,30 +182,58 @@ export default function UserManagementPage() {
       </div>
 
       {/* User List */}
-      <div className="w-full max-w-3xl p-8 bg-white shadow-xl dark:bg-gray-800 rounded-2xl">
+      <div className="w-full max-w-3xl p-8 mb-6 bg-white shadow-xl dark:bg-gray-800 rounded-2xl">
         <h2 className="mb-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
           Registered Users
         </h2>
         <ul className="space-y-4">
-          {users.map((user) => (
-            <li
-              key={user._id}
-              className="flex items-center justify-between p-4 transition-transform shadow-md rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-purple-700 dark:via-pink-700 dark:to-blue-700 hover:scale-105"
-            >
-              <span className="font-medium text-gray-800 dark:text-gray-100">
-                {user.FirstName} {user.LastName} ({user.EmployeeId})
-              </span>
-              <span
-                className={`px-4 py-1 rounded-full text-sm font-semibold text-white ${
-                  user.Role === "Backoffice" ? "bg-red-500" : "bg-blue-500"
-                }`}
-              >
-                {user.Role}
-              </span>
-            </li>
-          ))}
-        </ul>
+  {users.map((user) => (
+    <li
+      key={user._id || user.employeeId}  // fallback if _id is not present
+      onClick={() => setSelectedUser(user)}
+      className="flex items-center justify-between p-4 transition-transform shadow-md cursor-pointer rounded-xl bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-purple-700 dark:via-pink-700 dark:to-blue-700 hover:scale-105"
+    >
+      <span className="font-medium text-gray-800 dark:text-gray-100">
+        {user.firstName} {user.lastName} ({user.employeeId})
+      </span>
+      <span
+        className={`px-4 py-1 rounded-full text-sm font-semibold text-white ${
+          user.role === "Backoffice" ? "bg-red-500" : "bg-blue-500"
+        }`}
+      >
+        {user.role}
+      </span>
+    </li>
+  ))}
+</ul>
+
       </div>
+
+      {/* Selected User Details Card */}
+      {selectedUser && (
+  <div className="w-full max-w-2xl p-6 mt-4 bg-white shadow-lg dark:bg-gray-800 rounded-2xl">
+    <h3 className="mb-4 text-xl font-bold text-gray-800 dark:text-gray-100">
+      User Details
+    </h3>
+    <div className="space-y-2 text-gray-700 dark:text-gray-200">
+      <p>
+        <span className="font-semibold">Name:</span>{" "}
+        {selectedUser.firstName} {selectedUser.lastName}
+      </p>
+      <p>
+        <span className="font-semibold">Email:</span> {selectedUser.email}
+      </p>
+      <p>
+        <span className="font-semibold">Phone:</span>{" "}
+        {selectedUser.phoneNumber}
+      </p>
+      <p>
+        <span className="font-semibold">Role:</span> {selectedUser.role}
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
