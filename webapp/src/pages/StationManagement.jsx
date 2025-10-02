@@ -160,6 +160,20 @@ const StationManagement = () => {
                                                 <MapPin className="w-4 h-4" />
                                                 <span className="text-sm">{stationDetails.station?.address}</span>
                                             </div>
+                                            <div className="flex flex-wrap gap-4 mt-2">
+                                                <div className="px-3 py-1 rounded-xl bg-white/10 text-white/90 text-sm font-semibold flex items-center gap-2">
+                                                    <span>Operator:</span>
+                                                    <span className="font-bold">{stationDetails.station?.operatorId}</span>
+                                                </div>
+                                                <div className="px-3 py-1 rounded-xl bg-blue-600/20 text-blue-100 text-sm font-semibold flex items-center gap-2">
+                                                    <span>AC Rate:</span>
+                                                    <span className="font-bold">{stationDetails.station?.acChargingRate} LKR/kWh</span>
+                                                </div>
+                                                <div className="px-3 py-1 rounded-xl bg-purple-600/20 text-purple-100 text-sm font-semibold flex items-center gap-2">
+                                                    <span>DC Rate:</span>
+                                                    <span className="font-bold">{stationDetails.station?.dcChargingRate} LKR/kWh</span>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="flex-1 flex justify-center items-center">
                                             {stationDetails.station?.latitude && stationDetails.station?.longitude ? (
@@ -178,17 +192,32 @@ const StationManagement = () => {
                                     <div className="mb-6">
                                         <h4 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Slots</h4>
                                         {stationDetails.slots && stationDetails.slots.length > 0 ? (
-                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                                {stationDetails.slots.map((slot) => (
-                                                    <div key={slot.slotId} className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <span className={`font-semibold ${getColor('text.primary')}`}>{slot.slotNumber}</span>
-                                                            <span className={`text-xs px-2 py-1 rounded-full ${slot.chargerType === 'AC' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{slot.chargerType}</span>
-                                                        </div>
-                                                        <div className={`text-sm ${getColor('text.secondary')}`}>Operational: {slot.isOperational ? 'Yes' : 'No'}</div>
-                                                    </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                {stationDetails.slots.map((slot, idx) => (
+                                                    <SlotCard
+                                                        key={slot.slotId}
+                                                        slot={slot}
+                                                        darkMode={darkMode}
+                                                        getColor={getColor}
+                                                        onToggle={async (newStatus) => {
+                                                            try {
+                                                                console.log(slot)
+                                                                console.log(newStatus)
+                                                                await api.updateSlotOperationalStatus(slot.id, newStatus);
+                                                                // Update local state for instant feedback
+                                                                setStationDetails(prev => {
+                                                                    if (!prev) return prev;
+                                                                    const updatedSlots = prev.slots.map((s, i) => i === idx ? { ...s, isOperational: newStatus } : s);
+                                                                    return { ...prev, slots: updatedSlots };
+                                                                });
+                                                            } catch (err) {
+                                                                // Optionally show error
+                                                            }
+                                                        }}
+                                                    />
                                                 ))}
                                             </div>
+
                                         ) : (
                                             <div className="text-gray-400">No slots found.</div>
                                         )}
@@ -197,11 +226,26 @@ const StationManagement = () => {
                                         <h4 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Schedules</h4>
                                         {stationDetails.schedules && stationDetails.schedules.length > 0 ? (
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {stationDetails.schedules.map((schedule) => (
-                                                    <div key={schedule.id} className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                                                        <div className="font-semibold mb-1">{schedule.dayOfWeek}</div>
-                                                        <div className={`text-sm ${getColor('text.secondary')}`}>Open: {schedule.openingTime} - {schedule.closingTime}</div>
-                                                    </div>
+                                                {stationDetails.schedules.map((schedule, idx) => (
+                                                    <ScheduleCard
+                                                        key={schedule.id}
+                                                        schedule={schedule}
+                                                        darkMode={darkMode}
+                                                        getColor={getColor}
+                                                        onUpdate={async (updatedSchedule) => {
+                                                            try {
+                                                                console.log('Updating schedule:', updatedSchedule);
+                                                                await api.updateSchedule(schedule.id, updatedSchedule);
+                                                                setStationDetails(prev => {
+                                                                    if (!prev) return prev;
+                                                                    const updatedSchedules = prev.schedules.map((s, i) => i === idx ? { ...s, ...updatedSchedule } : s);
+                                                                    return { ...prev, schedules: updatedSchedules };
+                                                                });
+                                                            } catch (err) {
+                                                                alert('Failed to update schedule');
+                                                            }
+                                                        }}
+                                                    />
                                                 ))}
                                             </div>
                                         ) : (
@@ -536,5 +580,106 @@ const CreateStationModal = ({ onClose, onCreate }) => {
         </div>
     );
 };
+
+
+// ScheduleCard component for inline editing
+function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
+    const [editing, setEditing] = useState(false);
+    const [form, setForm] = useState({
+        dayOfWeek: schedule.dayOfWeek,
+        openingTime: schedule.openingTime,
+        closingTime: schedule.closingTime
+    });
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        await onUpdate({
+            id: schedule.id,
+            stationId: schedule.stationId,
+            dayOfWeek: form.dayOfWeek,
+            openingTime: form.openingTime,
+            closingTime: form.closingTime
+        });
+        setSaving(false);
+        setEditing(false);
+    };
+
+    return (
+        <div className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+            {editing ? (
+                <form className="space-y-2" onSubmit={handleSave}>
+                    <div>
+                        <select
+                            value={form.dayOfWeek}
+                            onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value }))}
+                            className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                        >
+                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+                                <option key={day} value={day}>{day}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <input
+                            type="time"
+                            value={form.openingTime}
+                            onChange={e => setForm(f => ({ ...f, openingTime: e.target.value }))}
+                            className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="time"
+                            value={form.closingTime}
+                            onChange={e => setForm(f => ({ ...f, closingTime: e.target.value }))}
+                            className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                        />
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                        <button type="submit" disabled={saving} className="px-3 py-1 rounded bg-emerald-500 text-white font-semibold">{saving ? 'Saving...' : 'Save'}</button>
+                        <button type="button" className="px-3 py-1 rounded bg-gray-300 text-gray-700 font-semibold" onClick={() => setEditing(false)}>Cancel</button>
+                    </div>
+                </form>
+            ) : (
+                <>
+                    <div className="font-semibold mb-1">{schedule.dayOfWeek}</div>
+                    <div className={`text-sm ${getColor('text.secondary')}`}>Open: {schedule.openingTime} - {schedule.closingTime}</div>
+                    <button className="mt-2 px-3 py-1 rounded bg-blue-500 text-white text-xs font-semibold" onClick={() => setEditing(true)}>Edit</button>
+                </>
+            )}
+        </div>
+    );
+}
+
+// SlotCard component for slot display and toggle
+function SlotCard({ slot, darkMode, getColor, onToggle }) {
+    return (
+        <div className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+            <div className="flex items-center justify-between mb-2">
+                <span className={`font-semibold ${getColor('text.primary')}`}>{slot.slotNumber}</span>
+                <span className={`text-xs px-2 py-1 rounded-full ${slot.chargerType === 'AC' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>{slot.chargerType}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+                <span className={`text-sm ${getColor('text.secondary')}`}>Operational:</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={slot.isOperational}
+                        onChange={e => onToggle(e.target.checked)}
+                        className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full dark:bg-gray-700 peer-checked:bg-green-500 transition-all relative">
+                        <div
+                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${slot.isOperational ? 'translate-x-5' : ''}`}
+                            style={{ transform: slot.isOperational ? 'translateX(20px)' : 'none' }}
+                        ></div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    );
+}
 
 export default StationManagement;
