@@ -4,6 +4,7 @@ import BookingManagement from "../src/pages/BookingManagement";
 import UserManagementPage from "../src/pages/UserManagementPage";
 import StationManagement from './pages/StationManagement';
 import LoginPage from './pages/LoginPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
   return (
@@ -12,6 +13,8 @@ const App = () => {
       <Route path="/users" element={<UserManagementPage />} />
           <Route path="/station" element={<StationManagement />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      
     </Routes>
   );
 };
