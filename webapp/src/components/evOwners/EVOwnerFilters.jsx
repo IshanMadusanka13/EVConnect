@@ -7,6 +7,11 @@ const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
     const { darkMode, getColor } = useContext(ThemeContext);
     const [searchResults, setSearchResults] = useState([]);
 
+    const getDropdownIcon = (darkMode) => {
+        const strokeColor = darkMode ? '%239ca3af' : '%236b7280';
+        return `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='${strokeColor}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`;
+    };
+
     // Handle filter changes
     const handleFilterChange = (key, value) => {
         onFiltersChange({
@@ -58,7 +63,10 @@ const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
                     <select
                         value={filters.status}
                         onChange={(e) => handleFilterChange('status', e.target.value)}
-                        className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                        className={`px-4 py-3 pr-10 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none bg-[length:1.5rem_1.5rem] bg-[position:right_0.5rem_center] bg-no-repeat`}
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='${darkMode ? '%239ca3af' : '%236b7280'}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`
+                        }}
                     >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
@@ -69,7 +77,10 @@ const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
                     <select
                         value={filters.vehicleType}
                         onChange={(e) => handleFilterChange('vehicleType', e.target.value)}
-                        className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                        className={`px-4 py-3 pr-10 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none bg-[length:1.5rem_1.5rem] bg-[position:right_0.5rem_center] bg-no-repeat`}
+                        style={{
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='${darkMode ? '%239ca3af' : '%236b7280'}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`
+                        }}
                     >
                         <option value="all">All Vehicles</option>
                         <option value="Car">Cars</option>

@@ -138,7 +138,7 @@ const EVOwnerCard = ({
                             e.stopPropagation();
                             onEdit(owner);
                         }}
-                        className="flex-1 px-3 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+                        className="flex-1 px-3 py-2 rounded-lg border-2 border-blue-500/70 text-blue-600 bg-blue-50/50 hover:bg-blue-100 text-sm font-medium transition-colors dark:border-blue-500 dark:text-blue-400 dark:bg-blue-900/20 dark:hover:bg-blue-900/40"
                     >
                         Edit
                     </button>
@@ -151,9 +151,9 @@ const EVOwnerCard = ({
                                 onActivate(owner.nic);
                             }
                         }}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${owner.isActive
-                                ? 'bg-amber-500 text-white hover:bg-amber-600'
-                                : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors border-2 ${owner.isActive
+                            ? 'border-amber-500/70 text-amber-600 bg-amber-50/50 hover:bg-amber-100 dark:border-amber-500 dark:text-amber-400 dark:bg-amber-900/20 dark:hover:bg-amber-900/40'
+                            : 'border-emerald-500/70 text-emerald-600 bg-emerald-50/50 hover:bg-emerald-100 dark:border-emerald-500 dark:text-emerald-400 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40'
                             }`}
                     >
                         {owner.isActive ? 'Deactivate' : 'Activate'}
@@ -163,7 +163,7 @@ const EVOwnerCard = ({
                             e.stopPropagation();
                             onDelete(owner.nic);
                         }}
-                        className="px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                        className="px-3 py-2 rounded-lg border-2 border-red-500/70 text-red-600 bg-red-50/50 hover:bg-red-100 transition-colors dark:border-red-500 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40"
                     >
                         <Trash2 className="w-4 h-4" />
                     </button>
