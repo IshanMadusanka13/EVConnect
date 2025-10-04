@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { X, User, Mail, Phone, MapPin, Calendar, Car, Battery, AlertCircle } from 'lucide-react';
+import { X, User, Mail, Phone, MapPin, Calendar, Car, Battery } from 'lucide-react';
 import { ThemeContext } from '../../contexts/ThemeContext';
 
 const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
@@ -25,6 +25,18 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Convert ISO date to yyyy-MM-dd format for HTML input
+    const formatDateForInput = (isoDateString) => {
+        if (!isoDateString) return '';
+        try {
+            const date = new Date(isoDateString);
+            return date.toISOString().split('T')[0];
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return '';
+        }
+    };
+
     // Initialize form with owner data
     useEffect(() => {
         if (owner) {
@@ -32,7 +44,7 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
                 nic: owner.nic || '',
                 firstName: owner.firstName || '',
                 lastName: owner.lastName || '',
-                dateOfBirth: owner.dateOfBirth || '',
+                dateOfBirth: formatDateForInput(owner.dateOfBirth),
                 gender: owner.gender || '',
                 email: owner.email || '',
                 phoneNumber: owner.phoneNumber || '',
@@ -92,10 +104,28 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
 
         setIsSubmitting(true);
         try {
-            await onUpdate(owner.nic, formData);
+            // Prepare the data for update - convert date back to ISO format
+            const updateData = {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : '',
+                gender: formData.gender,
+                email: formData.email,
+                phoneNumber: formData.phoneNumber,
+                address: formData.address,
+                vehicleType: formData.vehicleType,
+                vehicleModel: formData.vehicleModel,
+                vehiclePlateNumber: formData.vehiclePlateNumber,
+                batteryCapacity: formData.batteryCapacity,
+                compatibleChargerTypes: formData.compatibleChargerTypes
+            };
+
+            console.log('Updating owner with data:', updateData);
+
+            await onUpdate(owner.nic, updateData);
         } catch (error) {
             console.error('Error updating owner:', error);
-            // Error is handled in the parent component
+            alert('Failed to update owner. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -342,14 +372,14 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
                                         type="button"
                                         onClick={() => handleInputChange('compatibleChargerTypes', type.value)}
                                         className={`p-4 rounded-xl border-2 text-left transition-all duration-300 ${formData.compatibleChargerTypes === type.value
-                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 scale-105'
-                                                : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
+                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 scale-105'
+                                            : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className={`p-2 rounded-lg ${formData.compatibleChargerTypes === type.value
-                                                    ? 'bg-blue-500 text-white'
-                                                    : darkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-600'
+                                                ? 'bg-blue-500 text-white'
+                                                : darkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-600'
                                                 }`}>
                                                 <Battery className="w-4 h-4" />
                                             </div>

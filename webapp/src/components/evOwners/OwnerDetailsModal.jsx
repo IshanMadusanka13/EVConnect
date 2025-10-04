@@ -5,26 +5,70 @@ import { ThemeContext } from '../../contexts/ThemeContext';
 const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete }) => {
     const { darkMode, getColor } = useContext(ThemeContext);
 
+    // Safe value getter with fallbacks
+    const getSafeValue = (value, fallback = 'N/A') => {
+        return value !== null && value !== undefined ? value : fallback;
+    };
+
+    // Safe number to string conversion
+    const getSafeNumberString = (value, fallback = '0') => {
+        return value !== null && value !== undefined ? value.toString() : fallback;
+    };
+
     // Format date for display
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        if (!dateString) return 'N/A';
+        try {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (error) {
+            return 'Invalid Date';
+        }
     };
 
     // Calculate member duration
     const getMemberDuration = () => {
-        const registrationDate = new Date(owner.registrationDate);
-        const today = new Date();
-        const diffTime = Math.abs(today - registrationDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (!owner.registrationDate) return 'N/A';
 
-        if (diffDays < 30) return `${diffDays} days`;
-        if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
-        return `${Math.floor(diffDays / 365)} years`;
+        try {
+            const registrationDate = new Date(owner.registrationDate);
+            const today = new Date();
+            const diffTime = Math.abs(today - registrationDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 30) return `${diffDays} days`;
+            if (diffDays < 365) return `${Math.floor(diffDays / 30)} months`;
+            return `${Math.floor(diffDays / 365)} years`;
+        } catch (error) {
+            return 'N/A';
+        }
     };
+
+    // Safe compatible charger types split
+    const getChargerTypes = () => {
+        if (!owner.compatibleChargerTypes) return [];
+        try {
+            return owner.compatibleChargerTypes.split(',').map(type => type.trim());
+        } catch (error) {
+            return [];
+        }
+    };
+
+    if (!owner) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+                <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
+                    <div className="p-6 text-center">
+                        <p className={`text-lg ${getColor('text.primary')}`}>No owner data available</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
@@ -54,19 +98,19 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
 
                 <div className="p-6">
                     {/* Owner Banner */}
-                    <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r ${owner.isActive ? 'from-emerald-500 to-teal-500' : 'from-red-500 to-pink-500'}`}>
+                    <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r ${getSafeValue(owner.isActive) ? 'from-emerald-500 to-teal-500' : 'from-red-500 to-pink-500'}`}>
                         <div className="flex items-start justify-between">
                             <div>
                                 <h3 className="text-2xl font-bold text-white mb-2">
-                                    {owner.firstName} {owner.lastName}
+                                    {getSafeValue(owner.firstName)} {getSafeValue(owner.lastName)}
                                 </h3>
                                 <div className="flex items-center gap-2 text-white/90 mb-1">
                                     <User className="w-4 h-4" />
-                                    <span className="text-sm">NIC: {owner.nic}</span>
+                                    <span className="text-sm">NIC: {getSafeValue(owner.nic)}</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-white/90">
                                     <Mail className="w-4 h-4" />
-                                    <span className="text-sm">{owner.email}</span>
+                                    <span className="text-sm">{getSafeValue(owner.email)}</span>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -84,19 +128,19 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <InfoCard
                                 label="Email Address"
-                                value={owner.email}
+                                value={getSafeValue(owner.email)}
                                 icon={Mail}
                                 color="blue"
                             />
                             <InfoCard
                                 label="Phone Number"
-                                value={owner.phoneNumber}
+                                value={getSafeValue(owner.phoneNumber)}
                                 icon={Phone}
                                 color="green"
                             />
                             <InfoCard
                                 label="Gender"
-                                value={owner.gender}
+                                value={getSafeValue(owner.gender)}
                                 icon={User}
                                 color="purple"
                             />
@@ -110,7 +154,7 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                         <div className="mt-4">
                             <InfoCard
                                 label="Address"
-                                value={owner.address}
+                                value={getSafeValue(owner.address)}
                                 icon={MapPin}
                                 color="red"
                                 fullWidth
@@ -129,28 +173,28 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                                     <Car className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <p className={`text-sm ${getColor('text.secondary')}`}>Type</p>
-                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{owner.vehicleType}</p>
+                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{getSafeValue(owner.vehicleType)}</p>
                             </div>
                             <div className="text-center">
                                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-green-100 dark:bg-green-500/20 mb-2`}>
                                     <Car className="w-6 h-6 text-green-600 dark:text-green-400" />
                                 </div>
                                 <p className={`text-sm ${getColor('text.secondary')}`}>Model</p>
-                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{owner.vehicleModel}</p>
+                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{getSafeValue(owner.vehicleModel)}</p>
                             </div>
                             <div className="text-center">
                                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-500/20 mb-2`}>
                                     <Car className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <p className={`text-sm ${getColor('text.secondary')}`}>Plate</p>
-                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{owner.vehiclePlateNumber}</p>
+                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{getSafeValue(owner.vehiclePlateNumber)}</p>
                             </div>
                             <div className="text-center">
                                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-500/20 mb-2`}>
                                     <Battery className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                                 </div>
                                 <p className={`text-sm ${getColor('text.secondary')}`}>Battery</p>
-                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{owner.batteryCapacity}</p>
+                                <p className={`text-lg font-bold ${getColor('text.primary')}`}>{getSafeValue(owner.batteryCapacity)}</p>
                             </div>
                         </div>
                         <div className="mt-4 p-4 rounded-xl bg-white/50 dark:bg-slate-700/50">
@@ -158,14 +202,18 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                                 Compatible Charger Types
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                {owner.compatibleChargerTypes.split(',').map((type, index) => (
-                                    <span
-                                        key={index}
-                                        className="px-3 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 rounded-full text-sm font-medium"
-                                    >
-                                        {type.trim()}
-                                    </span>
-                                ))}
+                                {getChargerTypes().length > 0 ? (
+                                    getChargerTypes().map((type, index) => (
+                                        <span
+                                            key={index}
+                                            className="px-3 py-1 bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400 rounded-full text-sm font-medium"
+                                        >
+                                            {type}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span className="text-slate-500 dark:text-slate-400">No charger types specified</span>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -178,27 +226,27 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <StatCard
                                 label="Total Bookings"
-                                value={owner.totalBookings.toString()}
+                                value={getSafeNumberString(owner.totalBookings)}
                                 subtitle="charging sessions"
                                 gradient="from-blue-500 to-cyan-500"
                             />
                             <StatCard
                                 label="Total Energy"
-                                value={`${owner.totalEnergy}`}
+                                value={getSafeNumberString(owner.totalEnergy)}
                                 subtitle="kWh consumed"
                                 gradient="from-green-500 to-emerald-500"
                             />
                             <StatCard
                                 label="Customer Rating"
-                                value={owner.rating.toString()}
+                                value={getSafeNumberString(owner.rating, '0.0')}
                                 subtitle="out of 5 stars"
                                 gradient="from-amber-500 to-orange-500"
                             />
                             <StatCard
                                 label="Account Status"
-                                value={owner.isActive ? "Active" : "Inactive"}
-                                subtitle={owner.isActive ? "✓ Verified" : "✗ Suspended"}
-                                gradient={owner.isActive ? "from-emerald-500 to-teal-500" : "from-red-500 to-pink-500"}
+                                value={getSafeValue(owner.isActive) ? "Active" : "Inactive"}
+                                subtitle={getSafeValue(owner.isActive) ? "✓ Verified" : "✗ Suspended"}
+                                gradient={getSafeValue(owner.isActive) ? "from-emerald-500 to-teal-500" : "from-red-500 to-pink-500"}
                             />
                         </div>
                     </div>
@@ -213,12 +261,12 @@ const OwnerDetailsModal = ({ owner, onClose, onEdit, onStatusToggle, onDelete })
                         </button>
                         <button
                             onClick={onStatusToggle}
-                            className={`flex-1 px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all ${owner.isActive
-                                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-amber-500/50'
-                                    : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:shadow-emerald-500/50'
+                            className={`flex-1 px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all ${getSafeValue(owner.isActive)
+                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-amber-500/50'
+                                : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:shadow-emerald-500/50'
                                 }`}
                         >
-                            {owner.isActive ? 'Deactivate Account' : 'Activate Account'}
+                            {getSafeValue(owner.isActive) ? 'Deactivate Account' : 'Activate Account'}
                         </button>
                         <button
                             onClick={onDelete}

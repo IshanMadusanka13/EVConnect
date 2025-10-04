@@ -29,7 +29,7 @@ const EVOwnerManagement = () => {
         fetchEVOwners();
     }, []);
 
-    // Simulate API call to fetch EV owners
+    // Fetch EV owners from API
     const fetchEVOwners = async () => {
         setLoading(true);
         try {
@@ -46,10 +46,10 @@ const EVOwnerManagement = () => {
     // Filter owners based on search and filter criteria
     const filteredOwners = evOwners.filter(owner => {
         const matchesSearch = filters.search === '' ||
-            owner.firstName.toLowerCase().includes(filters.search.toLowerCase()) ||
-            owner.lastName.toLowerCase().includes(filters.search.toLowerCase()) ||
-            owner.email.toLowerCase().includes(filters.search.toLowerCase()) ||
-            owner.nic.includes(filters.search);
+            owner.firstName?.toLowerCase().includes(filters.search.toLowerCase()) ||
+            owner.lastName?.toLowerCase().includes(filters.search.toLowerCase()) ||
+            owner.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
+            owner.nic?.includes(filters.search);
 
         const matchesStatus = filters.status === 'all' ||
             (filters.status === 'active' && owner.isActive) ||
@@ -116,16 +116,49 @@ const EVOwnerManagement = () => {
     // Handle owner update
     const handleUpdateOwner = async (nic, ownerData) => {
         try {
-            const updatedOwner = await api.updateEVOwner(nic, ownerData);
+            console.log('Sending update for NIC:', nic, 'Data:', ownerData);
+
+            // Prepare the update data with proper date handling
+            const updateData = {
+                firstName: ownerData.firstName?.trim() || '',
+                lastName: ownerData.lastName?.trim() || '',
+                dateOfBirth: ownerData.dateOfBirth || null, // Send as is, let backend handle conversion
+                gender: ownerData.gender || '',
+                email: ownerData.email?.trim() || '',
+                phoneNumber: ownerData.phoneNumber?.trim() || '',
+                address: ownerData.address?.trim() || '',
+                vehicleType: ownerData.vehicleType || 'Car',
+                vehicleModel: ownerData.vehicleModel?.trim() || '',
+                vehiclePlateNumber: ownerData.vehiclePlateNumber?.trim() || '',
+                batteryCapacity: ownerData.batteryCapacity?.trim() || '',
+                compatibleChargerTypes: ownerData.compatibleChargerTypes || 'AC,DC'
+            };
+
+            console.log('Final update data:', updateData);
+
+            // Send update
+            await api.updateEVOwner(nic, updateData);
+
+            // Update local state by refetching the updated data
+            const updatedOwner = await api.getEVOwnerByNIC(nic);
             setEvOwners(prev => prev.map(owner =>
-                owner.nic === nic ? { ...owner, ...updatedOwner } : owner
+                owner.nic === nic ? updatedOwner : owner
             ));
+
             setShowEditModal(false);
             setSelectedOwner(null);
             alert('EV Owner updated successfully!');
         } catch (error) {
             console.error('Error updating owner:', error);
-            alert('Failed to update owner');
+
+            // Provide more specific error messages
+            if (error.status === 400) {
+                alert(`Bad request: ${error.message}`);
+            } else if (error.status === 404) {
+                alert('Owner not found. Please refresh the page and try again.');
+            } else {
+                alert(`Failed to update owner: ${error.message || 'Please check the console for details.'}`);
+            }
         }
     };
 
