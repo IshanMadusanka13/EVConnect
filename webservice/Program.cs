@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<DBConnect>();
 builder.Services.AddScoped<webservice.services.StationService>();
+builder.Services.AddScoped<webservice.services.EVOwnerService>();
+
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
