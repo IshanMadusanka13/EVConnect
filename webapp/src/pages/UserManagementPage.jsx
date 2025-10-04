@@ -81,9 +81,9 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-300 via-pink-300 to-red-200 p-6">
-      <div className="w-full max-w-lg p-8 rounded-2xl shadow-2xl bg-white/20 backdrop-blur-md border border-white/30">
-        <h1 className="mb-6 text-3xl font-bold text-center text-white">
+    <div className="flex items-center justify-center min-h-screen p-6 bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100">
+      <div className="w-full max-w-lg p-8 border shadow-2xl rounded-2xl bg-white/20 backdrop-blur-md border-white/30">
+        <h1 className="mb-6 text-3xl font-bold text-center text-black">
           User{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
             Management
@@ -97,7 +97,7 @@ export default function UserManagementPage() {
             placeholder="Employee ID"
             value={form.EmployeeId}
             onChange={(e) => setForm({ ...form, EmployeeId: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -106,7 +106,7 @@ export default function UserManagementPage() {
             placeholder="First Name"
             value={form.FirstName}
             onChange={(e) => setForm({ ...form, FirstName: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -115,7 +115,7 @@ export default function UserManagementPage() {
             placeholder="Last Name"
             value={form.LastName}
             onChange={(e) => setForm({ ...form, LastName: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -124,7 +124,7 @@ export default function UserManagementPage() {
             placeholder="Phone Number"
             value={form.PhoneNumber}
             onChange={(e) => setForm({ ...form, PhoneNumber: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -133,7 +133,7 @@ export default function UserManagementPage() {
             placeholder="Email"
             value={form.Email}
             onChange={(e) => setForm({ ...form, Email: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -142,7 +142,7 @@ export default function UserManagementPage() {
             placeholder="Password"
             value={form.Password}
             onChange={(e) => setForm({ ...form, Password: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
@@ -153,14 +153,14 @@ export default function UserManagementPage() {
             onChange={(e) =>
               setForm({ ...form, ConfirmPassword: e.target.value })
             }
-            className="p-3 rounded-lg bg-white/30 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black placeholder-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
             required
           />
 
           <select
             value={form.Role}
             onChange={(e) => setForm({ ...form, Role: e.target.value })}
-            className="p-3 rounded-lg bg-white/30 text-black focus:outline-none focus:ring-2 focus:ring-pink-300"
+            className="p-3 text-black rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-pink-300"
           >
             <option value="Backoffice" className="text-gray-900">
               Backoffice
@@ -172,7 +172,7 @@ export default function UserManagementPage() {
 
           <button
             type="submit"
-            className="w-full py-3 mt-4 font-semibold text-white rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:opacity-90 transition"
+            className="w-full py-3 mt-4 font-semibold text-white transition rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:opacity-90"
           >
             Add User
           </button>
