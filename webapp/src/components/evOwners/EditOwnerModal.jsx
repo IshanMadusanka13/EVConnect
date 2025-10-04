@@ -95,6 +95,7 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
             await onUpdate(owner.nic, formData);
         } catch (error) {
             console.error('Error updating owner:', error);
+            // Error is handled in the parent component
         } finally {
             setIsSubmitting(false);
         }

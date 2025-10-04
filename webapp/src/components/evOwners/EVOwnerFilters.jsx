@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { ThemeContext } from '../../contexts/ThemeContext';
+import api from '../../utils/api';
 
 const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
     const { darkMode, getColor } = useContext(ThemeContext);
+    const [searchResults, setSearchResults] = useState([]);
 
     // Handle filter changes
     const handleFilterChange = (key, value) => {
@@ -11,6 +13,29 @@ const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
             ...filters,
             [key]: value
         });
+
+        // If it's a search filter change, trigger search API call
+        if (key === 'search') {
+            handleSearch(value);
+        }
+    };
+
+    // Handle search API call
+    const handleSearch = async (searchTerm) => {
+        if (searchTerm.trim() === '') {
+            // Reset search results if search is empty
+            setSearchResults([]);
+            return;
+        }
+
+        try {
+            const results = await api.searchEVOwners(searchTerm);
+            setSearchResults(results);
+            // Note: You'll need to handle how these search results integrate with your main data
+        } catch (error) {
+            console.error('Error searching owners:', error);
+            setSearchResults([]);
+        }
     };
 
     return (
@@ -63,6 +88,13 @@ const EVOwnerFilters = ({ filters, onFiltersChange, onCreateOwner }) => {
                     </span>
                 </button>
             </div>
+
+            {/* Display search results count (optional) */}
+            {searchResults.length > 0 && (
+                <div className="mt-4 text-sm text-blue-600 dark:text-blue-400">
+                    Found {searchResults.length} matching owners
+                </div>
+            )}
         </div>
     );
 };

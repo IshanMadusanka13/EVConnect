@@ -85,27 +85,10 @@ const CreateOwnerModal = ({ onClose, onCreate }) => {
 
         setIsSubmitting(true);
         try {
-            // Prepare data for API call
-            const ownerData = {
-                nic: formData.nic,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                dateOfBirth: formData.dateOfBirth,
-                gender: formData.gender,
-                email: formData.email,
-                phoneNumber: formData.phoneNumber,
-                address: formData.address,
-                password: formData.password,
-                vehicleType: formData.vehicleType,
-                vehicleModel: formData.vehicleModel,
-                vehiclePlateNumber: formData.vehiclePlateNumber,
-                batteryCapacity: formData.batteryCapacity,
-                compatibleChargerTypes: formData.compatibleChargerTypes
-            };
-
-            await onCreate(ownerData);
+            await onCreate(formData);
         } catch (error) {
             console.error('Error creating owner:', error);
+            // Error is handled in the parent component
         } finally {
             setIsSubmitting(false);
         }

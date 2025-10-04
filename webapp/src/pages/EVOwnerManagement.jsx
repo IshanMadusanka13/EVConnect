@@ -7,6 +7,7 @@ import EVOwnerCard from '../components/evOwners/EVOwnerCard';
 import CreateOwnerModal from '../components/evOwners/CreateOwnerModal';
 import EditOwnerModal from '../components/evOwners/EditOwnerModal';
 import OwnerDetailsModal from '../components/evOwners/OwnerDetailsModal';
+import api from '../utils/api';
 
 const EVOwnerManagement = () => {
     const { darkMode, getColor } = useContext(ThemeContext);
@@ -32,36 +33,12 @@ const EVOwnerManagement = () => {
     const fetchEVOwners = async () => {
         setLoading(true);
         try {
-            // TODO: Replace with actual API call
-            setTimeout(() => {
-                const mockData = [
-                    {
-                        nic: '987654321V',
-                        firstName: 'John',
-                        lastName: 'Doe',
-                        dateOfBirth: '1990-05-15',
-                        gender: 'Male',
-                        email: 'john.doe@example.com',
-                        phoneNumber: '0771234567',
-                        address: '123 Main Street, Colombo',
-                        vehicleType: 'Car',
-                        vehicleModel: 'Tesla Model 3',
-                        vehiclePlateNumber: 'CAB-1234',
-                        batteryCapacity: '75 kWh',
-                        compatibleChargerTypes: 'AC,DC,Super',
-                        isActive: true,
-                        registrationDate: '2024-01-10',
-                        totalBookings: 12,
-                        totalEnergy: 450.5,
-                        rating: 4.8
-                    },
-                    // Add more mock data as needed...
-                ];
-                setEvOwners(mockData);
-                setLoading(false);
-            }, 1000);
+            const data = await api.getAllEVOwners();
+            setEvOwners(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching EV owners:', error);
+            setEvOwners([]);
+        } finally {
             setLoading(false);
         }
     };
@@ -87,24 +64,26 @@ const EVOwnerManagement = () => {
     // Handle owner activation
     const handleActivate = async (nic) => {
         try {
-            // TODO: Replace with actual API call
+            await api.activateEVOwner(nic);
             setEvOwners(prev => prev.map(owner =>
                 owner.nic === nic ? { ...owner, isActive: true } : owner
             ));
         } catch (error) {
             console.error('Error activating owner:', error);
+            alert('Failed to activate owner');
         }
     };
 
     // Handle owner deactivation
     const handleDeactivate = async (nic) => {
         try {
-            // TODO: Replace with actual API call
+            await api.deactivateEVOwner(nic);
             setEvOwners(prev => prev.map(owner =>
                 owner.nic === nic ? { ...owner, isActive: false } : owner
             ));
         } catch (error) {
             console.error('Error deactivating owner:', error);
+            alert('Failed to deactivate owner');
         }
     };
 
@@ -112,10 +91,11 @@ const EVOwnerManagement = () => {
     const handleDelete = async (nic) => {
         if (window.confirm('Are you sure you want to delete this EV owner?')) {
             try {
-                // TODO: Replace with actual API call
+                await api.deleteEVOwner(nic);
                 setEvOwners(prev => prev.filter(owner => owner.nic !== nic));
             } catch (error) {
                 console.error('Error deleting owner:', error);
+                alert('Failed to delete owner');
             }
         }
     };
@@ -123,34 +103,29 @@ const EVOwnerManagement = () => {
     // Handle owner creation
     const handleCreateOwner = async (ownerData) => {
         try {
-            // TODO: Replace with actual API call
-            const newOwner = {
-                ...ownerData,
-                nic: ownerData.nic,
-                isActive: true,
-                registrationDate: new Date().toISOString().split('T')[0],
-                totalBookings: 0,
-                totalEnergy: 0,
-                rating: 0
-            };
+            const newOwner = await api.createEVOwner(ownerData);
             setEvOwners(prev => [...prev, newOwner]);
             setShowCreateModal(false);
+            alert('EV Owner created successfully!');
         } catch (error) {
             console.error('Error creating owner:', error);
+            alert('Failed to create owner');
         }
     };
 
     // Handle owner update
     const handleUpdateOwner = async (nic, ownerData) => {
         try {
-            // TODO: Replace with actual API call
+            const updatedOwner = await api.updateEVOwner(nic, ownerData);
             setEvOwners(prev => prev.map(owner =>
-                owner.nic === nic ? { ...owner, ...ownerData } : owner
+                owner.nic === nic ? { ...owner, ...updatedOwner } : owner
             ));
             setShowEditModal(false);
             setSelectedOwner(null);
+            alert('EV Owner updated successfully!');
         } catch (error) {
             console.error('Error updating owner:', error);
+            alert('Failed to update owner');
         }
     };
 

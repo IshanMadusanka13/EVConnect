@@ -4,6 +4,7 @@ import { ThemeContext } from '../../contexts/ThemeContext';
 
 const EVOwnerStats = ({ evOwners }) => {
     const { darkMode, getColor } = useContext(ThemeContext);
+    // const [stats, setStats] = useState([]);
 
     // Calculate statistics
     const stats = [
@@ -36,6 +37,19 @@ const EVOwnerStats = ({ evOwners }) => {
             gradient: 'from-purple-500 to-pink-500'
         }
     ];
+
+    // useEffect(() => {
+    //     const fetchStats = async () => {
+    //         try {
+    //             // If you have a dedicated stats endpoint
+    //             // const statsData = await api.getEVOwnerStats();
+    //             // setStats(statsData);
+    //         } catch (error) {
+    //             console.error('Error fetching stats:', error);
+    //         }
+    //     };
+    //     fetchStats();
+    // }, []);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
