@@ -13,6 +13,7 @@ namespace webservice.controllers
     public class BookingController : ControllerBase
     {
         private readonly BookingService _service = new BookingService();
+        private readonly StationService _stationService;
 
         [HttpGet]
         public async Task<ActionResult<List<Booking>>> GetAll()
@@ -82,17 +83,17 @@ namespace webservice.controllers
                 return BadRequest("Invalid time format. Use HH:MM:SS format.");
             }
 
-            var result = await _service.CreateBookingAsync(request.StationId, request.ReservationDate, start, end, request.ChargerType);
-            
+            var result = await _service.CreateBookingAsync(request.StationId, request.NIC, request.ReservationDate, start, end, request.ChargerType);
+
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Message });
             }
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Booking.Id }, new 
-            { 
-                message = result.Message, 
-                booking = result.Booking 
+            return CreatedAtAction(nameof(GetById), new { id = result.Booking.Id }, new
+            {
+                message = result.Message,
+                booking = result.Booking
             });
         }
 
@@ -105,7 +106,7 @@ namespace webservice.controllers
             }
 
             var result = await _service.UpdateBookingAsync(id, request.ReservationDate, start, end, request.ChargerType);
-            
+
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Message });
@@ -118,7 +119,7 @@ namespace webservice.controllers
         public async Task<ActionResult> CancelBooking(string id, [FromBody] CancelBookingRequest request)
         {
             var result = await _service.CancelBookingAsync(id, request.CancelledBy, request.CancellationReason);
-            
+
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Message });
@@ -148,7 +149,7 @@ namespace webservice.controllers
 
             var success = await _service.ScanQRCodeAsync(id);
             if (!success) return BadRequest(new { message = "Failed to scan QR code" });
-            
+
             return Ok(new { message = "QR Code scanned successfully" });
         }
 
@@ -166,6 +167,32 @@ namespace webservice.controllers
             var success = await _service.DeleteBookingAsync(id);
             if (!success) return NotFound();
             return NoContent();
+        }
+        
+        public BookingController(BookingService service, StationService stationService)
+        {
+            _service = service;
+            _stationService = stationService;
+        }
+
+        [HttpGet("{id}/charging-rate")]
+        public async Task<ActionResult> GetChargingRate(string id)
+        {
+            var booking = await _service.GetBookingByIdAsync(id);
+            if (booking == null) return NotFound();
+
+            var station = await _stationService.GetStationByIdAsync(booking.StationId);
+            if (station == null) return NotFound(new { message = "Station not found" });
+
+            var rate = booking.ChargerType == "AC" ? station.AcChargingRate : station.DcChargingRate;
+
+            return Ok(new
+            {
+                chargingRate = rate,
+                chargerType = booking.ChargerType,
+                stationId = station.Id,
+                stationName = station.StationName
+            });
         }
     }
 

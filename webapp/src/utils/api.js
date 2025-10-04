@@ -29,25 +29,25 @@ const fetchApi = async (endpoint, options = {}) => {
       window.location.href = '/login';
       return null;
     }
-    
+
     // Check if the response has content before trying to parse JSON
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       // Only try to parse JSON if there's content and it's JSON type
       const text = await response.text();
       const data = text ? JSON.parse(text) : {};
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong');
       }
-      
+
       return data;
     } else {
       // Handle non-JSON responses
       if (!response.ok) {
         throw new Error('Something went wrong');
       }
-      
+
       return { success: true };
     }
   } catch (error) {
@@ -59,45 +59,126 @@ const fetchApi = async (endpoint, options = {}) => {
 // API methods
 export const api = {
   // Auth
-  login: (credentials) => 
-    fetchApi('/users/login', { 
-      method: 'POST', 
-      body: JSON.stringify(credentials) 
+  login: (credentials) =>
+    fetchApi('/users/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
     }),
-  
-  register: (userData) => 
-    fetchApi('/users/register', { 
-      method: 'POST', 
-      body: JSON.stringify(userData) 
+
+  register: (userData) =>
+    fetchApi('/users/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
     }),
-  
-  logout: () => 
-    fetchApi('/auth/logout', { 
-      method: 'POST' 
+
+  logout: () =>
+    fetchApi('/auth/logout', {
+      method: 'POST'
     }),
-  
+
   //Station
-  addStation: (station) => 
-    fetchApi('/Station', { 
+  addStation: (station) =>
+    fetchApi('/Station', {
       method: 'POST',
-      body: JSON.stringify(station) 
+      body: JSON.stringify(station)
     }),
-  addStationSlot: (slot) => 
-    fetchApi('/Slot', { 
+  addStationSlot: (slot) =>
+    fetchApi('/Slot', {
       method: 'POST',
-      body: JSON.stringify(slot) 
+      body: JSON.stringify(slot)
     }),
-  addStationSchedule: (schedule) => 
-    fetchApi('/Schedule', { 
+  addStationSchedule: (schedule) =>
+    fetchApi('/Schedule', {
       method: 'POST',
-      body: JSON.stringify(schedule) 
+      body: JSON.stringify(schedule)
     }),
-  getAllStation: () => 
-    fetchApi('/Station', { 
+  getAllStation: () =>
+    fetchApi('/Station', {
       method: 'GET'
     }),
-  getStationAllDetails: (id) => 
-    fetchApi(`/Station/all/${id}`, { 
+  getStationAllDetails: (id) =>
+    fetchApi(`/Station/all/${id}`, {
+      method: 'GET'
+    }),
+
+  // Booking
+  getAllBookings: () =>
+    fetchApi('/Booking', {
+      method: 'GET'
+    }),
+
+  getBookingById: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStation: (stationId) =>
+    fetchApi(`/Booking/station/${stationId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsBySlot: (slotId) =>
+    fetchApi(`/Booking/slot/${slotId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStatus: (status) =>
+    fetchApi(`/Booking/status/${status}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByDateRange: (startDate, endDate) =>
+    fetchApi(`/Booking/date-range?startDate=${startDate}&endDate=${endDate}`, {
+      method: 'GET'
+    }),
+
+  checkAvailability: (stationId, reservationDate, startTime, endTime, chargerType) =>
+    fetchApi(`/Booking/availability?stationId=${stationId}&reservationDate=${reservationDate}&startTime=${startTime}&endTime=${endTime}&chargerType=${chargerType}`, {
+      method: 'GET'
+    }),
+
+  createBooking: (bookingData) =>
+    fetchApi('/Booking/create', {
+      method: 'POST',
+      body: JSON.stringify(bookingData)
+    }),
+
+  updateBooking: (id, bookingData) =>
+    fetchApi(`/Booking/${id}/update`, {
+      method: 'PUT',
+      body: JSON.stringify(bookingData)
+    }),
+
+  cancelBooking: (id, cancelData) =>
+    fetchApi(`/Booking/${id}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify(cancelData)
+    }),
+
+  updateBookingStatus: (id, status) =>
+    fetchApi(`/Booking/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    }),
+
+  scanQRCode: (id) =>
+    fetchApi(`/Booking/${id}/scan-qr`, {
+      method: 'POST'
+    }),
+
+  updateEnergyAndCost: (id, energyConsumed, cost) =>
+    fetchApi(`/Booking/${id}/energy-cost`, {
+      method: 'PATCH',
+      body: JSON.stringify({ energyConsumed, cost })
+    }),
+
+  deleteBooking: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'DELETE'
+    }),
+
+  getChargingRate: (id) =>
+    fetchApi(`/Booking/${id}/charging-rate`, {
       method: 'GET'
     }),
 

@@ -6,7 +6,7 @@ import StationManagement from './pages/StationManagement';
 const App = () => {
   return (
         <Routes>
-          <Route path="/" element={<BookingManagement />} />
+          <Route path="/booking" element={<BookingManagement />} />
           <Route path="/station" element={<StationManagement />} />
         </Routes>
   );
