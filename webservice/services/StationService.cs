@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using webservice.data;
-using webservice.dto;
+// using webservice.dto;
 using webservice.models;
 using webservice.dto;
 
@@ -47,7 +47,7 @@ namespace webservice.services
                 var station = await _stations.Find(s => s.Id == id).FirstOrDefaultAsync();
                 if (station == null)
                     _logger.LogWarning($"Station not found: {id}");
-                return station;
+                return station!;
             }
             catch (Exception ex)
             {
@@ -67,7 +67,7 @@ namespace webservice.services
                     .FirstOrDefaultAsync();
 
                 int nextNumber = 1;
-                if (lastStation != null && int.TryParse(lastStation.Id.Substring(2), out int lastNumber))
+                if (lastStation?.Id != null && int.TryParse(lastStation.Id.Substring(2), out int lastNumber))
                 {
                     nextNumber = lastNumber + 1;
                 }
@@ -79,8 +79,6 @@ namespace webservice.services
                     Address = request.Address,
                     Latitude = request.Latitude,
                     Longitude = request.Longitude,
-                    AcChargingRate = request.AcChargingRate,
-                    DcChargingRate = request.DcChargingRate,
                     IsActive = true,
                     OperatorId = request.OperatorId
                 };
@@ -88,37 +86,28 @@ namespace webservice.services
                 await _stations.InsertOneAsync(station);
                 _logger.LogInformation($"Station created with id: {station.Id}");
 
-                // Create slots for the station
+                // Create slots for the station using dynamic slot types
                 var slotService = new SlotService();
-                int acCount = (int)request.AcCount;
-                int dcCount = (int)request.DcCount;
                 int slotNumber = 1;
                 var slotTasks = new List<Task>();
-                for (int i = 0; i < acCount; i++)
+                if (request.Slots != null)
                 {
-                    var slot = new Slot
+                    foreach (var slotInfo in request.Slots)
                     {
-                        Id = station.Id + $"-SLOT{slotNumber:D3}",
-                        SlotNumber = $"SLOT{slotNumber:D3}",
-                        StationId = station.Id,
-                        ChargerType = "AC",
-                        IsOperational = true
-                    };
-                    slotTasks.Add(slotService.CreateSlotAsync(slot));
-                    slotNumber++;
-                }
-                for (int i = 0; i < dcCount; i++)
-                {
-                    var slot = new Slot
-                    {
-                        Id = station.Id + $"-SLOT{slotNumber:D3}",
-                        SlotNumber = $"SLOT{slotNumber:D3}",
-                        StationId = station.Id,
-                        ChargerType = "DC",
-                        IsOperational = true
-                    };
-                    slotTasks.Add(slotService.CreateSlotAsync(slot));
-                    slotNumber++;
+                        for (int i = 0; i < slotInfo.Count; i++)
+                        {
+                            var slot = new Slot
+                            {
+                                Id = station.Id + $"-SLOT{slotNumber:D3}",
+                                SlotNumber = $"SLOT{slotNumber:D3}",
+                                StationId = station.Id,
+                                ChargerType = slotInfo.Type?.SlotName ?? "Unknown",
+                                IsOperational = true
+                            };
+                            slotTasks.Add(slotService.CreateSlotAsync(slot));
+                            slotNumber++;
+                        }
+                    }
                 }
                 await Task.WhenAll(slotTasks);
 

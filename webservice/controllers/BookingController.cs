@@ -184,7 +184,7 @@ namespace webservice.controllers
             var station = await _stationService.GetStationByIdAsync(booking.StationId);
             if (station == null) return NotFound(new { message = "Station not found" });
 
-            var rate = booking.ChargerType == "AC" ? station.AcChargingRate : station.DcChargingRate;
+            var rate = 1;
 
             return Ok(new
             {

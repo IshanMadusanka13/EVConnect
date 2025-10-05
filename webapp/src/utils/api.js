@@ -119,6 +119,14 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(updatedStation)
     }),
+  getAllSlotTypes: () =>
+    fetchApi('/SlotType', { method: 'GET' }),
+  addSlotType: (slotType) =>
+    fetchApi('/SlotType', { method: 'POST', body: JSON.stringify(slotType) }),
+  updateSlotType: (id, slotType) =>
+    fetchApi(`/SlotType/${id}`, { method: 'PUT', body: JSON.stringify(slotType) }),
+  deleteSlotType: (id) =>
+    fetchApi(`/SlotType/${id}`, { method: 'DELETE' }),
 
   // Booking
   getAllBookings: () =>

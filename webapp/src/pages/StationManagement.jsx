@@ -3,7 +3,7 @@ import api from '../utils/api';
 import MapPicker from '../components/MapPicker';
 import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
-import { Plus, X, MapPin } from 'lucide-react';
+import { Plus, X, MapPin, Pencil, Trash } from 'lucide-react';
 
 const StationManagement = () => {
     const { darkMode, getColor } = useContext(ThemeContext);
@@ -13,6 +13,70 @@ const StationManagement = () => {
     const [stationDetails, setStationDetails] = useState(null);
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    // SlotTypes modal state
+    const [showSlotTypesModal, setShowSlotTypesModal] = useState(false);
+    const [slotTypes, setSlotTypes] = useState([]);
+    const [slotTypeForm, setSlotTypeForm] = useState({ SlotName: '', Rate: '' });
+    const [editingSlotType, setEditingSlotType] = useState(null);
+    const [slotTypeLoading, setSlotTypeLoading] = useState(false);
+
+    // Fetch slot types
+    const fetchSlotTypes = async () => {
+        setSlotTypeLoading(true);
+        try {
+            const data = await api.getAllSlotTypes();
+            setSlotTypes(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setSlotTypes([]);
+        }
+        setSlotTypeLoading(false);
+    };
+
+    useEffect(() => {
+        if (showSlotTypesModal) fetchSlotTypes();
+    }, [showSlotTypesModal]);
+
+    // Add or update slot type
+    const handleAddOrUpdateSlotType = async (e) => {
+        e.preventDefault();
+        try {
+            if (editingSlotType) {
+                await api.updateSlotType(editingSlotType.id, slotTypeForm);
+            } else {
+                await api.addSlotType(slotTypeForm);
+            }
+            setSlotTypeForm({ SlotName: '', Rate: '' });
+            setEditingSlotType(null);
+            fetchSlotTypes();
+        } catch (err) {
+            alert('Failed to save slot type');
+        }
+    };
+
+    // Edit slot type
+    const handleEditSlotType = (slotType) => {
+        setEditingSlotType(slotType);
+        setSlotTypeForm({ SlotName: slotType.slotName, Rate: slotType.rate });
+    };
+
+    // Delete slot type
+    const handleDeleteSlotType = async (id) => {
+        if (!window.confirm('Delete this slot type?')) return;
+        try {
+            await api.deleteSlotType(id);
+            fetchSlotTypes();
+        } catch (err) {
+            alert('Failed to delete slot type');
+        }
+    };
+
+    // Close modal and reset
+    const handleCloseSlotTypesModal = () => {
+        setShowSlotTypesModal(false);
+        setSlotTypeForm({ SlotName: '', Rate: '' });
+        setEditingSlotType(null);
+    };
 
     useEffect(() => {
         const fetchStations = async () => {
@@ -86,6 +150,13 @@ const StationManagement = () => {
                                 placeholder="Search stations..."
                                 className={`pl-4 pr-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all w-full md:w-80`}
                             />
+                            <button
+                                onClick={() => setShowSlotTypesModal(true)}
+                                className="px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-pink-500/50 hover:scale-105 flex items-center gap-2"
+                            >
+                                <Plus className="w-5 h-5" />
+                                SlotTypes
+                            </button>
                         </div>
                         <button
                             onClick={() => setShowCreateModal(true)}
@@ -135,6 +206,86 @@ const StationManagement = () => {
             {showCreateModal ? (
                 <CreateStationModal onClose={() => setShowCreateModal(false)} onCreate={handleCreateStation} />
             ) : null}
+
+            {/* SlotTypes Modal */}
+            {showSlotTypesModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={handleCloseSlotTypesModal}></div>
+                    <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
+                        <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
+                            <div className="flex items-center justify-between">
+                                <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>Slot Types</h2>
+                                <button onClick={handleCloseSlotTypesModal} className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}>
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="p-6">
+                            {/* Add/Edit Form */}
+                            <form className="flex items-center gap-4 mb-6" onSubmit={handleAddOrUpdateSlotType}>
+                                <input
+                                    type="text"
+                                    placeholder="Slot"
+                                    value={slotTypeForm.SlotName}
+                                    onChange={e => setSlotTypeForm(f => ({ ...f, SlotName: e.target.value }))}
+                                    className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all w-40`}
+                                    required
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="Rate"
+                                    value={slotTypeForm.Rate}
+                                    onChange={e => setSlotTypeForm(f => ({ ...f, Rate: e.target.value }))}
+                                    className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all w-32`}
+                                    required
+                                    step="any"
+                                />
+                                <button type="submit" className="px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold flex items-center gap-2">
+                                    <Plus className="w-5 h-5" />
+                                    {editingSlotType ? 'Update' : 'Add'}
+                                </button>
+                                {editingSlotType && (
+                                    <button type="button" className="px-3 py-2 rounded-xl bg-gray-300 text-gray-700 font-semibold" onClick={() => { setEditingSlotType(null); setSlotTypeForm({ SlotName: '', Rate: '' }); }}>Cancel</button>
+                                )}
+                            </form>
+                            {/* Table */}
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full border rounded-xl">
+                                    <thead>
+                                        <tr className={`bg-purple-100 dark:bg-purple-900`}>
+                                            <th className="px-4 py-2 text-left">Slot</th>
+                                            <th className="px-4 py-2 text-left">Rate</th>
+                                            <th className="px-4 py-2 text-left">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {slotTypeLoading ? (
+                                            <tr><td colSpan={3} className="text-center py-6 text-gray-400">Loading...</td></tr>
+                                        ) : slotTypes.length === 0 ? (
+                                            <tr><td colSpan={3} className="text-center py-6 text-gray-400">No slot types found.</td></tr>
+                                        ) : (
+                                            slotTypes.map(st => (
+                                                <tr key={st.Id || st.id} className="border-b">
+                                                    <td className="px-4 py-2">{st.slotName}</td>
+                                                    <td className="px-4 py-2">{st.rate}</td>
+                                                    <td className="px-4 py-2 flex gap-2">
+                                                        <button className="p-2 rounded bg-blue-500 text-white hover:bg-blue-600" title="Edit" onClick={() => handleEditSlotType(st)}>
+                                                            <Pencil className="w-4 h-4" />
+                                                        </button>
+                                                        <button className="p-2 rounded bg-red-500 text-white hover:bg-red-600" title="Delete" onClick={() => handleDeleteSlotType(st.Id || st.id)}>
+                                                            <Trash className="w-4 h-4" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {selectedStation && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
@@ -281,14 +432,12 @@ const CreateStationModal = ({ onClose, onCreate }) => {
         operatorId: '',
         latitude: '',
         longitude: '',
-        acChargingRate: '',
-        dcChargingRate: '',
-        acCount: '',
-        dcCount: '',
         schedules: []
     });
     const [showMap, setShowMap] = useState(false);
-    const [slotData, setSlotData] = useState({ acCount: '', dcCount: '', acRate: '', dcRate: '' });
+    const [slotTypes, setSlotTypes] = useState([]);
+    // Dynamic slot types selection
+    const [selectedSlots, setSelectedSlots] = useState([]); // [{slotTypeId, slotName, rate, count}]
     // Seven days schedule state
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const [scheduleStep, setScheduleStep] = useState(
@@ -299,6 +448,20 @@ const CreateStationModal = ({ onClose, onCreate }) => {
             closingTime: ''
         }))
     );
+
+    useEffect(() => {
+        fetchSlotTypes();
+    }, [step]);
+
+    // Fetch slot types
+    const fetchSlotTypes = async () => {
+        try {
+            const data = await api.getAllSlotTypes();
+            setSlotTypes(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setSlotTypes([]);
+        }
+    };
 
     // Step 1: Station Details
     const handleMapPick = (lat, lng) => {
@@ -314,13 +477,6 @@ const CreateStationModal = ({ onClose, onCreate }) => {
     // Step 2: Slot Details
     const handleSlotSubmit = async (e) => {
         e.preventDefault();
-        setStationForm(prev => ({
-            ...prev,
-            acCount: slotData.acCount,
-            dcCount: slotData.dcCount,
-            acChargingRate: slotData.acRate,
-            dcChargingRate: slotData.dcRate
-        }));
         setStep(3);
     };
 
@@ -337,20 +493,23 @@ const CreateStationModal = ({ onClose, onCreate }) => {
         e.preventDefault();
         // Prepare payload matching CreateStationRequest DTO
         const payload = {
-            StationName: stationForm.stationName,
-            Address: stationForm.address,
-            Latitude: parseFloat(stationForm.latitude),
-            Longitude: parseFloat(stationForm.longitude),
-            OperatorId: stationForm.operatorId,
-            AcChargingRate: parseFloat(stationForm.acChargingRate),
-            DcChargingRate: parseFloat(stationForm.dcChargingRate),
-            AcCount: parseInt(stationForm.acCount),
-            DcCount: parseInt(stationForm.dcCount),
-            Schedules: scheduleStep.map(s => ({
-                DayOfWeek: s.dayOfWeek,
-                IsOpen: s.isOpen,
-                OpeningTime: s.openingTime,
-                ClosingTime: s.closingTime
+            stationName: stationForm.stationName,
+            address: stationForm.address,
+            latitude: parseFloat(stationForm.latitude),
+            longitude: parseFloat(stationForm.longitude),
+            operatorId: stationForm.operatorId,
+            slots: selectedSlots.filter(s => parseInt(s.count) > 0).map(s => ({
+                type: {
+                    id: s.slotTypeId,
+                    slotName: s.slotName
+                },
+                count: parseInt(s.count)
+            })),
+            schedules: scheduleStep.map(s => ({
+                dayOfWeek: s.dayOfWeek,
+                isOpen: s.isOpen,
+                openingTime: s.openingTime,
+                closingTime: s.closingTime
             }))
         };
         try {
@@ -456,44 +615,39 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                     {step === 2 && (
                         <form className="space-y-6" onSubmit={handleSlotSubmit}>
                             <div>
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Number of AC Chargers</label>
-                                <input
-                                    type="number"
-                                    value={slotData.acCount}
-                                    onChange={e => setSlotData({ ...slotData, acCount: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>AC Charging Rate</label>
-                                <input
-                                    type="number"
-                                    value={slotData.acRate}
-                                    onChange={e => setSlotData({ ...slotData, acRate: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Number of DC Charges</label>
-                                <input
-                                    type="number"
-                                    value={slotData.dcCount}
-                                    onChange={e => setSlotData({ ...slotData, dcCount: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>DC Charging Rate</label>
-                                <input
-                                    type="number"
-                                    value={slotData.dcRate}
-                                    onChange={e => setSlotData({ ...slotData, dcRate: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                    required
-                                />
+                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Add Slots</label>
+                                <div className="space-y-2">
+                                    {Array.isArray(slotTypes) && slotTypes.length > 0 ? (
+                                        slotTypes.map(st => {
+                                            const selected = selectedSlots.find(s => s.slotTypeId === st.id);
+                                            return (
+                                                <div key={st.id} className="flex items-center gap-4">
+                                                    <span className={`font-semibold ${getColor('text.primary')} w-32`}>{st.slotName} Slots</span>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        value={selected ? selected.count : ''}
+                                                        onChange={e => {
+                                                            const val = e.target.value;
+                                                            setSelectedSlots(prev => {
+                                                                const exists = prev.find(s => s.slotTypeId === st.id);
+                                                                if (exists) {
+                                                                    return prev.map(s => s.slotTypeId === st.id ? { ...s, count: val } : s);
+                                                                } else {
+                                                                    return [...prev, { slotTypeId: st.id, slotName: st.slotName, rate: st.rate, count: val }];
+                                                                }
+                                                            });
+                                                        }}
+                                                        className={`px-4 py-2 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} w-54`}
+                                                        placeholder="Count"
+                                                    />
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="text-gray-400">No slot types available. Add slot types first.</div>
+                                    )}
+                                </div>
                             </div>
                             <button
                                 type="submit"
@@ -515,8 +669,8 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                                     <div
                                         key={sched.dayOfWeek}
                                         className={`p-4 rounded-xl border ${getColor('border.primary')} transition-all ${sched.isOpen
-                                                ? `${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'} border-emerald-500/30`
-                                                : `${getColor('background.input')} opacity-75`
+                                            ? `${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'} border-emerald-500/30`
+                                            : `${getColor('background.input')} opacity-75`
                                             }`}
                                     >
                                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
