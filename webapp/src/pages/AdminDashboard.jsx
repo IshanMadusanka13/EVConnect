@@ -31,6 +31,7 @@ import {
   UserCircle
 } from "lucide-react";
 import { ThemeContext } from '../contexts/ThemeContext';
+import Swal from "sweetalert2";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -38,25 +39,79 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    FirstName: "",
+    LastName: "",
+    Email: "",
+    EmployeeId: selectedUser ? selectedUser.employeeId : "",
+    PhoneNumber: "",
+    Password: selectedUser ? selectedUser.password : "",
+    Role: "StationOperator",
+    IsActive: true,
+  });
 
-  useEffect(() => {
+  // Fetch users
+  const fetchUsers = () => {
     axios
       .get("http://localhost:5116/users")
       .then((res) => setUsers(res.data))
       .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   const openModal = (user) => {
     setSelectedUser(user);
+    setEditForm({
+      FirstName: user.firstName,
+      LastName: user.lastName,
+      Email: user.email,
+      EmployeeId: user.employeeId,
+      PhoneNumber: user.phoneNumber,
+      Password: user.password,
+      Role: user.role,
+      IsActive: user.isActive,
+    });
+    setEditMode(false);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedUser(null);
     setIsModalOpen(false);
+    setEditMode(false);
   };
 
-  // Sample Data for Graphs
+  const handleUpdate = async () => {
+    
+    try {
+      var userid = toString(selectedUser._id);
+      console.log (`http://localhost:5116/users/${selectedUser.id}`);
+      console.log(editForm);
+      const res = await axios.put(`http://localhost:5116/users/${selectedUser.id}`, editForm);
+      Swal.fire({
+        icon: "success",
+        title: "User Updated!",
+        text: `${res.data.firstName} ${res.data.lastName} updated successfully.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      fetchUsers();
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: err.response?.data?.message || "Something went wrong.",
+      });
+    }
+  };
+
+  // Sample static user growth
   const userGrowthData = [
     { month: "Jan", users: 30 },
     { month: "Feb", users: 50 },
@@ -65,9 +120,10 @@ const AdminDashboard = () => {
     { month: "May", users: 150 },
   ];
 
+  // Role distribution based on actual users
   const roleData = [
-    { name: "Backoffice", value: 8 },
-    { name: "Station Operator", value: 12 },
+    { name: "Backoffice", value: users.filter(u => u.role === "Backoffice").length },
+    { name: "Station Operator", value: users.filter(u => u.role === "StationOperator").length },
   ];
 
   const COLORS = ["#8b5cf6", "#ec4899", "#ef4444"];
@@ -91,7 +147,7 @@ const AdminDashboard = () => {
         <div className={`absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-3xl opacity-10 ${darkMode ? 'bg-pink-600' : 'bg-pink-400'} animate-pulse`} style={{ animationDelay: '2s' }}></div>
       </div>
 
-      {/* Modern Sidebar */}
+      {/* Sidebar */}
       <div className={`fixed left-6 top-6 bottom-6 w-64 ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} rounded-3xl p-6 z-10`}>
         <div className="mb-8">
           <h2 className={`text-2xl font-bold mb-1 ${getColor('text.primary')}`}>
@@ -99,7 +155,6 @@ const AdminDashboard = () => {
           </h2>
           <p className={`text-sm ${getColor('text.secondary')}`}>Management Dashboard</p>
         </div>
-        
         <ul className="space-y-2">
           {sidebarItems.map((item, index) => {
             const Icon = item.icon;
@@ -121,17 +176,13 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <div className="relative flex-1 p-8 ml-80">
-        {/* Header Section */}
         <div className="mb-8">
           <h1 className={`text-4xl font-bold mb-2 ${getColor('text.primary')}`}>
             Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">Admin</span>
           </h1>
-          <p className={`text-lg ${getColor('text.secondary')}`}>
-            Here's what's happening with your platform today
-          </p>
+          <p className={`text-lg ${getColor('text.secondary')}`}>Here's what's happening with your platform today</p>
         </div>
 
-        {/* Add New User Button */}
         <button
           onClick={() => navigate("/users")}
           className="fixed z-20 px-6 py-3 font-semibold text-white transition-all rounded-xl top-8 right-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105"
@@ -141,18 +192,14 @@ const AdminDashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4">
-          {[
-            { label: 'Total Users', value: users.length, change: '+12%', icon: Users, gradient: 'from-blue-500 to-cyan-500' },
-            { label: 'Active Stations', value: '24', change: '+3', icon: Building, gradient: 'from-emerald-500 to-teal-500' },
-            { label: 'Total Bookings', value: '1.2K', change: '+18%', icon: Calendar, gradient: 'from-purple-500 to-pink-500' },
-            { label: 'Revenue', value: '$45K', change: '+23%', icon: TrendingUp, gradient: 'from-amber-500 to-orange-500' }
+          {[ { label: 'Total Users', value: users.length, change: '+12%', icon: Users, gradient: 'from-blue-500 to-cyan-500' },
+             { label: 'Active Stations', value: '24', change: '+3', icon: Building, gradient: 'from-emerald-500 to-teal-500' },
+             { label: 'Total Bookings', value: '1.2K', change: '+18%', icon: Calendar, gradient: 'from-purple-500 to-pink-500' },
+             { label: 'Revenue', value: '$45K', change: '+23%', icon: TrendingUp, gradient: 'from-amber-500 to-orange-500' }
           ].map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div
-                key={index}
-                className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}
-              >
+              <div key={index} className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}>
                 <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
                 <div className="relative">
                   <div className="flex items-start justify-between mb-4">
@@ -171,7 +218,7 @@ const AdminDashboard = () => {
           })}
         </div>
 
-        {/* Charts Section */}
+        {/* Charts */}
         <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2">
           {/* Line Chart */}
           <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
@@ -179,45 +226,17 @@ const AdminDashboard = () => {
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={userGrowthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#334155' : '#e2e8f0'} />
-                <XAxis dataKey="month" stroke={darkMode ? '#94a3b8' : '#64748b'} />
-                <YAxis stroke={darkMode ? '#94a3b8' : '#64748b'} />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
-                    borderRadius: '12px',
-                    color: darkMode ? '#ffffff' : '#000000'
-                  }}
-                />
-                <Line type="monotone" dataKey="users" stroke="#8b5cf6" strokeWidth={3} />
+                <XAxis dataKey="month" stroke={darkMode ? '#94a3b8' : '#475569'} />
+                <YAxis stroke={darkMode ? '#94a3b8' : '#475569'} />
+                <Tooltip />
+                <Line type="monotone" dataKey="users" stroke="#6366f1" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Bar Chart */}
+          {/* Role Distribution Pie Chart */}
           <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
-            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>Users per Role</h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={roleData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#334155' : '#e2e8f0'} />
-                <XAxis dataKey="name" stroke={darkMode ? '#94a3b8' : '#64748b'} />
-                <YAxis stroke={darkMode ? '#94a3b8' : '#64748b'} />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
-                    borderRadius: '12px',
-                    color: darkMode ? '#ffffff' : '#000000'
-                  }}
-                />
-                <Bar dataKey="value" fill="#a4eef5" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Pie Chart */}
-          <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl md:col-span-2 border ${getColor('border.primary')}`}>
-            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>Role Distribution</h2>
+            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>User Roles Distribution</h2>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -226,7 +245,7 @@ const AdminDashboard = () => {
                   cy="50%"
                   labelLine={false}
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
+                  outerRadius={80}
                   fill="#a4eef5"
                   dataKey="value"
                 >
@@ -234,106 +253,38 @@ const AdminDashboard = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend wrapperStyle={{ color: darkMode ? '#ffffff' : '#000000' }} />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
-                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
-                    borderRadius: '12px',
-                    color: darkMode ? '#ffffff' : '#000000'
-                  }}
-                />
+                <Legend />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* User List */}
-        <div className={`w-full p-6 mb-8 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
-          <h2 className={`mb-6 text-2xl font-bold ${getColor('text.primary')}`}>Registered Users</h2>
-
-          {/* Table Header */}
-          <div className={`grid grid-cols-4 gap-4 px-4 py-3 font-semibold rounded-xl mb-4 ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} ${getColor('text.primary')}`}>
-            <span>Name</span>
-            <span>Email</span>
-            <span>Phone</span>
-            <span>Role</span>
-          </div>
-
-          {/* Table Rows */}
-          <ul className="space-y-3">
-            {users.map((user, index) => (
-              <li
-                key={user._id || user.employeeId}
-                className={`grid grid-cols-4 gap-4 p-4 transition-all duration-300 cursor-pointer rounded-xl ${darkMode ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'} hover:scale-[1.02] border ${getColor('border.primary')}`}
-                onClick={() => openModal(user)}
-                style={{ animationDelay: `${index * 50}ms` }}
+        {/* Users List */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {users.map((user) => (
+            <div
+              key={user._id}
+              className={`p-6 rounded-3xl border ${getColor('border.primary')} ${getColor('background.card')} cursor-pointer hover:scale-105 transition-all duration-300`}
+              onClick={() => openModal(user)}
+            >
+              <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Full Name</p>
+              <p className={`text-lg font-semibold ${getColor('text.primary')}`}>
+                {user.firstName} {user.lastName}
+              </p>
+              <p className={`text-xs ${getColor('text.tertiary')} mt-2 mb-1`}>Email</p>
+              <p className={`text-sm font-semibold ${getColor('text.primary')}`}>{user.email}</p>
+              <p className={`text-xs ${getColor('text.tertiary')} mt-2 mb-1`}>Role</p>
+              <span
+                className={`inline-block px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                  user.role === "Backoffice" 
+                    ? "bg-gradient-to-r from-red-500 to-pink-500" 
+                    : "bg-gradient-to-r from-blue-500 to-cyan-500"
+                }`}
               >
-                <span className={`font-medium ${getColor('text.primary')}`}>
-                  {user.firstName} {user.lastName}
-                </span>
-                <span className={getColor('text.secondary')}>{user.email}</span>
-                <span className={getColor('text.secondary')}>{user.phoneNumber}</span>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold text-white w-fit ${
-                    user.role === "Backoffice" ? "bg-gradient-to-r from-red-500 to-pink-500" : "bg-gradient-to-r from-blue-500 to-cyan-500"
-                  }`}
-                >
-                  {user.role}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Management Cards */}
-        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
-          {[
-            {
-              label: "EV Owner Management",
-              description: "View, edit, or manage registered EV owners.",
-              icon: User,
-              gradient: "from-purple-500 to-pink-500",
-              onClick: () => navigate("/ev-owner"),
-            },
-            {
-              label: "Charging Station Management",
-              description: "Monitor and update charging station details.",
-              icon: MapPin,
-              gradient: "from-blue-500 to-cyan-500",
-              onClick: () => navigate("/station"),
-            },
-            {
-              label: "Booking Management",
-              description: "Monitor and manage booking details.",
-              icon: Calendar,
-              gradient: "from-emerald-500 to-teal-500",
-              onClick: () => navigate("/booking"),
-            },
-          ].map((card, index) => {
-            const Icon = card.icon;
-            return (
-              <div
-                key={index}
-                onClick={card.onClick}
-                className={`group relative p-6 overflow-hidden transition-all duration-300 border cursor-pointer rounded-2xl ${getColor('border.primary')} backdrop-blur-sm hover:scale-105 ${getColor('background.card')}`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-r ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                ></div>
-                <div className="relative">
-                  <div className="flex items-center justify-start mb-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-r ${card.gradient} mr-3`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <p className={`text-lg font-bold ${getColor('text.primary')}`}>{card.label}</p>
-                  </div>
-                  <p className={getColor('text.secondary')}>{card.description}</p>
-                </div>
-              </div>
-            );
-          })}
+                {user.role}
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* Modal */}
@@ -347,51 +298,110 @@ const AdminDashboard = () => {
               <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
                 <div className="flex items-center justify-between">
                   <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>
-                    User Details
+                    {editMode ? "Edit User" : "User Details"}
                   </h2>
-                  <button
-                    onClick={closeModal}
-                    className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  <div className="flex gap-2">
+                    {!editMode && (
+                      <button
+                        onClick={() => setEditMode(true)}
+                        className={`px-3 py-1 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 hover:scale-105`}
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button onClick={closeModal} className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}>
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Full Name</p>
-                    <p className={`font-semibold text-lg ${getColor('text.primary')}`}>
-                      {selectedUser.firstName} {selectedUser.lastName}
-                    </p>
-                  </div>
-                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Email</p>
-                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.email}</p>
-                  </div>
-                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
-                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.phoneNumber}</p>
-                  </div>
-                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Role</p>
-                    <span
-                      className={`inline-block px-4 py-2 rounded-full text-sm font-semibold text-white ${
-                        selectedUser.role === "Backoffice" 
-                          ? "bg-gradient-to-r from-red-500 to-pink-500" 
-                          : "bg-gradient-to-r from-blue-500 to-cyan-500"
-                      }`}
+
+              <div className="p-6 space-y-4">
+                {editMode ? (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      value={editForm.FirstName}
+                      onChange={(e) => setEditForm({ ...editForm, FirstName: e.target.value })}
+                      className="w-full p-3 border rounded-lg"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      value={editForm.LastName}
+                      onChange={(e) => setEditForm({ ...editForm, LastName: e.target.value })}
+                      className="w-full p-3 border rounded-lg"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={editForm.Email}
+                      onChange={(e) => setEditForm({ ...editForm, Email: e.target.value })}
+                      className="w-full p-3 border rounded-lg"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Phone Number"
+                      value={editForm.PhoneNumber}
+                      onChange={(e) => setEditForm({ ...editForm, PhoneNumber: e.target.value })}
+                      className="w-full p-3 border rounded-lg"
+                    />
+                    <select
+                      value={editForm.Role}
+                      onChange={(e) => setEditForm({ ...editForm, Role: e.target.value })}
+                      className="w-full p-3 border rounded-lg"
                     >
-                      {selectedUser.role}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  className="w-full py-3 mt-6 font-semibold text-white transition-all rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
+                      <option value="Backoffice">Backoffice</option>
+                      <option value="StationOperator">Station Operator</option>
+                    </select>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editForm.IsActive}
+                        onChange={(e) => setEditForm({ ...editForm, IsActive: e.target.checked })}
+                        id="isActive"
+                        className="w-4 h-4"
+                      />
+                      <label htmlFor="isActive" className={getColor('text.primary')}>Active</label>
+                    </div>
+                    <button
+                      onClick={handleUpdate}
+                      className="w-full py-3 mt-4 font-semibold text-white transition-all rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:scale-105"
+                    >
+                      Save Changes
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Full Name</p>
+                      <p className={`font-semibold text-lg ${getColor('text.primary')}`}>
+                        {selectedUser.firstName} {selectedUser.lastName}
+                      </p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Email</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.email}</p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.phoneNumber}</p>
+                    </div>
+                    <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Role</p>
+                      <span
+                        className={`inline-block px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                          selectedUser.role === "Backoffice" 
+                            ? "bg-gradient-to-r from-red-500 to-pink-500" 
+                            : "bg-gradient-to-r from-blue-500 to-cyan-500"
+                        }`}
+                      >
+                        {selectedUser.role}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
