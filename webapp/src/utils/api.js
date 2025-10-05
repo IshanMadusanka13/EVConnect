@@ -30,6 +30,7 @@ const fetchApi = async (endpoint, options = {}) => {
       return null;
     }
 
+
     // Check if the response has content before trying to parse JSON
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
@@ -37,9 +38,11 @@ const fetchApi = async (endpoint, options = {}) => {
       const text = await response.text();
       const data = text ? JSON.parse(text) : {};
 
+
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong');
       }
+
 
       return data;
     } else {
@@ -47,6 +50,7 @@ const fetchApi = async (endpoint, options = {}) => {
       if (!response.ok) {
         throw new Error('Something went wrong');
       }
+
 
       return { success: true };
     }
@@ -114,6 +118,168 @@ export const api = {
     fetchApi(`/Station/${stationId}`, {
       method: 'PUT',
       body: JSON.stringify(updatedStation)
+    }),
+
+  // Booking
+  getAllBookings: () =>
+    fetchApi('/Booking', {
+      method: 'GET'
+    }),
+
+  getBookingById: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStation: (stationId) =>
+    fetchApi(`/Booking/station/${stationId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsBySlot: (slotId) =>
+    fetchApi(`/Booking/slot/${slotId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStatus: (status) =>
+    fetchApi(`/Booking/status/${status}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByDateRange: (startDate, endDate) =>
+    fetchApi(`/Booking/date-range?startDate=${startDate}&endDate=${endDate}`, {
+      method: 'GET'
+    }),
+
+  checkAvailability: (stationId, reservationDate, startTime, endTime, chargerType) =>
+    fetchApi(`/Booking/availability?stationId=${stationId}&reservationDate=${reservationDate}&startTime=${startTime}&endTime=${endTime}&chargerType=${chargerType}`, {
+      method: 'GET'
+    }),
+
+  createBooking: (bookingData) =>
+    fetchApi('/Booking/create', {
+      method: 'POST',
+      body: JSON.stringify(bookingData)
+    }),
+
+  updateBooking: (id, bookingData) =>
+    fetchApi(`/Booking/${id}/update`, {
+      method: 'PUT',
+      body: JSON.stringify(bookingData)
+    }),
+
+  cancelBooking: (id, cancelData) =>
+    fetchApi(`/Booking/${id}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify(cancelData)
+    }),
+
+  updateBookingStatus: (id, status) =>
+    fetchApi(`/Booking/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    }),
+
+  scanQRCode: (id) =>
+    fetchApi(`/Booking/${id}/scan-qr`, {
+      method: 'POST'
+    }),
+
+  updateEnergyAndCost: (id, energyConsumed, cost) =>
+    fetchApi(`/Booking/${id}/energy-cost`, {
+      method: 'PATCH',
+      body: JSON.stringify({ energyConsumed, cost })
+    }),
+
+  deleteBooking: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'DELETE'
+    }),
+
+  getChargingRate: (id) =>
+    fetchApi(`/Booking/${id}/charging-rate`, {
+      method: 'GET'
+    }),
+
+  // Booking
+  getAllBookings: () =>
+    fetchApi('/Booking', {
+      method: 'GET'
+    }),
+
+  getBookingById: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStation: (stationId) =>
+    fetchApi(`/Booking/station/${stationId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsBySlot: (slotId) =>
+    fetchApi(`/Booking/slot/${slotId}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByStatus: (status) =>
+    fetchApi(`/Booking/status/${status}`, {
+      method: 'GET'
+    }),
+
+  getBookingsByDateRange: (startDate, endDate) =>
+    fetchApi(`/Booking/date-range?startDate=${startDate}&endDate=${endDate}`, {
+      method: 'GET'
+    }),
+
+  checkAvailability: (stationId, reservationDate, startTime, endTime, chargerType) =>
+    fetchApi(`/Booking/availability?stationId=${stationId}&reservationDate=${reservationDate}&startTime=${startTime}&endTime=${endTime}&chargerType=${chargerType}`, {
+      method: 'GET'
+    }),
+
+  createBooking: (bookingData) =>
+    fetchApi('/Booking/create', {
+      method: 'POST',
+      body: JSON.stringify(bookingData)
+    }),
+
+  updateBooking: (id, bookingData) =>
+    fetchApi(`/Booking/${id}/update`, {
+      method: 'PUT',
+      body: JSON.stringify(bookingData)
+    }),
+
+  cancelBooking: (id, cancelData) =>
+    fetchApi(`/Booking/${id}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify(cancelData)
+    }),
+
+  updateBookingStatus: (id, status) =>
+    fetchApi(`/Booking/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    }),
+
+  scanQRCode: (id) =>
+    fetchApi(`/Booking/${id}/scan-qr`, {
+      method: 'POST'
+    }),
+
+  updateEnergyAndCost: (id, energyConsumed, cost) =>
+    fetchApi(`/Booking/${id}/energy-cost`, {
+      method: 'PATCH',
+      body: JSON.stringify({ energyConsumed, cost })
+    }),
+
+  deleteBooking: (id) =>
+    fetchApi(`/Booking/${id}`, {
+      method: 'DELETE'
+    }),
+
+  getChargingRate: (id) =>
+    fetchApi(`/Booking/${id}/charging-rate`, {
+      method: 'GET'
     }),
 
 };

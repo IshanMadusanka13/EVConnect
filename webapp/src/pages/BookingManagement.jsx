@@ -5,6 +5,9 @@ import {
 } from 'lucide-react';
 import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
+import api from '../utils/api';
+import { QRCodeSVG } from 'qrcode.react';
+import { jsPDF } from 'jspdf';
 
 const BookingManagement = () => {
   const { darkMode, getColor } = useContext(ThemeContext);
@@ -12,87 +15,192 @@ const BookingManagement = () => {
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [energyInput, setEnergyInput] = useState('');
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  const [stationsLookup, setStationsLookup] = useState({});
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
     search: ''
   });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    pending: 0,
+    revenue: 0
+  });
+
+  const closeModal = () => {
+    setSelectedBooking(null);
+    setEnergyInput('');
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      setBookings([
-        {
-          id: '1',
-          stationName: 'Downtown Charging Hub',
-          stationId: 'ST001',
-          slotId: 'SL001',
-          reservationDate: '2024-01-15',
-          startTime: '14:00',
-          endTime: '16:00',
-          status: 'Confirmed',
-          chargerType: 'DC Fast',
-          energyConsumed: 45.5,
-          cost: 22.75,
-          qrCodeData: 'QR123456',
-          customerName: 'John Doe',
-          vehicleModel: 'Tesla Model 3',
-          rating: 4.8
-        },
-        {
-          id: '2',
-          stationName: 'Mall Parking Station',
-          stationId: 'ST002',
-          slotId: 'SL003',
-          reservationDate: '2024-01-16',
-          startTime: '10:00',
-          endTime: '11:30',
-          status: 'Pending',
-          chargerType: 'AC',
-          energyConsumed: 0,
-          cost: 0,
-          qrCodeData: 'QR789012',
-          customerName: 'Jane Smith',
-          vehicleModel: 'Nissan Leaf',
-          rating: 4.5
-        },
-        {
-          id: '3',
-          stationName: 'Airport Express Charge',
-          stationId: 'ST003',
-          slotId: 'SL002',
-          reservationDate: '2024-01-14',
-          startTime: '09:00',
-          endTime: '09:45',
-          status: 'Completed',
-          chargerType: 'DC Fast',
-          energyConsumed: 35.2,
-          cost: 17.60,
-          qrCodeData: 'QR345678',
-          customerName: 'Mike Johnson',
-          vehicleModel: 'BMW i4',
-          rating: 5.0
-        },
-        {
-          id: '4',
-          stationName: 'City Center Hub',
-          stationId: 'ST004',
-          slotId: 'SL005',
-          reservationDate: '2024-01-17',
-          startTime: '15:00',
-          endTime: '16:30',
-          status: 'Confirmed',
-          chargerType: 'AC',
-          energyConsumed: 0,
-          cost: 0,
-          qrCodeData: 'QR456789',
-          customerName: 'Sarah Wilson',
-          vehicleModel: 'Audi e-tron',
-          rating: 4.7
-        }
-      ]);
-      setLoading(false);
-    }, 1000);
+    fetchStations();
+    fetchBookings();
   }, []);
+
+  const fetchStations = async () => {
+    try {
+      const data = await api.getAllStation();
+      const lookup = {};
+      data.forEach(station => {
+        lookup[station.id] = station;
+      });
+      setStationsLookup(lookup);
+    } catch (error) {
+      console.error('Error fetching stations:', error);
+    }
+  };
+
+  const getStationName = (stationId) => {
+    return stationsLookup[stationId]?.stationName || stationId || 'Unknown Station';
+  };
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getAllBookings();
+      setBookings(data);
+      console.log('Fetched bookings:', data);
+
+      // Calculate real stats
+      const totalBookings = data.length;
+      const activeBookings = data.filter(b => b.status === 'In Progress').length;
+      const pendingBookings = data.filter(b => b.status === 'Pending').length;
+      const totalRevenue = data
+        .filter(b => b.status === 'Completed')
+        .reduce((sum, b) => sum + (parseFloat(b.cost) || 0), 0);
+
+      setStats({
+        total: totalBookings,
+        active: activeBookings,
+        pending: pendingBookings,
+        revenue: totalRevenue.toFixed(2)
+      });
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      alert('Failed to load bookings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    filterBookings();
+  }, [bookings, filters]);
+
+  const filterBookings = () => {
+    let filtered = [...bookings];
+
+    // Status filter
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(b =>
+        b.status.toLowerCase() === filters.status.toLowerCase()
+      );
+    }
+
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(b => {
+        const stationName = getStationName(b.stationId).toLowerCase();
+        return (
+          stationName.includes(searchLower) ||
+          b.customerName?.toLowerCase().includes(searchLower) ||
+          b.vehicleModel?.toLowerCase().includes(searchLower) ||
+          b.id?.toString().toLowerCase().includes(searchLower) ||
+          b.stationId?.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+
+    // Date range filter
+    if (filters.dateRange !== 'all') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      filtered = filtered.filter(b => {
+        const bookingDate = new Date(b.reservationDate);
+        bookingDate.setHours(0, 0, 0, 0);
+
+        switch (filters.dateRange) {
+          case 'today':
+            return bookingDate.getTime() === today.getTime();
+          case 'week':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+            return bookingDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(today.getMonth() - 1);
+            return bookingDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    setFilteredBookings(filtered);
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+
+    try {
+      await api.cancelBooking(bookingId, {
+        cancelledBy: 'User', // You can get this from auth context
+        cancellationReason: 'User requested cancellation'
+      });
+      alert('Booking cancelled successfully');
+      fetchBookings();
+    } catch (error) {
+      alert(error.message || 'Failed to cancel booking');
+    }
+  };
+
+  const handleConfirmBooking = async (bookingId) => {
+    try {
+      await api.updateBookingStatus(bookingId, 'Confirmed');
+      alert('Booking confirmed successfully');
+      fetchBookings();
+      closeModal();
+    } catch (error) {
+      alert(error.message || 'Failed to confirm booking');
+    }
+  };
+
+  const handleStartSession = async (bookingId) => {
+    try {
+      await api.scanQRCode(bookingId);
+      await api.updateBookingStatus(bookingId, 'In Progress');
+      alert('Session started successfully');
+      fetchBookings();
+      closeModal();
+    } catch (error) {
+      alert(error.message || 'Failed to start session');
+    }
+  };
+
+  const handleCompleteSession = async (bookingId) => {
+    if (!energyInput || parseFloat(energyInput) <= 0) {
+      alert('Please enter a valid energy amount');
+      return;
+    }
+
+    try {
+      const rateData = await api.getChargingRate(bookingId);
+      const cost = parseFloat(energyInput) * parseFloat(rateData.chargingRate);
+
+      await api.updateEnergyAndCost(bookingId, parseFloat(energyInput), cost);
+      await api.updateBookingStatus(bookingId, 'Completed');
+      alert(`Session completed successfully! Cost: $${cost.toFixed(2)} (${energyInput} kWh × $${rateData.chargingRate}/kWh)`);
+      setEnergyInput('');
+      fetchBookings();
+      closeModal();
+    } catch (error) {
+      alert(error.message || 'Failed to complete session');
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -108,6 +216,302 @@ const BookingManagement = () => {
     return type === 'DC Fast' ?
       <Zap className={`w-5 h-5 ${getColor('charger.dc')}`} /> :
       <Battery className={`w-5 h-5 ${getColor('charger.ac')}`} />;
+  };
+
+  const generateReceiptPDF = (booking) => {
+    const doc = new jsPDF();
+
+    const stationName = getStationName(booking.stationId);
+    const stationInfo = stationsLookup[booking.stationId];
+
+    // Enhanced color palette
+    const brand = {
+      primary: [59, 130, 246],
+      secondary: [168, 85, 247],
+      accent: [14, 165, 233],
+      success: [16, 185, 129],
+      dark: [15, 23, 42],
+      medium: [100, 116, 139],
+      light: [148, 163, 184],
+      bg: [249, 250, 251],
+      white: [255, 255, 255]
+    };
+
+    const pageWidth = 210;
+    const centerX = pageWidth / 2;
+
+    // ========== HEADER SECTION ==========
+    // Main gradient background
+    doc.setFillColor(brand.primary[0], brand.primary[1], brand.primary[2]);
+    doc.rect(0, 0, pageWidth, 60, 'F');
+
+    // Purple gradient overlay (lighter color for transparency effect)
+    doc.setFillColor(200, 170, 240);
+    doc.triangle(pageWidth, 0, pageWidth, 60, pageWidth - 80, 60, 'F');
+
+    // Company initials logo
+    const logoX = 25, logoY = 15;
+
+    doc.setFillColor(255, 255, 255);
+    doc.circle(logoX, logoY, 6, 'F');
+
+    doc.setTextColor(brand.primary[0], brand.primary[1], brand.primary[2]);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('EV', logoX, logoY + 2, { align: 'center' });
+
+    // Company Name
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(32);
+    doc.setFont(undefined, 'bold');
+    doc.text('EV ChargeHub', 42, 22);
+
+    // Tagline
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.text('Powering Your Journey', 42, 29);
+
+    // Decorative lines
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.5);
+    doc.line(20, 42, 80, 42);
+    doc.line(130, 42, 190, 42);
+
+    // Receipt title
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('RECEIPT', centerX, 46, { align: 'center' });
+
+    // ========== RECEIPT INFO BANNER ==========
+    let yPos = 70;
+
+    doc.setFillColor(brand.bg[0], brand.bg[1], brand.bg[2]);
+    doc.roundedRect(15, yPos, 180, 22, 3, 3, 'F');
+
+    // Left accent line
+    doc.setDrawColor(brand.primary[0], brand.primary[1], brand.primary[2]);
+    doc.setLineWidth(2);
+    doc.line(20, yPos + 5, 20, yPos + 17);
+
+    doc.setTextColor(brand.medium[0], brand.medium[1], brand.medium[2]);
+    doc.setFontSize(8);
+    doc.setFont(undefined, 'bold');
+    doc.text('RECEIPT ID', 25, yPos + 8);
+
+    doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+    doc.setFontSize(11);
+    doc.text(`#${booking.id.substring(0, 8).toUpperCase()}`, 25, yPos + 15);
+
+    // Right accent line
+    doc.setDrawColor(brand.secondary[0], brand.secondary[1], brand.secondary[2]);
+    doc.line(125, yPos + 5, 125, yPos + 17);
+
+    doc.setTextColor(brand.medium[0], brand.medium[1], brand.medium[2]);
+    doc.setFontSize(8);
+    doc.text('ISSUED DATE', 130, yPos + 8);
+
+    doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+    doc.setFontSize(11);
+    const issueDate = new Date(booking.bookingDateTime || new Date()).toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    doc.text(issueDate, 130, yPos + 15);
+
+    // ========== STATION INFORMATION ==========
+    yPos = 102;
+
+    doc.setFillColor(brand.primary[0], brand.primary[1], brand.primary[2]);
+    doc.roundedRect(15, yPos, 180, 10, 2, 2, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('CHARGING STATION', 20, yPos + 7);
+
+    yPos += 15;
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(brand.light[0], brand.light[1], brand.light[2]);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(15, yPos, 180, 35, 2, 2, 'FD');
+
+    yPos += 8;
+    doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+    doc.setFontSize(13);
+    doc.setFont(undefined, 'bold');
+    doc.text(stationName, 20, yPos);
+
+    yPos += 8;
+    const stationGrid = [
+      ['Address:', stationInfo?.address || 'N/A'],
+      ['Station ID:', booking.stationId],
+      ['Slot:', booking.slotId]
+    ];
+
+    doc.setFontSize(9);
+    stationGrid.forEach(([label, value]) => {
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(brand.medium[0], brand.medium[1], brand.medium[2]);
+      doc.text(label, 20, yPos);
+
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+      doc.text(value, 75, yPos);
+      yPos += 6;
+    });
+
+    // ========== CHARGING SESSION ==========
+    yPos = 157;
+
+    doc.setFillColor(brand.secondary[0], brand.secondary[1], brand.secondary[2]);
+    doc.roundedRect(15, yPos, 180, 10, 2, 2, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('SESSION DETAILS', 20, yPos + 7);
+
+    yPos += 15;
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(brand.light[0], brand.light[1], brand.light[2]);
+    doc.roundedRect(15, yPos, 180, 40, 2, 2, 'FD');
+
+    yPos += 8;
+    const sessionGrid = [
+      ['Date:', new Date(booking.reservationDate).toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })],
+      ['Start Time:', booking.startTime],
+      ['End Time:', booking.endTime],
+      ['Charger Type:', booking.chargerType || 'AC'],
+      ['Customer:', booking.customerName || 'N/A'],
+      ['Vehicle:', booking.vehicleModel || 'N/A']
+    ];
+
+    doc.setFontSize(9);
+    sessionGrid.forEach(([label, value]) => {
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(brand.medium[0], brand.medium[1], brand.medium[2]);
+      doc.text(label, 20, yPos);
+
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+      doc.text(String(value), 75, yPos);
+      yPos += 6;
+    });
+
+    // ========== BILLING SUMMARY ==========
+    yPos = 217;
+
+    doc.setFillColor(brand.primary[0], brand.primary[1], brand.primary[2]);
+    doc.roundedRect(15, yPos, 180, 45, 3, 3, 'F');
+
+    // Lighter overlay for gradient effect
+    doc.setFillColor(200, 170, 240);
+    doc.roundedRect(100, yPos, 95, 45, 3, 3, 'F');
+
+    yPos += 10;
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('BILLING SUMMARY', centerX, yPos, { align: 'center' });
+
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.3);
+    doc.line(30, yPos + 3, 180, yPos + 3);
+
+    yPos += 12;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('Energy Consumed', 25, yPos);
+
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text(`${booking.energyConsumed || 0} kWh`, 185, yPos, { align: 'right' });
+
+    yPos += 14;
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.text('Total Amount', 25, yPos);
+
+    doc.setFontSize(26);
+    doc.setFont(undefined, 'bold');
+    doc.text(`$${(booking.cost || 0).toFixed(2)}`, 185, yPos, { align: 'right' });
+
+    // ========== STATUS BADGE ==========
+    yPos = 270;
+
+    let statusColor, statusText;
+    switch (booking.status) {
+      case 'Completed':
+        statusColor = brand.success;
+        statusText = 'COMPLETED';
+        break;
+      case 'Confirmed':
+        statusColor = brand.primary;
+        statusText = 'CONFIRMED';
+        break;
+      case 'Pending':
+        statusColor = [251, 191, 36];
+        statusText = 'PENDING';
+        break;
+      case 'Cancelled':
+        statusColor = [239, 68, 68];
+        statusText = 'CANCELLED';
+        break;
+      default:
+        statusColor = brand.medium;
+        statusText = booking.status;
+    }
+
+    doc.setFillColor(statusColor[0], statusColor[1], statusColor[2]);
+    doc.roundedRect(60, yPos, 90, 12, 6, 6, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text(statusText, centerX, yPos + 8, { align: 'center' });
+
+    // ========== FOOTER ==========
+    yPos = 285;
+
+    doc.setDrawColor(brand.light[0], brand.light[1], brand.light[2]);
+    doc.setLineWidth(0.3);
+    doc.line(15, yPos, 195, yPos);
+
+    yPos += 5;
+    doc.setTextColor(brand.dark[0], brand.dark[1], brand.dark[2]);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('Thank you for charging with us!', centerX, yPos, { align: 'center' });
+
+    yPos += 6;
+    doc.setFontSize(8);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(brand.medium[0], brand.medium[1], brand.medium[2]);
+    doc.text('Together, we\'re building a sustainable future', centerX, yPos, { align: 'center' });
+
+    yPos += 7;
+    doc.setFontSize(7);
+    doc.text('support@evchargehub.com  |  +1 (555) 123-4567  |  www.evchargehub.com', centerX, yPos, { align: 'center' });
+
+    yPos += 4;
+    doc.setFontSize(6);
+    doc.setTextColor(brand.light[0], brand.light[1], brand.light[2]);
+    doc.text(`Generated: ${new Date().toLocaleString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })}`, centerX, yPos, { align: 'center' });
+
+    const fileName = `EVChargeHub_Receipt_${booking.id.substring(0, 8)}_${new Date().getTime()}.pdf`;
+    doc.save(fileName);
   };
 
   return (
@@ -145,10 +549,10 @@ const BookingManagement = () => {
         {/* Modern Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[
-            { label: 'Total Bookings', value: '156', change: '+12%', icon: Calendar, gradient: 'from-blue-500 to-cyan-500' },
-            { label: 'Active Sessions', value: '8', change: '+2', icon: Activity, gradient: 'from-emerald-500 to-teal-500' },
-            { label: 'Pending', value: '23', change: '-5', icon: Clock, gradient: 'from-amber-500 to-orange-500' },
-            { label: 'Revenue', value: '$1.2K', change: '+18%', icon: TrendingUp, gradient: 'from-purple-500 to-pink-500' }
+            { label: 'Total Bookings', value: stats.total.toString(), change: '+12%', icon: Calendar, gradient: 'from-blue-500 to-cyan-500' },
+            { label: 'Active Sessions', value: stats.active.toString(), change: `${stats.active > 0 ? '+' : ''}${stats.active}`, icon: Activity, gradient: 'from-emerald-500 to-teal-500' },
+            { label: 'Pending', value: stats.pending.toString(), change: `${stats.pending}`, icon: Clock, gradient: 'from-amber-500 to-orange-500' },
+            { label: 'Revenue', value: `$${stats.revenue}`, change: '+18%', icon: TrendingUp, gradient: 'from-purple-500 to-pink-500' }
           ].map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -163,9 +567,9 @@ const BookingManagement = () => {
                     <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient}`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <span className={`text-sm font-semibold ${stat.change.startsWith('+') ? 'text-emerald-500' : 'text-red-500'}`}>
+                    {/* <span className={`text-sm font-semibold ${stat.change.startsWith('+') ? 'text-emerald-500' : 'text-red-500'}`}>
                       {stat.change}
-                    </span>
+                    </span> */}
                   </div>
                   <p className={`text-sm ${getColor('text.secondary')} mb-1`}>{stat.label}</p>
                   <p className={`text-3xl font-bold ${getColor('text.primary')}`}>{stat.value}</p>
@@ -194,18 +598,18 @@ const BookingManagement = () => {
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                className={`w-40 px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
               >
                 <option value="all">All Status</option>
-                <option value="confirmed">Confirmed</option>
                 <option value="pending">Pending</option>
+                <option value="In Progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
 
               <select
                 value={filters.dateRange}
                 onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-                className={`px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                className={`w-40 px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -239,121 +643,140 @@ const BookingManagement = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bookings.map((booking, index) => (
-              <div
-                key={booking.id}
-                className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
-                style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() => setSelectedBooking(booking)}
-              >
-                {/* Gradient Border Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${getStatusColor(booking.status)} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
-
-                {/* Status Badge */}
-                <div className="absolute top-4 right-4 z-10">
-                  <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getStatusColor(booking.status)} text-white text-xs font-semibold shadow-lg`}>
-                    {booking.status}
-                  </div>
-                </div>
-
-                <div className="relative p-6">
-                  {/* Station Info */}
-                  <div className="mb-4">
-                    <h3 className={`font-bold text-xl mb-2 ${getColor('text.primary')} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${getStatusColor(booking.status)} transition-all`}>
-                      {booking.stationName}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
-                      <span className={`text-sm ${getColor('text.secondary')}`}>
-                        {booking.stationId}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Customer & Vehicle */}
-                  <div className={`mb-4 p-3 rounded-xl ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-xs ${getColor('text.tertiary')}`}>Customer</span>
-                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.customerName}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs ${getColor('text.tertiary')}`}>Vehicle</span>
-                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.vehicleModel}</span>
-                    </div>
-                  </div>
-
-                  {/* Date & Time */}
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg bg-gradient-to-r ${getStatusColor(booking.status)}`}>
-                        <Calendar className="w-4 h-4 text-white" />
-                      </div>
-                      <div>
-                        <p className={`text-xs ${getColor('text.tertiary')}`}>Date</p>
-                        <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
-                          {new Date(booking.reservationDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg bg-gradient-to-r ${getStatusColor(booking.status)}`}>
-                        <Clock className="w-4 h-4 text-white" />
-                      </div>
-                      <div>
-                        <p className={`text-xs ${getColor('text.tertiary')}`}>Time Slot</p>
-                        <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
-                          {booking.startTime} - {booking.endTime}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Charger Type & Rating */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {getChargerIcon(booking.chargerType)}
-                      <span className={`text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                        {booking.chargerType}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
-                        {booking.rating}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Energy & Cost for Completed */}
-                  {booking.status === 'Completed' && (
-                    <div className={`mt-4 pt-4 border-t ${getColor('border.primary')}`}>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className={`text-xs ${getColor('text.tertiary')}`}>Energy</p>
-                          <p className={`text-lg font-bold ${getColor('text.primary')}`}>
-                            {booking.energyConsumed} kWh
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className={`text-xs ${getColor('text.tertiary')}`}>Cost</p>
-                          <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
-                            ${booking.cost}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Hover Arrow */}
-                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ChevronRight className={`w-5 h-5 ${getColor('text.secondary')}`} />
-                </div>
+          <>
+            {filteredBookings.length === 0 && (
+              <div className={`text-center py-12 ${getColor('background.card')} rounded-2xl border ${getColor('border.primary')}`}>
+                <Search className={`w-16 h-16 mx-auto mb-4 ${getColor('text.tertiary')}`} />
+                <h3 className={`text-xl font-bold mb-2 ${getColor('text.primary')}`}>
+                  No bookings found
+                </h3>
+                <p className={`${getColor('text.secondary')}`}>
+                  {filters.search || filters.status !== 'all' || filters.dateRange !== 'all'
+                    ? 'Try adjusting your filters'
+                    : 'Create your first booking to get started'}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
+            )}
+
+            {filteredBookings.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredBookings.map((booking, index) => (
+                  <div
+                    key={booking.id}
+                    className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} hover:scale-105 hover:shadow-2xl transition-all duration-300 cursor-pointer`}
+                    style={{ animationDelay: `${index * 100}ms` }}
+                    onClick={() => setSelectedBooking(booking)}
+                  >
+                    {/* Gradient Border Effect */}
+                    <div className={`absolute inset-0 bg-gradient-to-r ${getStatusColor(booking.status)} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
+
+                    {/* Status Badge */}
+                    <div className="absolute top-6 right-4 z-10">
+                      <div className={`px-3 py-1 rounded-full bg-gradient-to-r ${getStatusColor(booking.status)} text-white text-xs font-semibold shadow-lg`}>
+                        {booking.status}
+                      </div>
+                    </div>
+
+                    <div className="relative p-6 mb-4">
+                      {/* Station Info */}
+                      <div className="mb-4">
+                        <h3 className={`font-bold text-xl mb-2 ${getColor('text.primary')} group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${getStatusColor(booking.status)} transition-all`}>
+                          {getStationName(booking.stationId)}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
+                          <span className={`text-sm ${getColor('text.secondary')}`}>
+                            {booking.stationId}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer & Vehicle */}
+                      <div className={`mb-4 p-3 rounded-xl ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-xs ${getColor('text.tertiary')}`}>Customer</span>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.customerName}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className={`text-xs ${getColor('text.tertiary')}`}>Vehicle</span>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.vehicleModel}</span>
+                        </div>
+                      </div>
+
+                      {/* Date & Time */}
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg bg-gradient-to-r ${getStatusColor(booking.status)}`}>
+                            <Calendar className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className={`text-xs ${getColor('text.tertiary')}`}>Date</p>
+                            <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                              {new Date(booking.reservationDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg bg-gradient-to-r ${getStatusColor(booking.status)}`}>
+                            <Clock className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <p className={`text-xs ${getColor('text.tertiary')}`}>Time Slot</p>
+                            <p className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                              {booking.startTime} - {booking.endTime}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Charger Type & Rating */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getChargerIcon(booking.chargerType)}
+                          <span className={`text-sm font-medium ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                            {booking.chargerType}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                            {booking.rating}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Energy & Cost for Completed */}
+                      {booking.status === 'Completed' && (
+                        <div className={`mt-4 pt-4 border-t ${getColor('border.primary')}`}>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className={`text-xs ${getColor('text.tertiary')}`}>Energy</p>
+                              <p className={`text-lg font-bold ${getColor('text.primary')}`}>
+                                {booking.energyConsumed} kWh
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-xs ${getColor('text.tertiary')}`}>Cost</p>
+                              <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+                                ${booking.cost}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hover Arrow */}
+                    <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ChevronRight className={`w-5 h-5 ${getColor('text.secondary')}`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )
+        }
       </div>
 
       {/* Booking Details Modal */}
@@ -361,7 +784,7 @@ const BookingManagement = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-md"
-            onClick={() => setSelectedBooking(null)}
+            onClick={closeModal}
           ></div>
           <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
             <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
@@ -370,7 +793,7 @@ const BookingManagement = () => {
                   Booking Details
                 </h2>
                 <button
-                  onClick={() => setSelectedBooking(null)}
+                  onClick={closeModal}
                   className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}
                 >
                   <X className="w-5 h-5" />
@@ -380,7 +803,7 @@ const BookingManagement = () => {
             <div className="p-6">
               {/* Station Banner */}
               <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r ${getStatusColor(selectedBooking.status)}`}>
-                <h3 className="text-2xl font-bold text-white mb-2">{selectedBooking.stationName}</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">{getStationName(selectedBooking.stationId) || 'Station Name'}</h3>
                 <div className="flex items-center gap-2 text-white/90">
                   <MapPin className="w-4 h-4" />
                   <span className="text-sm">Station {selectedBooking.stationId} • Slot {selectedBooking.slotId}</span>
@@ -411,6 +834,33 @@ const BookingManagement = () => {
                 </div>
               </div>
 
+              {/* QR Code Display */}
+              {(selectedBooking.status === 'Confirmed' || selectedBooking.status === 'Pending') && selectedBooking.qrCodeData && (
+                <div className={`mb-6 p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} text-center`}>
+                  <h3 className={`font-bold mb-4 ${getColor('text.primary')}`}>QR Code</h3>
+                  <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
+                    <div className="flex justify-center items-center">
+                      <QRCodeSVG
+                        value={selectedBooking.qrCodeData}
+                        size={200}
+                        level="H"
+                        includeMargin={true}
+                      />
+                    </div>
+                    <p className={`text-sm mt-4 font-semibold text-center ${darkMode ? 'text-slate-700' : 'text-slate-600'}`}>
+                      Booking ID: {selectedBooking.id}
+                    </p>
+                  </div>
+                  <p className={`text-xs mt-3 ${getColor('text.tertiary')}`}>Show this code to station operator</p>
+                  {selectedBooking.qrCodeScanned && (
+                    <div className="mt-3 flex items-center justify-center gap-2">
+                      <Check className="w-5 h-5 text-emerald-500" />
+                      <p className="text-emerald-500 font-semibold">QR Code Scanned</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Charging Summary */}
               {selectedBooking.status === 'Completed' && (
                 <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'}`}>
@@ -432,25 +882,71 @@ const BookingManagement = () => {
                 </div>
               )}
 
+              {selectedBooking.status === 'In Progress' && (
+                <div className={`mb-6 p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-emerald-50 to-teal-50'}`}>
+                  <h3 className={`font-bold mb-4 ${getColor('text.primary')}`}>Complete Charging Session</h3>
+                  <div>
+                    <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                      Energy Consumed (kWh)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={energyInput}
+                      onChange={(e) => setEnergyInput(e.target.value)}
+                      placeholder="Enter energy consumed"
+                      className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-lg`}
+                    />
+                    <p className={`text-xs mt-2 ${getColor('text.tertiary')}`}>
+                      Enter the total energy consumed during this charging session
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="mt-6 flex gap-3">
                 {selectedBooking.status === 'Pending' && (
                   <>
-                    <button className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">
+                    <button
+                      onClick={() => handleConfirmBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">
                       Confirm Booking
                     </button>
-                    <button className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                    <button
+                      onClick={() => handleCancelBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
                       Cancel
                     </button>
                   </>
                 )}
                 {selectedBooking.status === 'Confirmed' && (
-                  <button className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all">
-                    Start Session
+                  <>
+                    <button
+                      onClick={() => handleStartSession(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all">
+                      Start Session
+                    </button>
+                    <button
+                      onClick={() => handleCancelBooking(selectedBooking.id)}
+                      className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                      Cancel
+                    </button>
+                  </>
+                )}
+                {selectedBooking.status === 'In Progress' && (
+                  <button
+                    onClick={() => handleCompleteSession(selectedBooking.id)}
+                    disabled={!energyInput || parseFloat(energyInput) <= 0}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Complete Session
                   </button>
                 )}
                 {selectedBooking.status === 'Completed' && (
-                  <button className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
+                  <button
+                    onClick={() => generateReceiptPDF(selectedBooking)}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
                     Download Receipt
                   </button>
                 )}
@@ -472,6 +968,9 @@ const BookingManagement = () => {
 const CreateBookingModal = ({ onClose }) => {
   const { darkMode, getColor } = useContext(ThemeContext);
   const [step, setStep] = useState(1);
+  const [stations, setStations] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     stationId: '',
     slotId: '',
@@ -481,23 +980,80 @@ const CreateBookingModal = ({ onClose }) => {
     chargerType: 'AC'
   });
 
-  const stations = [
-    { id: 'ST001', name: 'Downtown Charging Hub', address: '123 Main St', available: 8, rating: 4.8 },
-    { id: 'ST002', name: 'Mall Parking Station', address: '456 Shopping Ave', available: 5, rating: 4.5 },
-    { id: 'ST003', name: 'Airport Express Charge', address: '789 Airport Rd', available: 12, rating: 5.0 }
-  ];
+  useEffect(() => {
+    fetchStations();
+  }, []);
+
+  const fetchStations = async () => {
+    try {
+      const data = await api.getAllStation();
+      setStations(data);
+    } catch (error) {
+      console.error('Error fetching stations:', error);
+      alert('Failed to load stations');
+    }
+  };
+
+  const checkAvailability = async () => {
+    if (!formData.stationId || !formData.date || !formData.startTime || !formData.endTime) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const slots = await api.checkAvailability(
+        formData.stationId,
+        formData.date,
+        formData.startTime,
+        formData.endTime,
+        formData.chargerType
+      );
+      setAvailableSlots(slots);
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      alert('Failed to check availability');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+    '08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00',
+    '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00'
   ];
 
   const nextStep = () => {
+    if (step === 2) {
+      checkAvailability();
+    }
     if (step < 4) setStep(step + 1);
   };
 
   const prevStep = () => {
     if (step > 1) setStep(step - 1);
+  };
+
+  const handleCreateBooking = async () => {
+    try {
+      setLoading(true);
+      const bookingData = {
+        stationId: formData.stationId,
+        nic: '123456789V',
+        reservationDate: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        chargerType: formData.chargerType
+      };
+
+      await api.createBooking(bookingData);
+      alert('Booking created successfully!');
+      onClose();
+      window.location.reload(); // Refresh to show new booking
+    } catch (error) {
+      alert(error.message || 'Failed to create booking');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -840,13 +1396,11 @@ const CreateBookingModal = ({ onClose }) => {
               </button>
             ) : (
               <button
-                onClick={() => {
-                  alert('Booking confirmed! You will receive a confirmation email shortly.');
-                  onClose();
-                }}
-                className="flex-1 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold hover:shadow-xl hover:shadow-emerald-500/50 transition-all"
+                onClick={handleCreateBooking}
+                disabled={loading}
+                className="flex-1 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold hover:shadow-xl hover:shadow-emerald-500/50 transition-all disabled:opacity-50"
               >
-                Confirm Booking
+                {loading ? 'Creating...' : 'Confirm Booking'}
               </button>
             )}
           </div>
