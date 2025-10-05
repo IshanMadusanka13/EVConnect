@@ -119,6 +119,11 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(updatedStation)
     }),
+  updateStationStatus: (stationId, status) =>
+    fetchApi(`/Station/${stationId}/active-status`, {
+      method: 'PATCH',
+      body: JSON.stringify(status)
+    }),
   getAllSlotTypes: () =>
     fetchApi('/SlotType', { method: 'GET' }),
   addSlotType: (slotType) =>

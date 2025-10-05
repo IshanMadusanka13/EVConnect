@@ -188,9 +188,12 @@ const StationManagement = () => {
                                             <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
                                             <span className={`text-sm ${getColor('text.secondary')}`}>{station.address}</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 mb-2">
                                             <span className={`text-xs ${getColor('text.tertiary')}`}>Operator:</span>
                                             <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{station.operatorId || station.OperatorId}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${station.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{station.isActive ? 'Active' : 'Inactive'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -301,6 +304,7 @@ const StationManagement = () => {
                                 <div className="text-center text-lg py-12 text-gray-400">Loading details...</div>
                             ) : stationDetails ? (
                                 <>
+                                    {/* Header with name, address and map only */}
                                     <div className={`mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500 flex flex-col md:flex-row gap-8 items-center`}>
                                         <div className="flex-1">
                                             <h3 className="text-2xl font-bold text-white mb-2">{stationDetails.station?.stationName}</h3>
@@ -323,14 +327,25 @@ const StationManagement = () => {
                                             )}
                                         </div>
                                     </div>
-                                    {/* Editable Operator and Rates above slots */}
+
+                                    {/* Editable Operator and Active Status */}
                                     <EditableStationDetails
                                         station={stationDetails.station}
                                         getColor={getColor}
                                         darkMode={darkMode}
                                         onUpdate={async (updatedFields) => {
                                             try {
-                                                await api.updateStationDetails(stationDetails.station.id, updatedFields);
+                                                // Send complete station object with updates
+                                                const fullUpdate = {
+                                                    id: stationDetails.station.id,
+                                                    stationName: stationDetails.station.stationName,
+                                                    address: stationDetails.station.address,
+                                                    latitude: stationDetails.station.latitude,
+                                                    longitude: stationDetails.station.longitude,
+                                                    operatorId: updatedFields.operatorId !== undefined ? updatedFields.operatorId : stationDetails.station.operatorId,
+                                                    isActive: updatedFields.isActive !== undefined ? updatedFields.isActive : stationDetails.station.isActive
+                                                };
+                                                await api.updateStationDetails(stationDetails.station.id, fullUpdate);
                                                 setStationDetails(prev => {
                                                     if (!prev) return prev;
                                                     return {
@@ -340,6 +355,23 @@ const StationManagement = () => {
                                                 });
                                             } catch (err) {
                                                 alert('Failed to update station details');
+                                                console.error(err);
+                                            }
+                                        }}
+                                        onToggle={async (updatedFields) => {
+                                            try {
+
+                                                await api.updateStationStatus(stationDetails.station.id, updatedFields);
+                                                setStationDetails(prev => {
+                                                    if (!prev) return prev;
+                                                    return {
+                                                        ...prev,
+                                                        station: { ...prev.station, ...updatedFields }
+                                                    };
+                                                });
+                                            } catch (err) {
+                                                alert('Failed to update station details');
+                                                console.error(err);
                                             }
                                         }}
                                     />
@@ -405,7 +437,6 @@ const StationManagement = () => {
                                                         getColor={getColor}
                                                         onUpdate={async (updatedSchedule) => {
                                                             try {
-                                                                console.log('Updating schedule:', updatedSchedule);
                                                                 await api.updateSchedule(schedule.id, updatedSchedule);
                                                                 setStationDetails(prev => {
                                                                     if (!prev) return prev;
@@ -911,12 +942,10 @@ function SlotCard({ slot, darkMode, getColor, onToggle }) {
 
 // Place this function outside the main component
 
-function EditableStationDetails({ station, getColor, darkMode, onUpdate }) {
+function EditableStationDetails({ station, getColor, darkMode, onUpdate, onToggle }) {
     const [editing, setEditing] = React.useState(false);
     const [form, setForm] = React.useState({
         operatorId: station?.operatorId || '',
-        acChargingRate: station?.acChargingRate || '',
-        dcChargingRate: station?.dcChargingRate || '',
         isActive: station?.isActive ?? true
     });
     const [saving, setSaving] = React.useState(false);
@@ -924,120 +953,96 @@ function EditableStationDetails({ station, getColor, darkMode, onUpdate }) {
     React.useEffect(() => {
         setForm({
             operatorId: station?.operatorId || '',
-            acChargingRate: station?.acChargingRate || '',
-            dcChargingRate: station?.dcChargingRate || '',
             isActive: station?.isActive ?? true
         });
     }, [station]);
 
-    const handleSave = async (e) => {
+    const handleOperatorSave = async (e) => {
         e.preventDefault();
         setSaving(true);
-        await onUpdate({
-            id: station.id,
-            stationName: station.stationName,
-            address: station.address,
-            latitude: station.latitude,
-            longitude: station.longitude,
-            operatorId: form.operatorId,
-            acChargingRate: form.acChargingRate,
-            dcChargingRate: form.dcChargingRate,
-            isActive: form.isActive
-        });
-        setSaving(false);
-        setEditing(false);
+        try {
+            await onUpdate({ operatorId: form.operatorId });
+            setEditing(false);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleActiveToggle = async (checked) => {
+        setSaving(true);
+        try {
+            // Use dedicated endpoint for active status
+            await api.updateStationStatus(station.id, checked );
+            setForm(f => ({ ...f, isActive: checked }));
+        } catch (err) {
+            alert('Active Bookings Available. Cant Deactivate');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
-        <div className={`mb-6 p-4 rounded-2xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} w-full`}>
-            {editing ? (
-                <form className="grid grid-cols-2 gap-4 w-full" onSubmit={handleSave}>
-                    {/* Operator */}
-                    <div className="flex flex-col">
-                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Operator</label>
-                        <input
-                            type="text"
-                            value={form.operatorId}
-                            onChange={e => setForm(f => ({ ...f, operatorId: e.target.value }))}
-                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
-                        />
-                    </div>
-                    {/* AC Rate */}
-                    <div className="flex flex-col">
-                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>AC Rate (LKR/kWh)</label>
-                        <input
-                            type="number"
-                            value={form.acChargingRate}
-                            onChange={e => setForm(f => ({ ...f, acChargingRate: e.target.value }))}
-                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
-                            step="any"
-                        />
-                    </div>
-                    {/* Active Toggle */}
-                    <div className="flex items-center gap-4 mt-2">
-                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Active Status:</label>
+        <div className={`mb-6 p-4 rounded-2xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Operator */}
+                <div>
+                    {editing ? (
+                        <form onSubmit={handleOperatorSave} className="flex flex-col gap-2">
+                            <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Operator ID</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={form.operatorId}
+                                    onChange={e => setForm(f => ({ ...f, operatorId: e.target.value }))}
+                                    className={`flex-1 px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                                    required
+                                />
+                                <button type="submit" disabled={saving} className="px-3 py-2 rounded bg-emerald-500 text-white font-semibold text-sm">
+                                    {saving ? 'Saving...' : 'Save'}
+                                </button>
+                                <button type="button" className="px-3 py-2 rounded bg-gray-300 text-gray-700 font-semibold text-sm" onClick={() => setEditing(false)}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
+                        <div className="flex flex-col gap-2">
+                            <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Operator ID</label>
+                            <div className="flex items-center gap-2">
+                                <span className={`font-bold ${getColor('text.primary')}`}>{form.operatorId}</span>
+                                <button className="px-3 py-1 rounded bg-blue-500 text-white text-xs font-semibold" onClick={() => setEditing(true)}>
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Active Status */}
+                <div className="flex flex-col gap-2">
+                    <label className={`text-sm font-semibold ${getColor('text.primary')}`}>Station Status</label>
+                    <div className="flex items-center gap-3">
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={form.isActive}
-                                onChange={e => setForm(f => ({ ...f, isActive: e.target.checked }))}
+                                onChange={e => handleActiveToggle(e.target.checked)}
+                                disabled={saving}
                                 className="sr-only peer"
                             />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full dark:bg-gray-700 peer-checked:bg-green-500 transition-all relative">
-                                <div
-                                    className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${form.isActive ? 'translate-x-5' : ''}`}
-                                    style={{ transform: form.isActive ? 'translateX(20px)' : 'none' }}
-                                ></div>
+                            <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full dark:bg-gray-700 peer-checked:bg-green-500 transition-all relative`}>
+                                <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${form.isActive ? 'translate-x-5' : ''}`}
+                                    style={{ transform: form.isActive ? 'translateX(20px)' : 'none' }}></div>
                             </div>
                         </label>
-                        <span className={`text-sm font-semibold ${form.isActive ? 'text-green-600' : 'text-red-600'}`}>{form.isActive ? 'Active' : 'Inactive'}</span>
-                    </div>
-                    {/* DC Rate */}
-                    <div className="flex flex-col">
-                        <label className={`text-sm font-semibold ${getColor('text.primary')}`}>DC Rate (LKR/kWh)</label>
-                        <input
-                            type="number"
-                            value={form.dcChargingRate}
-                            onChange={e => setForm(f => ({ ...f, dcChargingRate: e.target.value }))}
-                            className={`px-3 py-2 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
-                            step="any"
-                        />
-                    </div>
-                    <div className="col-span-2 flex flex-col md:flex-row gap-2 justify-end mt-4">
-                        <button type="submit" disabled={saving} className="px-4 py-2 rounded bg-emerald-500 text-white font-semibold">{saving ? 'Saving...' : 'Save'}</button>
-                        <button type="button" className="px-4 py-2 rounded bg-gray-300 text-gray-700 font-semibold" onClick={() => setEditing(false)}>Cancel</button>
-                    </div>
-                </form>
-            ) : (
-                <div className="grid grid-cols-2 gap-4 w-full items-center">
-                    {/* Left column: Operator (top), Active status (bottom) */}
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                            <span className={`font-semibold ${getColor('text.primary')}`}>Operator:</span>
-                            <span className="font-bold">{station?.operatorId}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className={`font-semibold ${getColor('text.primary')}`}>Station Status:</span>
-                            <span className={`text-sm font-semibold ${station?.isActive ? 'text-green-600' : 'text-red-600'}`}>{station?.isActive ? 'Active' : 'Inactive'}</span>
-                        </div>
-                    </div>
-                    {/* Right column: AC rate (top), DC rate (bottom) */}
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                            <span className={`font-semibold ${getColor('text.primary')}`}>AC Rate:</span>
-                            <span className="font-bold">{station?.acChargingRate} LKR/kWh</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className={`font-semibold ${getColor('text.primary')}`}>DC Rate:</span>
-                            <span className="font-bold">{station?.dcChargingRate} LKR/kWh</span>
-                        </div>
-                    </div>
-                    {/* Edit Button full width */}
-                    <div className="col-span-2 flex justify-end">
-                        <button className="px-4 py-2 rounded bg-blue-500 text-white font-semibold text-sm" onClick={() => setEditing(true)}>Edit</button>
+                        <span className={`text-sm font-semibold px-3 py-1 rounded-full ${form.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                            {form.isActive ? 'Active' : 'Inactive'}
+                        </span>
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

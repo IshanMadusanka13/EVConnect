@@ -23,6 +23,27 @@ namespace webservice.services
             _logger = logger;
         }
 
+        public async Task<(bool Success, string Message)> ChangeStationActiveStatusAsync(string stationId, bool isActive)
+        {
+            // If deactivating, check for non-completed bookings
+            if (!isActive)
+            {
+                var db = new DBConnect();
+                var bookings = await db.Bookings.Find(b => b.StationId == stationId && b.Status != "Completed" && !b.IsCancelled).ToListAsync();
+                if (bookings.Count > 0)
+                {
+                    return (false, "Cannot deactivate station with active bookings.");
+                }
+            }
+            var update = Builders<Station>.Update.Set(s => s.IsActive, isActive);
+            var result = await _stations.UpdateOneAsync(s => s.Id == stationId, update);
+            if (result.ModifiedCount > 0)
+                return (true, "Station status updated.");
+            else
+                return (false, "Station not found or status unchanged.");
+        }
+
+
         public async Task<List<Station>> GetAllStationsAsync()
         {
             _logger.LogInformation("Fetching all stations");
