@@ -1,6 +1,7 @@
 ﻿
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using webservice.models;
 
 namespace webservice.models
 {

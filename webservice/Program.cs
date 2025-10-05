@@ -1,9 +1,18 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using webservice.data;
+using webservice.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<JwtService>();
 
+//builder.Services.AddSingleton<JwtService>();
+
+
+// ✅ Add DB & Services
 builder.Services.AddSingleton<DBConnect>();
-builder.Services.AddScoped<webservice.services.StationService>();
+//builder.Services.AddScoped<StationService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -22,11 +31,35 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // React app
+            policy.WithOrigins("http://localhost:5173")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
+
+// ================= JWT SETUP =================
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtSettings.GetValue<string>("Key"));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
+        ValidAudience = jwtSettings.GetValue<string>("Audience"),
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero // optional: remove default 5 min buffer
+    };
+});
+// ============================================
 
 var app = builder.Build();
 
@@ -37,11 +70,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// ✅ Make sure the middleware order is correct
 app.UseHttpsRedirection();
+app.UseCors("AllowSpecificOrigin");
 
-app.UseCors("AllowSpecificOrigin"); // CORS must be before MapControllers
-
+// ✅ Add authentication & authorization middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => "EVCONNECT Backend Started!");
