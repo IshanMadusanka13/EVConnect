@@ -1,9 +1,8 @@
 // src/pages/AdminDashboard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-// Import Recharts components
+import Navbar from "../components/Navbar";
 import {
   LineChart,
   Line,
@@ -19,12 +18,23 @@ import {
   Cell,
   Legend,
 } from "recharts";
-
-// Import icons (install lucide-react if not installed)
-import { User, MapPin, Calendar } from "lucide-react";
+import { 
+  User, 
+  MapPin, 
+  Calendar, 
+  X, 
+  TrendingUp,
+  Users,
+  Building,
+  LayoutDashboard,
+  LogOut,
+  UserCircle
+} from "lucide-react";
+import { ThemeContext } from '../contexts/ThemeContext';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { darkMode, getColor } = useContext(ThemeContext);
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,73 +72,152 @@ const AdminDashboard = () => {
 
   const COLORS = ["#8b5cf6", "#ec4899", "#ef4444"];
 
+  const sidebarItems = [
+    { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
+    { label: "Profile", path: "/profile", icon: UserCircle },
+    { label: "EV Owner", path: "/ev-owner", icon: User },
+    { label: "Charging Station", path: "/station", icon: Building },
+    { label: "Booking", path: "/booking", icon: Calendar },
+    { label: "Logout", path: "/logout", icon: LogOut },
+  ];
+
   return (
-    <div className="relative min-h-screen text-black transition-colors duration-500 bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute bg-blue-400 rounded-full -top-40 -right-40 w-80 h-80 blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute bg-purple-400 rounded-full -bottom-40 -left-40 w-80 h-80 blur-3xl opacity-20 animate-pulse" style={{ animationDelay: "1s" }}></div>
-        <div className="absolute bg-pink-400 rounded-full top-1/2 left-1/2 w-96 h-96 blur-3xl opacity-10 animate-pulse" style={{ animationDelay: "2s" }}></div>
+    <div className={`relative min-h-screen transition-colors duration-500 ${getColor('background.primary')}`}>
+      <Navbar />
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${darkMode ? 'bg-blue-600' : 'bg-blue-400'} animate-pulse`}></div>
+        <div className={`absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${darkMode ? 'bg-purple-600' : 'bg-purple-400'} animate-pulse`} style={{ animationDelay: '1s' }}></div>
+        <div className={`absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-3xl opacity-10 ${darkMode ? 'bg-pink-600' : 'bg-pink-400'} animate-pulse`} style={{ animationDelay: '2s' }}></div>
       </div>
 
-      {/* Sidebar */}
-      <div className="fixed w-64 p-6 m-6 border bg-white/30 backdrop-blur-sm border-white/30 rounded-3xl">
-        <h2 className="mb-6 text-2xl font-bold">Admin Panel</h2>
-        <ul className="space-y-4">
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/admin")}>Dashboard</li>
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/profile")}>Profile</li>
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/ev-owner")}>EV-Owner</li>
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/station")}>Charging Station</li>
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/booking")}>Booking</li>
-    <li className="p-2 transition rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white" onClick={() => navigate("/logout")}>Logout</li>
-  </ul>
+      {/* Modern Sidebar */}
+      <div className={`fixed left-6 top-6 bottom-6 w-64 ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} rounded-3xl p-6 z-10`}>
+        <div className="mb-8">
+          <h2 className={`text-2xl font-bold mb-1 ${getColor('text.primary')}`}>
+            Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Panel</span>
+          </h2>
+          <p className={`text-sm ${getColor('text.secondary')}`}>Management Dashboard</p>
+        </div>
+        
+        <ul className="space-y-2">
+          {sidebarItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <li 
+                key={index}
+                className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 ${getColor('hover.primary')} hover:scale-105`}
+                onClick={() => navigate(item.path)}
+              >
+                <div className="p-2 transition-all rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-blue-500/50">
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <span className={`font-medium ${getColor('text.primary')}`}>{item.label}</span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       {/* Main Content */}
       <div className="relative flex-1 p-8 ml-80">
-        <h1 className="mb-6 text-4xl font-bold">Welcome, Admin 👋</h1>
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className={`text-4xl font-bold mb-2 ${getColor('text.primary')}`}>
+            Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">Admin</span>
+          </h1>
+          <p className={`text-lg ${getColor('text.secondary')}`}>
+            Here's what's happening with your platform today
+          </p>
+        </div>
 
         {/* Add New User Button */}
         <button
           onClick={() => navigate("/users")}
-          className="absolute px-6 py-2 font-semibold text-white transition-transform rounded-xl top-6 right-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:scale-105"
+          className="fixed z-20 px-6 py-3 font-semibold text-white transition-all rounded-xl top-8 right-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105"
         >
           Add New User
         </button>
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4">
+          {[
+            { label: 'Total Users', value: users.length, change: '+12%', icon: Users, gradient: 'from-blue-500 to-cyan-500' },
+            { label: 'Active Stations', value: '24', change: '+3', icon: Building, gradient: 'from-emerald-500 to-teal-500' },
+            { label: 'Total Bookings', value: '1.2K', change: '+18%', icon: Calendar, gradient: 'from-purple-500 to-pink-500' },
+            { label: 'Revenue', value: '$45K', change: '+23%', icon: TrendingUp, gradient: 'from-amber-500 to-orange-500' }
+          ].map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={index}
+                className={`group relative overflow-hidden rounded-2xl ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} p-6 hover:scale-105 transition-all duration-300 cursor-pointer`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.gradient}`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className={`text-sm font-semibold ${stat.change.startsWith('+') ? 'text-emerald-500' : 'text-red-500'}`}>
+                      {stat.change}
+                    </span>
+                  </div>
+                  <p className={`text-sm ${getColor('text.secondary')} mb-1`}>{stat.label}</p>
+                  <p className={`text-3xl font-bold ${getColor('text.primary')}`}>{stat.value}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {/* Charts Section */}
-        <div className="grid grid-cols-1 gap-8 mb-8 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2">
           {/* Line Chart */}
-          <div className="p-6 shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl">
-            <h2 className="mb-4 text-xl font-semibold">User Growth Over Months</h2>
+          <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
+            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>User Growth Over Months</h2>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={userGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#334155' : '#e2e8f0'} />
+                <XAxis dataKey="month" stroke={darkMode ? '#94a3b8' : '#64748b'} />
+                <YAxis stroke={darkMode ? '#94a3b8' : '#64748b'} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
+                    borderRadius: '12px',
+                    color: darkMode ? '#ffffff' : '#000000'
+                  }}
+                />
                 <Line type="monotone" dataKey="users" stroke="#8b5cf6" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Bar Chart */}
-          <div className="p-6 shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl">
-            <h2 className="mb-4 text-xl font-semibold">Users per Role</h2>
+          <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
+            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>Users per Role</h2>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={roleData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#ec4899" />
+                <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#334155' : '#e2e8f0'} />
+                <XAxis dataKey="name" stroke={darkMode ? '#94a3b8' : '#64748b'} />
+                <YAxis stroke={darkMode ? '#94a3b8' : '#64748b'} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
+                    borderRadius: '12px',
+                    color: darkMode ? '#ffffff' : '#000000'
+                  }}
+                />
+                <Bar dataKey="value" fill="#a4eef5" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Pie Chart */}
-          <div className="p-6 shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl md:col-span-2">
-            <h2 className="mb-4 text-xl font-semibold">Role Distribution</h2>
+          <div className={`p-6 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl md:col-span-2 border ${getColor('border.primary')}`}>
+            <h2 className={`mb-6 text-xl font-bold ${getColor('text.primary')}`}>Role Distribution</h2>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -138,26 +227,33 @@ const AdminDashboard = () => {
                   labelLine={false}
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={100}
-                  fill="#8884d8"
+                  fill="#a4eef5"
                   dataKey="value"
                 >
                   {roleData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend />
-                <Tooltip />
+                <Legend wrapperStyle={{ color: darkMode ? '#ffffff' : '#000000' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                    border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
+                    borderRadius: '12px',
+                    color: darkMode ? '#ffffff' : '#000000'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* User List */}
-        <div className="w-full max-w-4xl p-6 mb-8 shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl">
-          <h2 className="mb-4 text-2xl font-semibold">Registered Users</h2>
+        <div className={`w-full p-6 mb-8 shadow-2xl ${getColor('background.card')} backdrop-blur-sm rounded-3xl border ${getColor('border.primary')}`}>
+          <h2 className={`mb-6 text-2xl font-bold ${getColor('text.primary')}`}>Registered Users</h2>
 
           {/* Table Header */}
-          <div className="grid grid-cols-4 gap-4 px-4 py-2 font-semibold border-b border-white/30">
+          <div className={`grid grid-cols-4 gap-4 px-4 py-3 font-semibold rounded-xl mb-4 ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} ${getColor('text.primary')}`}>
             <span>Name</span>
             <span>Email</span>
             <span>Phone</span>
@@ -165,21 +261,22 @@ const AdminDashboard = () => {
           </div>
 
           {/* Table Rows */}
-          <ul className="mt-2 space-y-2">
-            {users.map((user) => (
+          <ul className="space-y-3">
+            {users.map((user, index) => (
               <li
                 key={user._id || user.employeeId}
-                className="grid grid-cols-4 gap-4 p-4 transition transform cursor-pointer rounded-xl bg-white/20 backdrop-blur-sm hover:scale-105"
+                className={`grid grid-cols-4 gap-4 p-4 transition-all duration-300 cursor-pointer rounded-xl ${darkMode ? 'bg-slate-800/50 hover:bg-slate-800' : 'bg-slate-50 hover:bg-slate-100'} hover:scale-[1.02] border ${getColor('border.primary')}`}
                 onClick={() => openModal(user)}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <span className="font-medium">
+                <span className={`font-medium ${getColor('text.primary')}`}>
                   {user.firstName} {user.lastName}
                 </span>
-                <span>{user.email}</span>
-                <span>{user.phoneNumber}</span>
+                <span className={getColor('text.secondary')}>{user.email}</span>
+                <span className={getColor('text.secondary')}>{user.phoneNumber}</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold text-white ${
-                    user.role === "Backoffice" ? "bg-red-500" : "bg-blue-500"
+                  className={`px-3 py-1 rounded-full text-sm font-semibold text-white w-fit ${
+                    user.role === "Backoffice" ? "bg-gradient-to-r from-red-500 to-pink-500" : "bg-gradient-to-r from-blue-500 to-cyan-500"
                   }`}
                 >
                   {user.role}
@@ -189,7 +286,7 @@ const AdminDashboard = () => {
           </ul>
         </div>
 
-        {/* Modern Management Cards */}
+        {/* Management Cards */}
         <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-3">
           {[
             {
@@ -211,7 +308,7 @@ const AdminDashboard = () => {
               description: "Monitor and manage booking details.",
               icon: Calendar,
               gradient: "from-emerald-500 to-teal-500",
-              onClick: () => navigate("/"),
+              onClick: () => navigate("/booking"),
             },
           ].map((card, index) => {
             const Icon = card.icon;
@@ -219,7 +316,7 @@ const AdminDashboard = () => {
               <div
                 key={index}
                 onClick={card.onClick}
-                className="relative p-6 overflow-hidden transition-all duration-300 border cursor-pointer group rounded-2xl border-black/30 backdrop-blur-sm hover:scale-105"
+                className={`group relative p-6 overflow-hidden transition-all duration-300 border cursor-pointer rounded-2xl ${getColor('border.primary')} backdrop-blur-sm hover:scale-105 ${getColor('background.card')}`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div
@@ -230,9 +327,9 @@ const AdminDashboard = () => {
                     <div className={`p-3 rounded-xl bg-gradient-to-r ${card.gradient} mr-3`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-lg font-semibold">{card.label}</p>
+                    <p className={`text-lg font-bold ${getColor('text.primary')}`}>{card.label}</p>
                   </div>
-                  <p className="text-black/80">{card.description}</p>
+                  <p className={getColor('text.secondary')}>{card.description}</p>
                 </div>
               </div>
             );
@@ -241,29 +338,61 @@ const AdminDashboard = () => {
 
         {/* Modal */}
         {isModalOpen && selectedUser && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="p-8 text-gray-900 bg-white shadow-2xl rounded-3xl w-96">
-              <h2 className="mb-4 text-2xl font-bold text-center">User Details</h2>
-              <div className="space-y-3">
-                <p>
-                  <span className="font-semibold">Name:</span> {selectedUser.firstName} {selectedUser.lastName}
-                </p>
-                <p>
-                  <span className="font-semibold">Email:</span> {selectedUser.email}
-                </p>
-                <p>
-                  <span className="font-semibold">Phone:</span> {selectedUser.phoneNumber}
-                </p>
-                <p>
-                  <span className="font-semibold">Role:</span> {selectedUser.role}
-                </p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              onClick={closeModal}
+            ></div>
+            <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-md w-full animate-scaleIn border ${getColor('border.primary')}`}>
+              <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
+                <div className="flex items-center justify-between">
+                  <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>
+                    User Details
+                  </h2>
+                  <button
+                    onClick={closeModal}
+                    className={`p-2 rounded-xl ${getColor('hover.primary')} transition-colors`}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
-              <button
-                className="w-full py-2 mt-6 font-semibold text-white transition rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:scale-105"
-                onClick={closeModal}
-              >
-                Close
-              </button>
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Full Name</p>
+                    <p className={`font-semibold text-lg ${getColor('text.primary')}`}>
+                      {selectedUser.firstName} {selectedUser.lastName}
+                    </p>
+                  </div>
+                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Email</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.email}</p>
+                  </div>
+                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{selectedUser.phoneNumber}</p>
+                  </div>
+                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Role</p>
+                    <span
+                      className={`inline-block px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                        selectedUser.role === "Backoffice" 
+                          ? "bg-gradient-to-r from-red-500 to-pink-500" 
+                          : "bg-gradient-to-r from-blue-500 to-cyan-500"
+                      }`}
+                    >
+                      {selectedUser.role}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  className="w-full py-3 mt-6 font-semibold text-white transition-all rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105"
+                  onClick={closeModal}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}
