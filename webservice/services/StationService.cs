@@ -134,8 +134,12 @@ namespace webservice.services
                             Id = Guid.NewGuid().ToString(),
                             StationId = station.Id,
                             DayOfWeek = schedule.DayOfWeek,
-                            OpeningTime = schedule.OpeningTime,
-                            ClosingTime = schedule.ClosingTime
+                            OpeningTime = schedule.IsOpen && !string.IsNullOrEmpty(schedule.OpeningTime)
+                                ? TimeSpan.Parse(schedule.OpeningTime)
+                                : null,
+                            ClosingTime = schedule.IsOpen && !string.IsNullOrEmpty(schedule.ClosingTime)
+                                ? TimeSpan.Parse(schedule.ClosingTime)
+                                : null
                         };
                         scheduleTasks.Add(scheduleService.CreateStationScheduleAsync(stationSchedule));
                     }

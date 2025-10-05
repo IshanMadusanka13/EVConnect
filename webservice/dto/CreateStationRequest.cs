@@ -21,8 +21,9 @@ namespace webservice.dto
     public class StationScheduleRequest
     {
         public DayOfWeek DayOfWeek { get; set; }
-        public TimeSpan OpeningTime { get; set; }
-        public TimeSpan ClosingTime { get; set; }
+        public bool IsOpen { get; set; }
+        public string? OpeningTime { get; set; }
+        public string? ClosingTime { get; set; }
     }
 
 }

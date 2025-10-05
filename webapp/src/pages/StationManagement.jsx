@@ -289,7 +289,16 @@ const CreateStationModal = ({ onClose, onCreate }) => {
     });
     const [showMap, setShowMap] = useState(false);
     const [slotData, setSlotData] = useState({ acCount: '', dcCount: '', acRate: '', dcRate: '' });
-    const [scheduleStep, setScheduleStep] = useState({ dayOfWeek: '', openingTime: '', closingTime: '' });
+    // Seven days schedule state
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const [scheduleStep, setScheduleStep] = useState(
+        daysOfWeek.map(day => ({
+            dayOfWeek: day,
+            isOpen: false,
+            openingTime: '',
+            closingTime: ''
+        }))
+    );
 
     // Step 1: Station Details
     const handleMapPick = (lat, lng) => {
@@ -316,21 +325,12 @@ const CreateStationModal = ({ onClose, onCreate }) => {
     };
 
     // Step 3: Schedule Details
-    const handleScheduleAdd = (e) => {
-        e.preventDefault();
-        if (!scheduleStep.dayOfWeek || !scheduleStep.openingTime || !scheduleStep.closingTime) return;
-        setStationForm(prev => ({
-            ...prev,
-            schedules: [
-                ...prev.schedules,
-                {
-                    dayOfWeek: scheduleStep.dayOfWeek,
-                    openingTime: scheduleStep.openingTime,
-                    closingTime: scheduleStep.closingTime
-                }
-            ]
-        }));
-        setScheduleStep({ dayOfWeek: '', openingTime: '', closingTime: '' });
+    const handleDayToggle = (idx, checked) => {
+        setScheduleStep(prev => prev.map((item, i) => i === idx ? { ...item, isOpen: checked } : item));
+    };
+
+    const handleTimeChange = (idx, field, value) => {
+        setScheduleStep(prev => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item));
     };
 
     const handleScheduleSubmit = async (e) => {
@@ -346,8 +346,9 @@ const CreateStationModal = ({ onClose, onCreate }) => {
             DcChargingRate: parseFloat(stationForm.dcChargingRate),
             AcCount: parseInt(stationForm.acCount),
             DcCount: parseInt(stationForm.dcCount),
-            Schedules: stationForm.schedules.map(s => ({
+            Schedules: scheduleStep.map(s => ({
                 DayOfWeek: s.dayOfWeek,
+                isOpen: s.isOpen,
                 OpeningTime: s.openingTime,
                 ClosingTime: s.closingTime
             }))
@@ -369,7 +370,7 @@ const CreateStationModal = ({ onClose, onCreate }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
-            <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
+            <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl ${step === 3 ? 'max-w-4xl' : 'max-w-lg'} w-full max-h-[90vh] overflow-y-auto animate-scaleIn border ${getColor('border.primary')}`}>
                 <div className={`sticky top-0 ${getColor('background.modal')} z-10 p-6 border-b ${getColor('border.primary')}`}>
                     <div className="flex items-center justify-between">
                         <h2 className={`text-2xl font-bold ${getColor('text.primary')}`}>Create New Station</h2>
@@ -504,61 +505,97 @@ const CreateStationModal = ({ onClose, onCreate }) => {
                     )}
                     {step === 3 && (
                         <form className="space-y-6" onSubmit={handleScheduleSubmit}>
-                            <div className="mb-4">
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Day of Week</label>
-                                <select
-                                    value={scheduleStep.dayOfWeek}
-                                    onChange={e => setScheduleStep({ ...scheduleStep, dayOfWeek: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+                            <div className={`p-4 rounded-xl ${getColor('background.input')} border ${getColor('border.primary')} mb-4`}>
+                                <h3 className={`text-lg font-semibold mb-2 ${getColor('text.primary')}`}>Operating Hours</h3>
+                                <p className={`text-sm ${getColor('text.secondary')}`}>Set your station's operating hours for each day of the week</p>
+                            </div>
+
+                            <div className="space-y-3">
+                                {scheduleStep.map((sched, idx) => (
+                                    <div
+                                        key={sched.dayOfWeek}
+                                        className={`p-4 rounded-xl border ${getColor('border.primary')} transition-all ${sched.isOpen
+                                                ? `${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'} border-emerald-500/30`
+                                                : `${getColor('background.input')} opacity-75`
+                                            }`}
+                                    >
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                            {/* Day name and toggle */}
+                                            <div className="flex items-center gap-3 min-w-[180px]">
+                                                <span className={`font-semibold text-base ${getColor('text.primary')} w-24`}>
+                                                    {sched.dayOfWeek}
+                                                </span>
+                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={sched.isOpen}
+                                                        onChange={e => handleDayToggle(idx, e.target.checked)}
+                                                        className="sr-only peer"
+                                                    />
+                                                    <div className={`w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full dark:bg-gray-700 peer-checked:bg-emerald-500 transition-all relative shadow-inner`}>
+                                                        <div
+                                                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 shadow-md ${sched.isOpen ? 'translate-x-5' : ''
+                                                                }`}
+                                                            style={{ transform: sched.isOpen ? 'translateX(20px)' : 'none' }}
+                                                        ></div>
+                                                    </div>
+                                                </label>
+                                                <span className={`text-sm font-semibold ${sched.isOpen ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                                                    }`}>
+                                                    {sched.isOpen ? 'Open' : 'Closed'}
+                                                </span>
+                                            </div>
+
+                                            {/* Time inputs */}
+                                            {sched.isOpen && (
+                                                <div className="flex items-center gap-3 flex-1">
+                                                    <div className="flex-1">
+                                                        <label className={`text-xs font-medium ${getColor('text.secondary')} block mb-1`}>
+                                                            Opens
+                                                        </label>
+                                                        <input
+                                                            type="time"
+                                                            value={sched.openingTime}
+                                                            onChange={e => handleTimeChange(idx, 'openingTime', e.target.value)}
+                                                            className={`w-full px-3 py-2 rounded-lg border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all`}
+                                                            required={sched.isOpen}
+                                                        />
+                                                    </div>
+                                                    <span className={`text-lg ${getColor('text.tertiary')} mt-5`}>→</span>
+                                                    <div className="flex-1">
+                                                        <label className={`text-xs font-medium ${getColor('text.secondary')} block mb-1`}>
+                                                            Closes
+                                                        </label>
+                                                        <input
+                                                            type="time"
+                                                            value={sched.closingTime}
+                                                            onChange={e => handleTimeChange(idx, 'closingTime', e.target.value)}
+                                                            className={`w-full px-3 py-2 rounded-lg border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all`}
+                                                            required={sched.isOpen}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(2)}
+                                    className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                                 >
-                                    <option value="">Select Day</option>
-                                    {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                                        <option key={day} value={day}>{day}</option>
-                                    ))}
-                                </select>
+                                    Back
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105"
+                                >
+                                    Create Station
+                                </button>
                             </div>
-                            <div className="mb-4">
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Opening Time</label>
-                                <input
-                                    type="time"
-                                    value={scheduleStep.openingTime}
-                                    onChange={e => setScheduleStep({ ...scheduleStep, openingTime: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className={`block mb-1 font-medium ${getColor('text.primary')}`}>Closing Time</label>
-                                <input
-                                    type="time"
-                                    value={scheduleStep.closingTime}
-                                    onChange={e => setScheduleStep({ ...scheduleStep, closingTime: e.target.value })}
-                                    className={`w-full px-4 py-3 rounded-xl border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-                                />
-                            </div>
-                            <button
-                                type="button"
-                                className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 mb-2"
-                                onClick={handleScheduleAdd}
-                            >
-                                Add Schedule
-                            </button>
-                            <div className="mb-4">
-                                {stationForm.schedules.length > 0 && (
-                                    <ul className="list-disc pl-6">
-                                        {stationForm.schedules.map((sched, idx) => (
-                                            <li key={idx} className={`text-sm ${getColor('text.primary')}`}>
-                                                {sched.dayOfWeek}: {sched.openingTime} - {sched.closingTime}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50"
-                            >
-                                Finish
-                            </button>
                         </form>
                     )}
                 </div>
@@ -594,6 +631,7 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
     const [editing, setEditing] = useState(false);
     const [form, setForm] = useState({
         dayOfWeek: schedule.dayOfWeek,
+        isOpen: schedule.isOpen ?? schedule.IsOpen ?? false,
         openingTime: schedule.openingTime,
         closingTime: schedule.closingTime
     });
@@ -606,6 +644,7 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
             id: schedule.id,
             stationId: schedule.stationId,
             dayOfWeek: form.dayOfWeek,
+            isOpen: form.isOpen,
             openingTime: form.openingTime,
             closingTime: form.closingTime
         });
@@ -617,16 +656,21 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
         <div className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
             {editing ? (
                 <form className="space-y-2" onSubmit={handleSave}>
-                    <div>
-                        <select
-                            value={form.dayOfWeek}
-                            onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value }))}
-                            className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
-                        >
-                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                                <option key={day} value={day}>{day}</option>
-                            ))}
-                        </select>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className={`font-semibold ${getColor('text.primary')}`}>{form.dayOfWeek}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={form.isOpen}
+                                onChange={e => setForm(f => ({ ...f, isOpen: e.target.checked }))}
+                                className="sr-only peer"
+                            />
+                            <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full dark:bg-gray-700 peer-checked:bg-green-500 transition-all relative`}>
+                                <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${form.isOpen ? 'translate-x-5' : ''}`}
+                                    style={{ transform: form.isOpen ? 'translateX(20px)' : 'none' }}></div>
+                            </div>
+                        </label>
+                        <span className={`text-sm font-semibold ${form.isOpen ? 'text-green-600' : 'text-red-600'}`}>{form.isOpen ? 'Open' : 'Closed'}</span>
                     </div>
                     <div>
                         <input
@@ -634,6 +678,7 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
                             value={form.openingTime}
                             onChange={e => setForm(f => ({ ...f, openingTime: e.target.value }))}
                             className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                            disabled={!form.isOpen}
                         />
                     </div>
                     <div>
@@ -642,6 +687,7 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
                             value={form.closingTime}
                             onChange={e => setForm(f => ({ ...f, closingTime: e.target.value }))}
                             className={`w-full px-2 py-1 rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                            disabled={!form.isOpen}
                         />
                     </div>
                     <div className="flex gap-2 mt-2">
@@ -651,8 +697,15 @@ function ScheduleCard({ schedule, darkMode, getColor, onUpdate }) {
                 </form>
             ) : (
                 <>
-                    <div className="font-semibold mb-1">{schedule.dayOfWeek}</div>
-                    <div className={`text-sm ${getColor('text.secondary')}`}>Open: {schedule.openingTime} - {schedule.closingTime}</div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className={`font-semibold ${getColor('text.primary')}`}>{form.dayOfWeek}</span>
+                        <span className={`text-sm font-semibold ${form.isOpen ? 'text-green-600' : 'text-red-600'}`}>{form.isOpen ? 'Open' : 'Closed'}</span>
+                    </div>
+                    {form.isOpen ? (
+                        <div className={`text-sm ${getColor('text.secondary')}`}>Open: {form.openingTime} - {form.closingTime}</div>
+                    ) : (
+                        <div className={`text-sm ${getColor('text.secondary')}`}>Closed</div>
+                    )}
                     <button className="mt-2 px-3 py-1 rounded bg-blue-500 text-white text-xs font-semibold" onClick={() => setEditing(true)}>Edit</button>
                 </>
             )}
