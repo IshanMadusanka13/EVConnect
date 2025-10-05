@@ -348,7 +348,7 @@ const CreateStationModal = ({ onClose, onCreate }) => {
             DcCount: parseInt(stationForm.dcCount),
             Schedules: scheduleStep.map(s => ({
                 DayOfWeek: s.dayOfWeek,
-                isOpen: s.isOpen,
+                IsOpen: s.isOpen,
                 OpeningTime: s.openingTime,
                 ClosingTime: s.closingTime
             }))

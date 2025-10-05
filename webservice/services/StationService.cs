@@ -134,6 +134,7 @@ namespace webservice.services
                             Id = Guid.NewGuid().ToString(),
                             StationId = station.Id,
                             DayOfWeek = schedule.DayOfWeek,
+                            IsOpen = schedule.IsOpen,
                             OpeningTime = schedule.IsOpen && !string.IsNullOrEmpty(schedule.OpeningTime)
                                 ? TimeSpan.Parse(schedule.OpeningTime)
                                 : null,
