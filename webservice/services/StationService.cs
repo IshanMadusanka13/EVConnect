@@ -104,7 +104,7 @@ namespace webservice.services
                                 ChargerType = slotInfo.Type?.SlotName ?? "Unknown",
                                 IsOperational = true
                             };
-                            slotTasks.Add(slotService.CreateSlotAsync(slot));
+                            slotTasks.Add(slotService.CreateSlotForNewStationAsync(slot));
                             slotNumber++;
                         }
                     }

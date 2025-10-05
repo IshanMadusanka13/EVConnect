@@ -33,10 +33,6 @@ const StationManagement = () => {
         setSlotTypeLoading(false);
     };
 
-    useEffect(() => {
-        if (showSlotTypesModal) fetchSlotTypes();
-    }, [showSlotTypesModal]);
-
     // Add or update slot type
     const handleAddOrUpdateSlotType = async (e) => {
         e.preventDefault();
@@ -90,6 +86,7 @@ const StationManagement = () => {
             setLoading(false);
         };
         fetchStations();
+        fetchSlotTypes()
     }, []);
 
     // Only closes modal after schedule step is finished
@@ -359,10 +356,7 @@ const StationManagement = () => {
                                                         getColor={getColor}
                                                         onToggle={async (newStatus) => {
                                                             try {
-                                                                console.log(slot)
-                                                                console.log(newStatus)
                                                                 await api.updateSlotOperationalStatus(slot.id, newStatus);
-                                                                // Update local state for instant feedback
                                                                 setStationDetails(prev => {
                                                                     if (!prev) return prev;
                                                                     const updatedSlots = prev.slots.map((s, i) => i === idx ? { ...s, isOperational: newStatus } : s);
@@ -374,10 +368,29 @@ const StationManagement = () => {
                                                         }}
                                                     />
                                                 ))}
+                                                <AddSlotCard
+                                                    slotTypes={slotTypes}
+                                                    stationId={stationDetails.station?.id}
+                                                    darkMode={darkMode}
+                                                    getColor={getColor}
+                                                    onSlotAdded={newSlot => {
+                                                        setStationDetails(prev => prev ? { ...prev, slots: [...prev.slots, newSlot] } : prev);
+                                                    }}
+                                                />
                                             </div>
-
                                         ) : (
-                                            <div className="text-gray-400">No slots found.</div>
+                                            <>
+                                                <div className="text-gray-400 mb-4">No slots found.</div>
+                                                <AddSlotCard
+                                                    slotTypes={slotTypes}
+                                                    stationId={stationDetails.station?.id}
+                                                    darkMode={darkMode}
+                                                    getColor={getColor}
+                                                    onSlotAdded={newSlot => {
+                                                        setStationDetails(prev => prev ? { ...prev, slots: [newSlot] } : prev);
+                                                    }}
+                                                />
+                                            </>
                                         )}
                                     </div>
                                     <div>
@@ -1028,5 +1041,71 @@ function EditableStationDetails({ station, getColor, darkMode, onUpdate }) {
         </div>
     );
 }
+
+const AddSlotCard = ({ slotTypes, stationId, darkMode, getColor, onSlotAdded }) => {
+    const [showForm, setShowForm] = useState(false);
+    const [form, setForm] = useState({ slotTypeId: '', slotNumber: '', isOperational: true });
+    const [saving, setSaving] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        try {
+            const slotType = slotTypes.find(st => st.id === form.slotTypeId || st.Id === form.slotTypeId);
+            const payload = {
+                stationId,
+                chargerType: slotType.slotName,
+            };
+            console.log(payload)
+            const res = await api.addStationSlot(payload);
+            if (res && res.id) {
+                onSlotAdded(res);
+                setShowForm(false);
+                setForm({ slotTypeId: '', slotNumber: '', isOperational: true });
+            } else {
+                alert('Failed to add slot');
+            }
+        } catch (err) {
+            alert('Error adding slot');
+        }
+        setSaving(false);
+    };
+
+    if (!showForm) {
+        return (
+            <div
+                className={`p-4 rounded-xl border-2 border-dashed ${getColor('border.primary')} flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-all ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} min-h-[120px]`}
+                onClick={() => setShowForm(true)}
+            >
+                <Plus className="w-8 h-8 mb-2 text-blue-500" />
+                <span className={`font-semibold ${getColor('text.primary')}`}>Add Slot</span>
+            </div>
+        );
+    }
+
+    return (
+        <form className={`p-4 rounded-xl border ${getColor('border.primary')} ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} flex flex-col gap-2`} onSubmit={handleSubmit}>
+            <div>
+                <label className={`block mb-1 text-xs font-medium ${getColor('text.primary')}`}>Type</label>
+                <select
+                    value={form.slotTypeId}
+                    onChange={e => setForm(f => ({ ...f, slotTypeId: e.target.value }))}
+                    className={`w-full px-2 py-1.5 text-sm rounded border ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')}`}
+                    required
+                >
+                    <option value="">Select</option>
+                    {slotTypes.map(st => (
+                        <option key={st.id || st.Id} value={st.id || st.Id}>{st.slotName}</option>
+                    ))}
+                </select>
+            </div>
+            <div className="flex gap-2 mt-2">
+                <button type="submit" disabled={saving} className="flex-1 px-3 py-1.5 text-xs rounded bg-emerald-500 text-white font-semibold">{saving ? 'Saving...' : 'Add'}</button>
+                <button type="button" className="flex-1 px-3 py-1.5 text-xs rounded bg-gray-300 text-gray-700 font-semibold" onClick={() => setShowForm(false)}>Cancel</button>
+            </div>
+        </form>
+    );
+};
+
 
 export default StationManagement;
