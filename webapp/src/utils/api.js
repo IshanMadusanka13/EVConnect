@@ -201,6 +201,64 @@ export const api = {
       method: 'GET'
     }),
 
+  // EV Owner Management
+  getAllEVOwners: () =>
+    fetchApi('/EVOwner', {
+      method: 'GET'
+    }),
+
+  getEVOwnerByNIC: (nic) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'GET'
+    }),
+
+  createEVOwner: (ownerData) =>
+    fetchApi('/EVOwner', {
+      method: 'POST',
+      body: JSON.stringify(ownerData)
+    }),
+
+  updateEVOwner: (nic, ownerData) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'PUT',
+      body: JSON.stringify(ownerData)
+    }),
+
+  deleteEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'DELETE'
+    }),
+
+  activateEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}/activate`, {
+      method: 'PATCH'
+    }),
+
+  deactivateEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}/deactivate`, {
+      method: 'PATCH'
+    }),
+
+  getActiveEVOwners: () =>
+    fetchApi('/EVOwner/active', {
+      method: 'GET'
+    }),
+
+  getInactiveEVOwners: () =>
+    fetchApi('/EVOwner/inactive', {
+      method: 'GET'
+    }),
+
+  searchEVOwners: (searchTerm) =>
+    fetchApi(`/EVOwner/search?searchTerm=${encodeURIComponent(searchTerm)}`, {
+      method: 'GET'
+    }),
+
+  // getEVOwnerStats: () =>
+  //   fetchApi('/EVOwner/stats', {
+  //     method: 'GET'
+  //   }),
+
 };
 
 export default api;
