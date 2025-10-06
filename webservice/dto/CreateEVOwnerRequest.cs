@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace webservice.models
+namespace webservice.dto
 {
-    public class EVOwner
+    public class CreateEVOwnerRequest
     {
-        [BsonId]
-        [BsonElement("_id")]
         public string NIC { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -21,14 +11,10 @@ namespace webservice.models
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public string Password { get; set; }
-        public string VehicleType { get; set; } // "Car", "Bike"
+        public string VehicleType { get; set; }
         public string VehicleModel { get; set; }
         public string VehiclePlateNumber { get; set; }
         public string BatteryCapacity { get; set; }
-        public string CompatibleChargerTypes { get; set; } // "AC,DC,Super"
-        public bool IsActive { get; set; }
-        public DateTime RegistrationDate { get; set; }
-
+        public string CompatibleChargerTypes { get; set; }
     }
-
 }

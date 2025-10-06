@@ -51,9 +51,9 @@ namespace webservice.controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Slot>>> Create([FromBody] Slot slot)
+        public async Task<ActionResult<List<Slot>>> Create([FromBody] CreateSlotRequest slotRequest)
         {
-            var createdSlot = await _service.CreateSlotAsync(slot);
+            var createdSlot = await _service.CreateSlotAsync(slotRequest);
             return CreatedAtAction(nameof(GetById), new { id = createdSlot.Id }, createdSlot);
         }
 

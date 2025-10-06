@@ -9,10 +9,9 @@ builder.Services.AddSingleton<JwtService>();
 
 //builder.Services.AddSingleton<JwtService>();
 
-
-// ✅ Add DB & Services
 builder.Services.AddSingleton<DBConnect>();
-//builder.Services.AddScoped<StationService>();
+builder.Services.AddScoped<webservice.services.BookingService>();
+builder.Services.AddScoped<webservice.services.EVOwnerService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -25,7 +24,6 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -37,7 +35,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-// ================= JWT SETUP =================
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings.GetValue<string>("Key"));
 
@@ -56,14 +53,12 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings.GetValue<string>("Issuer"),
         ValidAudience = jwtSettings.GetValue<string>("Audience"),
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ClockSkew = TimeSpan.Zero // optional: remove default 5 min buffer
+        ClockSkew = TimeSpan.Zero
     };
 });
-// ============================================
 
 var app = builder.Build();
 
-// ✅ Enable Swagger in Development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -73,7 +68,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 
-// ✅ Add authentication & authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
 
