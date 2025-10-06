@@ -1,16 +1,15 @@
-﻿
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using webservice.models;
 
 namespace webservice.models
 {
     [BsonIgnoreExtraElements]
-    public class User
+    public class UserUpdatedto
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+       // public string Id { get; set; }
 
         public string EmployeeId { get; set; }
         public string FirstName { get; set; }

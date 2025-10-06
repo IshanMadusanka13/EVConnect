@@ -1,17 +1,7 @@
-﻿
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using webservice.models;
-
-namespace webservice.models
+namespace webservice.dto
 {
-    [BsonIgnoreExtraElements]
-    public class User
+    public class UserDTO
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
         public string EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
