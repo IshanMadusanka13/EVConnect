@@ -57,6 +57,10 @@ const BookingManagement = () => {
     return stationsLookup[stationId]?.stationName || stationId || 'Unknown Station';
   };
 
+  const getStation = (stationId) => {
+    return stationsLookup[stationId] || stationId || 'Unknown Station';
+  };
+
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -958,14 +962,18 @@ const BookingManagement = () => {
 
       {/* Create Booking Modal */}
       {showCreateModal && (
-        <CreateBookingModal onClose={() => setShowCreateModal(false)} />
+        <CreateBookingModal
+          onClose={() => setShowCreateModal(false)}
+          stationsLookup={stationsLookup}
+          getStation={getStation}
+        />
       )}
     </div>
   );
 };
 
 // Create Booking Modal Component
-const CreateBookingModal = ({ onClose }) => {
+const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
   const { darkMode, getColor } = useContext(ThemeContext);
   const [step, setStep] = useState(1);
   const [stations, setStations] = useState([]);
@@ -979,6 +987,9 @@ const CreateBookingModal = ({ onClose }) => {
     endTime: '',
     chargerType: 'AC'
   });
+
+  console.log('Station lookup:', stationsLookup);
+  console.log('Selected Station:', getStation('ST001'));
 
   useEffect(() => {
     fetchStations();
@@ -1009,6 +1020,7 @@ const CreateBookingModal = ({ onClose }) => {
         formData.chargerType
       );
       setAvailableSlots(slots);
+      setStep(3); // Move to step 3 after fetching slots
     } catch (error) {
       console.error('Error checking availability:', error);
       alert('Failed to check availability');
@@ -1114,44 +1126,61 @@ const CreateBookingModal = ({ onClose }) => {
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Charging Station
               </h3>
-              {stations.map((station) => (
-                <div
-                  key={station.id}
-                  onClick={() => setFormData({ ...formData, stationId: station.id })}
-                  className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${formData.stationId === station.id
-                    ? `border-blue-500 ${darkMode ? 'bg-blue-500/10' : 'bg-blue-50'} scale-105`
-                    : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
-                    }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className={`text-xl font-bold mb-2 ${getColor('text.primary')}`}>
-                        {station.name}
-                      </h4>
-                      <div className="flex items-center gap-2 mb-3">
-                        <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
-                        <span className={`text-sm ${getColor('text.secondary')}`}>
-                          {station.address}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
-                            {station.rating}
+              {stations.map((station) => {
+                const stationDetails = getStation(station.id);
+                return (
+                  <div
+                    key={station.id}
+                    onClick={() => setFormData({ ...formData, stationId: station.id })}
+                    className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${formData.stationId === station.id
+                      ? `border-blue-500 ${darkMode ? 'bg-blue-500/10' : 'bg-blue-50'} scale-105`
+                      : `${darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'}`
+                      }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className={`text-xl font-bold mb-2 ${getColor('text.primary')}`}>
+                          {stationDetails?.stationName || station.name}
+                        </h4>
+                        <div className="flex items-center gap-2 mb-3">
+                          <MapPin className={`w-4 h-4 ${getColor('text.secondary')}`} />
+                          <span className={`text-sm ${getColor('text.secondary')}`}>
+                            {stationDetails?.address || station.address}
                           </span>
                         </div>
-                        <div className={`px-3 py-1 rounded-full ${getColor('background.success')} ${getColor('text.success')} text-sm font-semibold`}>
-                          {station.available} slots available
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                            <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                              {station.rating || '4.5'}
+                            </span>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full ${getColor('background.success')} ${getColor('text.success')} text-sm font-semibold`}>
+                            {station.available || 'Available'} slots
+                          </div>
                         </div>
+                        {/* Show map for selected station */}
+                        {formData.stationId === station.id && stationDetails?.latitude && stationDetails?.longitude && (
+                          <div className="mt-4 rounded-xl overflow-hidden border-2 border-blue-500">
+                            <iframe
+                              width="100%"
+                              height="200"
+                              frameBorder="0"
+                              style={{ border: 0 }}
+                              src={`https://www.google.com/maps?q=${stationDetails.latitude},${stationDetails.longitude}&output=embed&z=15`}
+                              allowFullScreen
+                              title={`Map of ${stationDetails.stationName}`}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className={`p-4 rounded-xl ${formData.stationId === station.id ? 'bg-blue-500' : darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                        <Zap className={`w-8 h-8 ${formData.stationId === station.id ? 'text-white' : darkMode ? 'text-slate-400' : 'text-slate-600'}`} />
                       </div>
                     </div>
-                    <div className={`p-4 rounded-xl ${formData.stationId === station.id ? 'bg-blue-500' : darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                      <Zap className={`w-8 h-8 ${formData.stationId === station.id ? 'text-white' : darkMode ? 'text-slate-400' : 'text-slate-600'}`} />
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -1163,79 +1192,175 @@ const CreateBookingModal = ({ onClose }) => {
               </h3>
 
               <div className="space-y-6">
+                {/* Enhanced Date Picker */}
                 <div>
                   <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                     Reservation Date
                   </label>
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    min={new Date().toISOString().split('T')[0]}
-                    className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
-                  />
+                  <div className="relative">
+                    <Calendar className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')} pointer-events-none`} />
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      className={`w-full pl-12 pr-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg cursor-pointer`}
+                      style={{
+                        colorScheme: darkMode ? 'dark' : 'light'
+                      }}
+                    />
+                  </div>
+                  {formData.date && (
+                    <div className={`mt-2 p-3 rounded-lg ${darkMode ? 'bg-blue-500/10' : 'bg-blue-50'} flex items-center gap-2`}>
+                      <Check className="w-4 h-4 text-blue-500" />
+                      <span className={`text-sm font-medium ${darkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+                        {new Date(formData.date).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
+                {/* Time Selection with Validation */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                       Start Time
                     </label>
-                    <select
-                      value={formData.startTime}
-                      onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                      className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
-                    >
-                      <option value="">Select time</option>
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>{time}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <Clock className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')} pointer-events-none`} />
+                      <select
+                        value={formData.startTime}
+                        onChange={(e) => {
+                          const newStartTime = e.target.value;
+                          setFormData({
+                            ...formData,
+                            startTime: newStartTime,
+                            // Reset end time if it's before or equal to new start time
+                            endTime: formData.endTime && formData.endTime <= newStartTime ? '' : formData.endTime
+                          });
+                        }}
+                        className={`w-full pl-12 pr-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg appearance-none cursor-pointer`}
+                      >
+                        <option value="">Select time</option>
+                        {timeSlots.map((time) => (
+                          <option key={time} value={time}>
+                            {new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </option>
+                        ))}
+                      </select>
+                      {/* <ChevronDown className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')} pointer-events-none`} /> */}
+                    </div>
                   </div>
                   <div>
                     <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                       End Time
                     </label>
-                    <select
-                      value={formData.endTime}
-                      onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                      className={`w-full px-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
-                    >
-                      <option value="">Select time</option>
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>{time}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <Clock className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')} pointer-events-none`} />
+                      <select
+                        value={formData.endTime}
+                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                        disabled={!formData.startTime}
+                        className={`w-full pl-12 pr-6 py-4 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        <option value="">Select time</option>
+                        {timeSlots
+                          .filter(time => !formData.startTime || time > formData.startTime)
+                          .map((time) => (
+                            <option key={time} value={time}>
+                              {new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              })}
+                            </option>
+                          ))}
+                      </select>
+                      {/* <ChevronDown className={`absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${getColor('text.tertiary')} pointer-events-none`} /> */}
+                    </div>
                   </div>
                 </div>
 
+                {/* Duration Display */}
+                {formData.startTime && formData.endTime && (
+                  <div className={`p-4 rounded-xl ${darkMode ? 'bg-purple-500/10' : 'bg-purple-50'} border-2 border-purple-500/20`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-purple-500" />
+                        <span className={`font-semibold ${darkMode ? 'text-purple-400' : 'text-purple-700'}`}>
+                          Charging Duration
+                        </span>
+                      </div>
+                      <span className={`text-lg font-bold ${darkMode ? 'text-purple-400' : 'text-purple-700'}`}>
+                        {(() => {
+                          const start = new Date(`2000-01-01T${formData.startTime}`);
+                          const end = new Date(`2000-01-01T${formData.endTime}`);
+                          const diffMs = end - start;
+                          const diffHrs = Math.floor(diffMs / 3600000);
+                          const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                          return `${diffHrs}h ${diffMins}m`;
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Charger Type Selection */}
                 <div>
                   <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                     Charger Type
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
+                      type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'AC' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'AC'
-                        ? 'border-emerald-500 bg-emerald-500/10 scale-105'
-                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg shadow-emerald-500/20'
+                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                         }`}
                     >
-                      <Battery className="w-12 h-12 mx-auto mb-3 text-emerald-500" />
+                      <Battery className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'AC' ? 'text-emerald-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
                       <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>AC Charging</p>
                       <p className={`text-sm ${getColor('text.secondary')}`}>Standard • 7-22 kW</p>
+                      <p className={`text-xs mt-2 ${getColor('text.tertiary')}`}>Perfect for overnight</p>
                     </button>
                     <button
+                      type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'DC Fast' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC Fast'
-                        ? 'border-orange-500 bg-orange-500/10 scale-105'
-                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
+                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                         }`}
                     >
-                      <Zap className="w-12 h-12 mx-auto mb-3 text-orange-500" />
+                      <Zap className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'DC Fast' ? 'text-orange-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
                       <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>DC Fast</p>
                       <p className={`text-sm ${getColor('text.secondary')}`}>Rapid • 50-350 kW</p>
+                      <p className={`text-xs mt-2 ${getColor('text.tertiary')}`}>Quick charge in minutes</p>
                     </button>
+                  </div>
+                </div>
+
+                {/* Info Alert */}
+                <div className={`p-4 rounded-xl ${getColor('background.info')} border ${getColor('border.info')}`}>
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className={`text-sm ${getColor('text.info')}`}>
+                      <p className="font-semibold mb-1">Booking Tips</p>
+                      <ul className="space-y-1">
+                        <li>• End time must be after start time</li>
+                        <li>• Minimum booking duration: 1 hour</li>
+                        <li>• Available slots: 8:00 AM - 8:00 PM</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1248,49 +1373,87 @@ const CreateBookingModal = ({ onClose }) => {
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Slot
               </h3>
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((slot) => {
-                  const isAvailable = slot !== 3 && slot !== 6;
-                  const isSelected = formData.slotId === `SL00${slot}`;
-                  return (
-                    <button
-                      key={slot}
-                      disabled={!isAvailable}
-                      onClick={() => isAvailable && setFormData({ ...formData, slotId: `SL00${slot}` })}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${isSelected
-                        ? 'border-blue-500 bg-blue-500/10 scale-105'
-                        : isAvailable
-                          ? darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
-                          : darkMode ? 'border-slate-800 bg-slate-800/50 opacity-50' : 'border-slate-100 bg-slate-100 opacity-50'
-                        } ${!isAvailable && 'cursor-not-allowed'}`}
-                    >
-                      <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center ${isSelected
-                        ? 'bg-blue-500'
-                        : isAvailable
-                          ? darkMode ? 'bg-emerald-500/20' : 'bg-emerald-100'
-                          : darkMode ? 'bg-slate-700' : 'bg-slate-200'
-                        }`}>
-                        {isAvailable ? (
-                          <Zap className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-emerald-500'}`} />
-                        ) : (
-                          <X className={`w-8 h-8 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
-                        )}
-                      </div>
-                      <p className={`font-bold text-lg ${getColor('text.primary')}`}>Slot {slot}</p>
-                      <p className={`text-sm mt-1 ${isAvailable ? 'text-emerald-500 font-semibold' : darkMode ? 'text-slate-500' : 'text-slate-400'
-                        }`}>
-                        {isAvailable ? 'Available' : 'Occupied'}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
+
+              {loading ? (
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    <div key={i} className={`p-6 rounded-2xl border-2 ${getColor('border.primary')} animate-pulse`}>
+                      <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
+                      <div className={`h-4 ${darkMode ? 'bg-slate-700' : 'bg-slate-200'} rounded mb-2`}></div>
+                      <div className={`h-3 ${darkMode ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
+                    </div>
+                  ))}
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className={`p-8 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} text-center`}>
+                  <X className={`w-16 h-16 mx-auto mb-4 ${getColor('text.tertiary')}`} />
+                  <h4 className={`text-xl font-bold mb-2 ${getColor('text.primary')}`}>
+                    No Available Slots
+                  </h4>
+                  <p className={`${getColor('text.secondary')}`}>
+                    All slots are booked for the selected time. Please try a different time slot.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-4 mb-6">
+                  {availableSlots.map((slot) => {
+                    const isSelected = formData.slotId === slot.id;
+                    const isOperational = slot.isOperational;
+
+                    return (
+                      <button
+                        key={slot.id}
+                        disabled={!isOperational}
+                        onClick={() => isOperational && setFormData({ ...formData, slotId: slot.id })}
+                        className={`p-6 rounded-2xl border-2 transition-all duration-300 ${isSelected
+                          ? 'border-blue-500 bg-blue-500/10 scale-105'
+                          : isOperational
+                            ? darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                            : darkMode ? 'border-slate-800 bg-slate-800/50 opacity-50' : 'border-slate-100 bg-slate-100 opacity-50'
+                          } ${!isOperational && 'cursor-not-allowed'}`}
+                      >
+                        <div className={`w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center ${isSelected
+                          ? 'bg-blue-500'
+                          : isOperational
+                            ? darkMode ? 'bg-emerald-500/20' : 'bg-emerald-100'
+                            : darkMode ? 'bg-slate-700' : 'bg-slate-200'
+                          }`}>
+                          {isOperational ? (
+                            slot.chargerType === 'DC' ? (
+                              <Zap className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-orange-500'}`} />
+                            ) : (
+                              <Battery className={`w-8 h-8 ${isSelected ? 'text-white' : 'text-emerald-500'}`} />
+                            )
+                          ) : (
+                            <X className={`w-8 h-8 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                          )}
+                        </div>
+                        <p className={`font-bold text-lg ${getColor('text.primary')}`}>
+                          {slot.slotNumber}
+                        </p>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>
+                          {slot.chargerType} • {slot.powerOutput}kW
+                        </p>
+                        <p className={`text-sm mt-1 ${isOperational
+                          ? 'text-emerald-500 font-semibold'
+                          : darkMode ? 'text-slate-500' : 'text-slate-400'
+                          }`}>
+                          {isOperational ? 'Available' : 'Unavailable'}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               <div className={`p-4 rounded-xl ${getColor('background.info')} ${getColor('border.info')}`}>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                   <p className={`text-sm ${getColor('text.info')}`}>
-                    Your selected slot will be reserved for {formData.startTime} - {formData.endTime}
+                    {formData.slotId
+                      ? `Your selected slot will be reserved for ${formData.startTime} - ${formData.endTime}`
+                      : `Showing ${availableSlots.length} available slot${availableSlots.length !== 1 ? 's' : ''} for your selected time`
+                    }
                   </p>
                 </div>
               </div>
@@ -1308,7 +1471,13 @@ const CreateBookingModal = ({ onClose }) => {
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
                   <span className={`font-medium ${getColor('text.secondary')}`}>Station</span>
                   <span className={`font-bold text-lg ${getColor('text.primary')}`}>
-                    {stations.find(s => s.id === formData.stationId)?.name}
+                    {getStation(formData.stationId)?.stationName || stations.find(s => s.id === formData.stationId)?.name}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
+                  <span className={`font-medium ${getColor('text.secondary')}`}>Address</span>
+                  <span className={`font-bold text-lg ${getColor('text.primary')}`}>
+                    {getStation(formData.stationId)?.address || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
@@ -1321,6 +1490,7 @@ const CreateBookingModal = ({ onClose }) => {
                     })}
                   </span>
                 </div>
+                {/* Rest of the review fields remain the same */}
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
                   <span className={`font-medium ${getColor('text.secondary')}`}>Time</span>
                   <span className={`font-bold text-lg ${getColor('text.primary')}`}>
@@ -1344,15 +1514,22 @@ const CreateBookingModal = ({ onClose }) => {
                     {formData.slotId}
                   </span>
                 </div>
-                <div className={`pt-4 mt-4 border-t-2 ${getColor('border.primary')}`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-lg font-medium ${getColor('text.secondary')}`}>Estimated Cost</span>
-                    <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
-                      $18.50
-                    </span>
-                  </div>
-                </div>
               </div>
+
+              {/* Show map in review */}
+              {getStation(formData.stationId)?.latitude && getStation(formData.stationId)?.longitude && (
+                <div className="mb-6 rounded-2xl overflow-hidden border-2 border-blue-500">
+                  <iframe
+                    width="100%"
+                    height="250"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src={`https://www.google.com/maps?q=${getStation(formData.stationId).latitude},${getStation(formData.stationId).longitude}&output=embed&z=15`}
+                    allowFullScreen
+                    title={`Map of ${getStation(formData.stationId).stationName}`}
+                  />
+                </div>
+              )}
 
               <div className={`p-4 rounded-xl ${getColor('background.warning')} ${getColor('border.warning')}`}>
                 <div className="flex items-start gap-3">
@@ -1388,11 +1565,12 @@ const CreateBookingModal = ({ onClose }) => {
                 disabled={
                   (step === 1 && !formData.stationId) ||
                   (step === 2 && (!formData.date || !formData.startTime || !formData.endTime)) ||
-                  (step === 3 && !formData.slotId)
+                  (step === 3 && !formData.slotId) ||
+                  loading
                 }
                 className="flex-1 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
               >
-                Continue
+                {loading && step === 2 ? 'Checking Availability...' : 'Continue'}
               </button>
             ) : (
               <button
