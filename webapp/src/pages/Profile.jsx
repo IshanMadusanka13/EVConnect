@@ -1,20 +1,39 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import Navbar from "../components/Navbar";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { UserCircle, X } from "lucide-react";
 
 const ProfilePage = () => {
   const { darkMode, getColor } = useContext(ThemeContext);
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
-  const userId = "68e2bab51f6a9852b6e0dcee";
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:5116/users/${userId}`);
+        // ✅ Get token from localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No token found — user not logged in.");
+          return;
+        }
+
+        // ✅ Decode token to extract user ID
+        const decoded = jwtDecode(token);
+        const userId = decoded.id || decoded.userId || decoded.sub;
+
+        if (!userId) {
+          console.error("User ID not found in token");
+          return;
+        }
+
+        // ✅ Fetch user details using ID
+        const response = await axios.get(`http://localhost:5116/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setUser(response.data);
         setEditForm({
           firstName: response.data.firstName,
@@ -28,12 +47,19 @@ const ProfilePage = () => {
         console.error("Error fetching user:", err);
       }
     };
+
     fetchUser();
-  }, [userId]);
+  }, []);
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:5116/users/${userId}`, editForm);
+      const token = localStorage.getItem("token");
+      const decoded = jwtDecode(token);
+      const userId = decoded.id || decoded.userId || decoded.sub;
+
+      await axios.put(`http://localhost:5116/users/${userId}`, editForm, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUser(editForm);
       setIsEditing(false);
     } catch (err) {
@@ -55,9 +81,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="relative flex flex-col items-center justify-center min-h-screen px-8 py-16">
-        <h1 className={`text-4xl font-bold mb-8 ${getColor('text.primary')}`}>
-          My Profile
-        </h1>
+        <h1 className={`text-4xl font-bold mb-8 ${getColor('text.primary')}`}>My Profile</h1>
 
         <div className={`w-full max-w-3xl p-6 bg-white dark:bg-slate-800 shadow-2xl rounded-3xl border ${getColor('border.primary')}`}>
           {/* Edit Mode Toggle */}
