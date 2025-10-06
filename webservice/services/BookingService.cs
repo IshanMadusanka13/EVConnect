@@ -55,7 +55,7 @@ namespace webservice.services
         }
 
         // Create new booking with availability check and automatic slot assignment
-        public async Task<(bool Success, string Message, Booking Booking)> CreateBookingAsync(string stationId, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType)
+        public async Task<(bool Success, string Message, Booking Booking)> CreateBookingAsync(string stationId, string nic, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType)
         {
             // Validate reservation date is within 7 days from now
             var bookingDateTime = DateTime.Now;
@@ -99,6 +99,7 @@ namespace webservice.services
             {
                 Id = Guid.NewGuid().ToString(),
                 StationId = stationId,
+                NIC = nic,
                 SlotId = availableSlot.Id,
                 ReservationDate = reservationDate,
                 StartTime = startTime,
@@ -106,6 +107,7 @@ namespace webservice.services
                 BookingDateTime = bookingDateTime,
                 Status = "Pending",
                 EnergyConsumed = 0,
+                ChargerType = chargerType,
                 Cost = 0,
                 QRCodeData = GenerateQRCodeData(),
                 QRCodeScanned = false,

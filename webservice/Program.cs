@@ -13,6 +13,10 @@ builder.Services.AddSingleton<JwtService>();
 // ✅ Add DB & Services
 builder.Services.AddSingleton<DBConnect>();
 //builder.Services.AddScoped<StationService>();
+builder.Services.AddScoped<webservice.services.BookingService>();
+builder.Services.AddScoped<webservice.services.EVOwnerService>();
+
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

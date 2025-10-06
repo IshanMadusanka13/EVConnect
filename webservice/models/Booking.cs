@@ -9,6 +9,7 @@ namespace webservice.models
     public class Booking
     {
         public string Id { get; set; }
+        public string NIC { get; set; }
         public string StationId { get; set; }
         public string SlotId { get; set; }
         public DateTime ReservationDate { get; set; }
@@ -17,6 +18,7 @@ namespace webservice.models
         public DateTime BookingDateTime { get; set; }
         public string Status { get; set; }
         public decimal EnergyConsumed { get; set; }
+        public string ChargerType { get; set; }
         public decimal Cost { get; set; }
         public string QRCodeData { get; set; }
         public bool QRCodeScanned { get; set; }
