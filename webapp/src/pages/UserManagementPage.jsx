@@ -42,14 +42,14 @@ const handleSubmit = async (e) => {
 
   try {
     const res = await axios.post("http://localhost:5116/users/register", {
-      employeeId: form.EmployeeId,
-      firstName: form.FirstName,
-      lastName: form.LastName,
-      phoneNumber: form.PhoneNumber,
-      email: form.Email,
-      password: form.Password,
-      role: form.Role,
-      isActive: form.IsActive,
+      EmployeeId: form.EmployeeId,
+      FirstName: form.FirstName,
+      LastName: form.LastName,
+      PhoneNumber: form.PhoneNumber,
+      Email: form.Email,
+      Password: form.Password,
+      Role: form.Role,
+      IsActive: form.IsActive,
     });
 
     setUsers([...users, res.data]);
@@ -64,15 +64,15 @@ const handleSubmit = async (e) => {
     });
 
     setForm({
-      EmployeeId: "",
-      FirstName: "",
-      LastName: "",
-      PhoneNumber: "",
-      Email: "",
-      Password: "",
-      ConfirmPassword: "",
-      Role: "StationOperator",
-      IsActive: true,
+      employeeId: "",
+      firstName: "",
+      LastNameastName: "",
+      phoneNumber: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "StationOperator",
+      isActive: true,
     });
   } catch (err) {
     console.error(err);
