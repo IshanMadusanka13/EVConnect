@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; // ✅ Import SweetAlert2
 import axios from "axios"; // ✅ For backend login call
 
@@ -8,48 +8,59 @@ const LoginPage = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [users, setUsers] = useState([]);
 
   const handleSignup = () => {
     navigate("/users");
   };
 
   // ✅ Handle Login
-  const handleLogin = async (e) => {
-    e.preventDefault();
+ const handleLogin = async (e) => {
+  e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:5116/auth/login", {
-        email,
-        password,
-      });
+  try {
+    const response = await axios.post("http://localhost:5116/auth/login", {
+      email,
+      password,
+    });
 
-      // ✅ Show success alert
-      Swal.fire({
-        icon: "success",
-        title: "Login Successful!",
-        text: "Welcome back!",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+    const data = response.data;
+    console.log("Login response:", data); // for debugging
 
-      // ✅ Store JWT token (optional)
-      localStorage.setItem("token", response.data.token);
+    Swal.fire({
+      icon: "success",
+      title: "Login Successful!",
+      text: "Welcome back!",
+      timer: 2000,
+      showConfirmButton: false,
+    });
 
-      // ✅ Redirect to dashboard
-      setTimeout(() => {
+    // ✅ Store JWT token
+    localStorage.setItem("token", data.token);
+
+    // ✅ Redirect based on user role
+    setTimeout(() => {
+      const role = data.user.role; // 👈 fix: access role properly
+
+      if (role === "Backoffice") {
         navigate("/admin");
-      }, 2000);
-    } catch (error) {
-      // ✅ Show error alert
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed!",
-        text:
-          error.response?.data?.message ||
-          "Invalid email or password. Please try again.",
-      });
-    }
-  };
+      } else if (role === "StationOperator") {
+        navigate("/ev-owners");
+      } else {
+        navigate("/");
+      }
+    }, 1500);
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed!",
+      text:
+        error.response?.data?.message ||
+        "Invalid email or password. Please try again.",
+    });
+  }
+};
+
 
   return (
     <div className="relative min-h-screen transition-colors duration-500 bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100">
