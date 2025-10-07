@@ -1,5 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="background_primary">#F8FAFC</color>
+    <color name="background_secondary">#FFFFFF</color>
+    <color name="background_card">#FFFFFF</color>
+    <color name="background_input">#F1F5F9</color>
+    <color name="background_elevated">#FFFFFFCC</color>
+    <color name="background_modal">#FFFFFF</color>
+    <color name="background_accent">#EBF8FF</color>
+    <color name="background_danger">#FEF2F2</color>
+    <color name="background_success">#ECFDF5</color>
+    <color name="background_warning">#FFFBEB</color>
+    <color name="background_info">#EBF8FF</color>
+
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#4B5563</color>
+    <color name="text_tertiary">#9CA3AF</color>
+    <color name="text_accent">#1D4ED8</color>
+    <color name="text_danger">#B91C1C</color>
+    <color name="text_success">#16A34A</color>
+    <color name="text_warning">#CA8A04</color>
+    <color name="text_info">#1D4ED8</color>
+
+    <color name="border_primary">#E5E7EB</color>
+    <color name="border_secondary">#D1D5DB</color>
+    <color name="border_input">#E5E7EB</color>
+    <color name="border_accent">#BFDBFE</color>
+    <color name="border_danger">#FCA5A5</color>
+    <color name="border_success">#86EFAC</color>
+    <color name="border_warning">#FBBF24</color>
+    <color name="border_info">#BFDBFE</color>
+
+    <color name="hover_primary">#F3F4F6</color>
+    <color name="hover_secondary">#F9FAFB</color>
+
+    <color name="status_confirmed">#34D399</color>
+    <color name="status_pending">#FBBF24</color>
+    <color name="status_completed">#3B82F6</color>
+    <color name="status_cancelled">#F87171</color>
+    <color name="status_default">#A1A1AA</color>
+
+    <color name="charger_ac">#34D399</color>
+    <color name="charger_dc">#FB923C</color>
+
+    <color name="gradient_bluePurple">#3B82F6</color>
+    <color name="gradient_navLogo">#3B82F6</color>
+
+    <color name="shadow_primary">#3B82F650</color>
 </resources>

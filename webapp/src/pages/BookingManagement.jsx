@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Calendar, Clock, MapPin, Search, Filter, Plus, X, ChevronDown, Bell, Star, ChevronRight,
-  Zap, Battery, Navigation, TrendingUp, Activity, Check, AlertCircle
+  Zap, Battery, Navigation, TrendingUp, Activity, Check, AlertCircle, User
 } from 'lucide-react';
 import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
@@ -18,6 +18,7 @@ const BookingManagement = () => {
   const [energyInput, setEnergyInput] = useState('');
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [stationsLookup, setStationsLookup] = useState({});
+  const [evOwnersLookup, setEvOwnersLookup] = useState({});
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
@@ -37,6 +38,7 @@ const BookingManagement = () => {
 
   useEffect(() => {
     fetchStations();
+    fetchEVOwners();
     fetchBookings();
   }, []);
 
@@ -53,6 +55,19 @@ const BookingManagement = () => {
     }
   };
 
+  const fetchEVOwners = async () => {
+    try {
+      const data = await api.getAllEVOwners();
+      const lookup = {};
+      data.forEach(owner => {
+        lookup[owner.nic] = owner;
+      });
+      setEvOwnersLookup(lookup);
+    } catch (error) {
+      console.error('Error fetching EV owners:', error);
+    }
+  };
+
   const getStationName = (stationId) => {
     return stationsLookup[stationId]?.stationName || stationId || 'Unknown Station';
   };
@@ -61,12 +76,15 @@ const BookingManagement = () => {
     return stationsLookup[stationId] || stationId || 'Unknown Station';
   };
 
+  const getEVOwner = (nic) => {
+    return evOwnersLookup[nic] || null;
+  };
+
   const fetchBookings = async () => {
     try {
       setLoading(true);
       const data = await api.getAllBookings();
       setBookings(data);
-      console.log('Fetched bookings:', data);
 
       // Calculate real stats
       const totalBookings = data.length;
@@ -113,7 +131,8 @@ const BookingManagement = () => {
           b.customerName?.toLowerCase().includes(searchLower) ||
           b.vehicleModel?.toLowerCase().includes(searchLower) ||
           b.id?.toString().toLowerCase().includes(searchLower) ||
-          b.stationId?.toLowerCase().includes(searchLower)
+          b.stationId?.toLowerCase().includes(searchLower) ||
+          b.nic?.toLowerCase().includes(searchLower)
         );
       });
     }
@@ -162,14 +181,27 @@ const BookingManagement = () => {
     }
   };
 
-  const handleConfirmBooking = async (bookingId) => {
+  const handleApproveBooking = async (bookingId) => {
     try {
-      await api.updateBookingStatus(bookingId, 'Confirmed');
-      alert('Booking confirmed successfully');
+      await api.updateBookingStatus(bookingId, 'Approved');
+      alert('Booking approved successfully');
       fetchBookings();
       closeModal();
     } catch (error) {
-      alert(error.message || 'Failed to confirm booking');
+      alert(error.message || 'Failed to approve booking');
+    }
+  };
+
+  const handleRejectBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to reject this booking?')) return;
+
+    try {
+      await api.updateBookingStatus(bookingId, 'Rejected');
+      alert('Booking rejected successfully');
+      fetchBookings();
+      closeModal();
+    } catch (error) {
+      alert(error.message || 'Failed to reject booking');
     }
   };
 
@@ -208,10 +240,12 @@ const BookingManagement = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Confirmed': return getColor('status.confirmed');
+      case 'Confirmed':
+      case 'Approved': return getColor('status.confirmed');
       case 'Pending': return getColor('status.pending');
       case 'Completed': return getColor('status.completed');
-      case 'Cancelled': return getColor('status.cancelled');
+      case 'Cancelled':
+      case 'Rejected': return getColor('status.cancelled');
       default: return getColor('status.default');
     }
   };
@@ -455,9 +489,9 @@ const BookingManagement = () => {
         statusColor = brand.success;
         statusText = 'COMPLETED';
         break;
-      case 'Confirmed':
+      case 'Approved':
         statusColor = brand.primary;
-        statusText = 'CONFIRMED';
+        statusText = 'APPROVED';
         break;
       case 'Pending':
         statusColor = [251, 191, 36];
@@ -606,6 +640,8 @@ const BookingManagement = () => {
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
                 <option value="In Progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
@@ -699,11 +735,25 @@ const BookingManagement = () => {
                       <div className={`mb-4 p-3 rounded-xl ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <span className={`text-xs ${getColor('text.tertiary')}`}>Customer</span>
-                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.customerName}</span>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                            {(() => {
+                              const owner = getEVOwner(booking.nic);
+                              return owner ? `${owner.firstName} ${owner.lastName}` : booking.customerName;
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-xs ${getColor('text.tertiary')}`}>NIC</span>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.nic || 'N/A'}</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className={`text-xs ${getColor('text.tertiary')}`}>Vehicle</span>
-                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>{booking.vehicleModel}</span>
+                          <span className={`text-sm font-semibold ${getColor('text.primary')}`}>
+                            {(() => {
+                              const owner = getEVOwner(booking.nic);
+                              return owner ? owner.vehicleModel : booking.vehicleModel;
+                            })()}
+                          </span>
                         </div>
                       </div>
 
@@ -814,16 +864,69 @@ const BookingManagement = () => {
                 </div>
               </div>
 
+              {/* EV Owner Details Section - UPDATED WITH CORRECT FIELD NAMES */}
+              {(() => {
+                const owner = getEVOwner(selectedBooking.nic);
+                return owner ? (
+                  <div className={`mb-6 p-6 rounded-2xl ${darkMode ? 'bg-gradient-to-br from-blue-900/20 to-purple-900/20' : 'bg-gradient-to-br from-blue-50 to-purple-50'} border-2 border-blue-500/30`}>
+                    <h4 className={`text-lg font-bold mb-4 ${getColor('text.primary')} flex items-center gap-2`}>
+                      <User className="w-5 h-5 text-blue-500" />
+                      EV Owner Details
+                    </h4>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+                        {owner.firstName?.charAt(0)}{owner.lastName?.charAt(0)}
+                      </div>
+                      <div className="flex-1">
+                        <h5 className={`text-xl font-bold ${getColor('text.primary')} mb-1`}>
+                          {owner.firstName} {owner.lastName}
+                        </h5>
+                        <p className={`text-sm ${getColor('text.secondary')} mb-2`}>{owner.email || 'N/A'}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                            {owner.isActive ? 'Active Account' : 'Inactive Account'}
+                          </span>
+                          {owner.Gender && (
+                            <span className={`px-3 py-1 rounded-full ${darkMode ? 'bg-slate-700' : 'bg-slate-200'} text-xs font-semibold ${getColor('text.primary')}`}>
+                              {owner.gender}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>NIC Number</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.nic}</p>
+                      </div>
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.phoneNumber || 'N/A'}</p>
+                      </div>
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Vehicle Model</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.vehicleModel || 'N/A'}</p>
+                      </div>
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Plate Number</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.vehiclePlateNumber || 'N/A'}</p>
+                      </div>
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Battery Capacity</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.batteryCapacity || 'N/A'}</p>
+                      </div>
+                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                        <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Compatible Chargers</p>
+                        <p className={`font-semibold ${getColor('text.primary')}`}>{owner.compatibleChargerTypes || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Customer</p>
-                  <p className={`font-semibold ${getColor('text.primary')}`}>{selectedBooking.customerName}</p>
-                </div>
-                <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                  <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Vehicle</p>
-                  <p className={`font-semibold ${getColor('text.primary')}`}>{selectedBooking.vehicleModel}</p>
-                </div>
                 <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
                   <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Date</p>
                   <p className={`font-semibold ${getColor('text.primary')}`}>
@@ -839,7 +942,7 @@ const BookingManagement = () => {
               </div>
 
               {/* QR Code Display */}
-              {(selectedBooking.status === 'Confirmed' || selectedBooking.status === 'Pending') && selectedBooking.qrCodeData && (
+              {(selectedBooking.status === 'Approved') && selectedBooking.qrCodeData && (
                 <div className={`mb-6 p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} text-center`}>
                   <h3 className={`font-bold mb-4 ${getColor('text.primary')}`}>QR Code</h3>
                   <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
@@ -914,6 +1017,20 @@ const BookingManagement = () => {
                 {selectedBooking.status === 'Pending' && (
                   <>
                     <button
+                      onClick={() => handleApproveBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all">
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleRejectBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                      Reject
+                    </button>
+                  </>
+                )}
+                {/* {selectedBooking.status === 'Pending' && (
+                  <>
+                    <button
                       onClick={() => handleConfirmBooking(selectedBooking.id)}
                       className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">
                       Confirm Booking
@@ -924,8 +1041,8 @@ const BookingManagement = () => {
                       Cancel
                     </button>
                   </>
-                )}
-                {selectedBooking.status === 'Confirmed' && (
+                )} */}
+                {selectedBooking.status === 'Approved' && (
                   <>
                     <button
                       onClick={() => handleStartSession(selectedBooking.id)}
@@ -979,6 +1096,9 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
   const [stations, setStations] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [evOwner, setEvOwner] = useState(null);
+  const [nicInput, setNicInput] = useState('');
+  const [nicError, setNicError] = useState('');
   const [formData, setFormData] = useState({
     stationId: '',
     slotId: '',
@@ -987,9 +1107,6 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
     endTime: '',
     chargerType: 'AC'
   });
-
-  console.log('Station lookup:', stationsLookup);
-  console.log('Selected Station:', getStation('ST001'));
 
   useEffect(() => {
     fetchStations();
@@ -1002,6 +1119,34 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
     } catch (error) {
       console.error('Error fetching stations:', error);
       alert('Failed to load stations');
+    }
+  };
+
+  const handleSearchEVOwner = async () => {
+    if (!nicInput.trim()) {
+      setNicError('Please enter a NIC number');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setNicError('');
+      const owner = await api.getEVOwnerByNIC(nicInput.trim());
+
+      if (!owner.isActive) {
+        setNicError('This EV Owner profile is deactivated. Please contact support to activate your account.');
+        setEvOwner(null);
+        return;
+      }
+
+      setEvOwner(owner);
+      setNicError('');
+    } catch (error) {
+      console.error('Error fetching EV Owner:', error);
+      setNicError(error.message || 'EV Owner not found. Please check the NIC number.');
+      setEvOwner(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1020,7 +1165,7 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
         formData.chargerType
       );
       setAvailableSlots(slots);
-      setStep(3); // Move to step 3 after fetching slots
+      setStep(4); // Move to step 4 (slot selection) after fetching slots
     } catch (error) {
       console.error('Error checking availability:', error);
       alert('Failed to check availability');
@@ -1035,10 +1180,13 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
   ];
 
   const nextStep = () => {
-    if (step === 2) {
+    if (step === 1 && evOwner) {
+      setStep(2);
+    } else if (step === 3) {
       checkAvailability();
+    } else if (step < 5) {
+      setStep(step + 1);
     }
-    if (step < 4) setStep(step + 1);
   };
 
   const prevStep = () => {
@@ -1050,7 +1198,7 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
       setLoading(true);
       const bookingData = {
         stationId: formData.stationId,
-        nic: '123456789V',
+        nic: evOwner.nic,
         reservationDate: formData.date,
         startTime: formData.startTime,
         endTime: formData.endTime,
@@ -1060,7 +1208,7 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
       await api.createBooking(bookingData);
       alert('Booking created successfully!');
       onClose();
-      window.location.reload(); // Refresh to show new booking
+      window.location.reload();
     } catch (error) {
       alert(error.message || 'Failed to create booking');
     } finally {
@@ -1072,30 +1220,27 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
       <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[100vh] overflow-hidden animate-slideUp border ${getColor('border.primary')}`}>
-        {/* Animated Header */}
+        {/* Header */}
         <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-white">Create New Booking</h2>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-xl hover:bg-white/20 transition-colors"
-              >
+              <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/20 transition-colors">
                 <X className="w-6 h-6 text-white" />
               </button>
             </div>
 
-            {/* Progress Steps */}
+            {/* Progress Steps - Updated to 5 steps */}
             <div className="mb-2">
               <div className="flex items-center justify-between">
-                {[1, 2, 3, 4].map((s) => (
+                {[1, 2, 3, 4, 5].map((s) => (
                   <div key={s} className="flex items-center flex-1 last:flex-none">
                     <div className={`relative w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${step >= s ? 'bg-white text-blue-600 scale-110' : 'bg-white/30 text-white'
                       }`}>
                       {step > s ? <Check className="w-6 h-6" /> : s}
                     </div>
-                    {s < 4 && (
+                    {s < 5 && (
                       <div className={`flex-1 h-2 mx-2 rounded-full transition-all duration-300 ${step > s ? 'bg-white' : 'bg-white/30'
                         }`}></div>
                     )}
@@ -1105,13 +1250,13 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
             </div>
 
             <div className="flex items-center justify-between">
-              {['Station', 'Date & Time', 'Slot', 'Confirm'].map((label, idx) => (
+              {['EV Owner', 'Station', 'Date & Time', 'Slot', 'Confirm'].map((label, idx) => (
                 <div key={label} className="flex items-center flex-1 last:flex-none">
                   <span className={`text-white text-sm font-medium w-12 text-center ${step === idx + 1 ? 'font-bold' : 'opacity-70'
                     }`}>
                     {label}
                   </span>
-                  {idx < 3 && <div className="flex-1 mx-2"></div>}
+                  {idx < 4 && <div className="flex-1 mx-2"></div>}
                 </div>
               ))}
             </div>
@@ -1120,8 +1265,105 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
 
         {/* Content */}
         <div className="p-8 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 300px)' }}>
-          {/* Step 1: Select Station */}
+          {/* Step 1: Search EV Owner */}
           {step === 1 && (
+            <div className="animate-fadeIn space-y-6">
+              <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
+                Find EV Owner
+              </h3>
+
+              <div>
+                <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  National Identity Card (NIC)
+                </label>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={nicInput}
+                    onChange={(e) => {
+                      setNicInput(e.target.value);
+                      setNicError('');
+                    }}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearchEVOwner()}
+                    placeholder="Enter NIC number (e.g., 123456789V)"
+                    className={`flex-1 px-6 py-4 rounded-xl border-2 ${nicError ? 'border-red-500' : getColor('border.input')
+                      } ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg`}
+                  />
+                  <button
+                    onClick={handleSearchEVOwner}
+                    disabled={loading || !nicInput.trim()}
+                    className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Searching...' : 'Search'}
+                  </button>
+                </div>
+                {nicError && (
+                  <div className="mt-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-500 font-medium">{nicError}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EV Owner Profile Display */}
+              {evOwner && (
+                <div className={`mt-6 p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-blue-50 to-purple-50'} border-2 border-blue-500 animate-fadeIn`}>
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl">
+                      {evOwner.firstName?.charAt(0)}{evOwner.lastName?.charAt(0)}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className={`text-xl font-bold ${getColor('text.primary')} mb-1`}>
+                        {evOwner.firstName} {evOwner.lastName}
+                      </h4>
+                      <p className={`text-sm ${getColor('text.secondary')}`}>{evOwner.email}</p>
+                      <div className="mt-2">
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                          Active Account
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.phoneNumber || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Vehicle</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.vehicleModel || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Battery Capacity</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.batteryCapacity || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Compatible Chargers</p>
+                      <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.compatibleChargerTypes || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {!evOwner && !nicError && (
+                <div className={`p-8 rounded-2xl ${darkMode ? 'bg-slate-800/50' : 'bg-slate-50'} text-center border-2 border-dashed ${getColor('border.primary')}`}>
+                  <Search className={`w-16 h-16 mx-auto mb-4 ${getColor('text.tertiary')}`} />
+                  <h4 className={`text-lg font-bold mb-2 ${getColor('text.primary')}`}>
+                    Search for EV Owner
+                  </h4>
+                  <p className={`${getColor('text.secondary')}`}>
+                    Enter the NIC number to find the EV owner profile and continue with booking
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 2: Select Station */}
+          {step === 2 && (
             <div className="animate-fadeIn space-y-4">
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Charging Station
@@ -1184,8 +1426,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
             </div>
           )}
 
-          {/* Step 2: Select Date & Time */}
-          {step === 2 && (
+          {/* Step 3: Select Date & Time */}
+          {step === 3 && (
             <div className="animate-fadeIn">
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Pick Your Schedule
@@ -1324,8 +1566,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'AC' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'AC'
-                          ? 'border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg shadow-emerald-500/20'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg shadow-emerald-500/20'
+                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                         }`}
                     >
                       <Battery className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'AC' ? 'text-emerald-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
@@ -1337,8 +1579,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'DC Fast' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC Fast'
-                          ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
+                        : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                         }`}
                     >
                       <Zap className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'DC Fast' ? 'text-orange-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
@@ -1367,8 +1609,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
             </div>
           )}
 
-          {/* Step 3: Select Slot */}
-          {step === 3 && (
+          {/* Step 4: Select Slot */}
+          {step === 4 && (
             <div className="animate-fadeIn">
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Choose Your Slot
@@ -1460,13 +1702,68 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
             </div>
           )}
 
-          {/* Step 4: Review & Confirm */}
-          {step === 4 && (
+          {/* Step 5: Review & Confirm */}
+          {step === 5 && (
             <div className="animate-fadeIn">
               <h3 className={`text-2xl font-bold mb-6 ${getColor('text.primary')}`}>
                 Review Your Booking
               </h3>
 
+              {/* EV Owner Details Section - ADD THIS */}
+              <div className={`p-6 rounded-2xl ${darkMode ? 'bg-gradient-to-br from-blue-900/20 to-purple-900/20' : 'bg-gradient-to-br from-blue-50 to-purple-50'} border-2 border-blue-500/30 mb-6`}>
+                <h4 className={`text-lg font-bold mb-4 ${getColor('text.primary')} flex items-center gap-2`}>
+                  <User className="w-5 h-5 text-blue-500" />
+                  EV Owner Details
+                </h4>
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0">
+                    {evOwner.firstName?.charAt(0)}{evOwner.lastName?.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <h5 className={`text-xl font-bold ${getColor('text.primary')} mb-1`}>
+                      {evOwner.firstName} {evOwner.lastName}
+                    </h5>
+                    <p className={`text-sm ${getColor('text.secondary')} mb-2`}>{evOwner.email}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
+                        Active Account
+                      </span>
+                      <span className={`px-3 py-1 rounded-full ${darkMode ? 'bg-slate-700' : 'bg-slate-200'} text-xs font-semibold ${getColor('text.primary')}`}>
+                        {evOwner.gender}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>NIC Number</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.nic}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Phone</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.phoneNumber}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Vehicle Model</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.vehicleModel}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Plate Number</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.vehiclePlateNumber}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Battery Capacity</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.batteryCapacity}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${darkMode ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <p className={`text-xs ${getColor('text.tertiary')} mb-1`}>Compatible Chargers</p>
+                    <p className={`font-semibold ${getColor('text.primary')}`}>{evOwner.compatibleChargerTypes}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Details Section */}
               <div className={`p-6 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-gradient-to-br from-slate-50 to-slate-100'} space-y-4 mb-6`}>
                 <div className="flex items-center justify-between py-3 border-b border-slate-200 dark:border-slate-700">
                   <span className={`font-medium ${getColor('text.secondary')}`}>Station</span>
@@ -1559,13 +1856,14 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                 Previous
               </button>
             )}
-            {step < 4 ? (
+            {step < 5 ? (
               <button
                 onClick={nextStep}
                 disabled={
-                  (step === 1 && !formData.stationId) ||
-                  (step === 2 && (!formData.date || !formData.startTime || !formData.endTime)) ||
-                  (step === 3 && !formData.slotId) ||
+                  (step === 1 && !evOwner) ||
+                  (step === 2 && !formData.stationId) ||
+                  (step === 3 && (!formData.date || !formData.startTime || !formData.endTime)) ||
+                  (step === 4 && !formData.slotId) ||
                   loading
                 }
                 className="flex-1 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
