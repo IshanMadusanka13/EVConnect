@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "mobile"
-include ':app'
+rootProject.name = "EVConnectMobile"
+include(":app")
