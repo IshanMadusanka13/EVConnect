@@ -76,13 +76,10 @@ const BookingManagement = () => {
     return stationsLookup[stationId] || stationId || 'Unknown Station';
   };
 
-<<<<<<< HEAD
-=======
   const getEVOwner = (nic) => {
     return evOwnersLookup[nic] || null;
   };
 
->>>>>>> ishan
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -1111,9 +1108,6 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
     chargerType: 'AC'
   });
 
-  console.log('Station lookup:', stationsLookup);
-  console.log('Selected Station:', getStation('ST001'));
-
   useEffect(() => {
     fetchStations();
   }, []);
@@ -1171,11 +1165,7 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
         formData.chargerType
       );
       setAvailableSlots(slots);
-<<<<<<< HEAD
-      setStep(3); // Move to step 3 after fetching slots
-=======
       setStep(4); // Move to step 4 (slot selection) after fetching slots
->>>>>>> ishan
     } catch (error) {
       console.error('Error checking availability:', error);
       alert('Failed to check availability');
@@ -1576,13 +1566,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'AC' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'AC'
-<<<<<<< HEAD
-                          ? 'border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg shadow-emerald-500/20'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
-=======
                         ? 'border-emerald-500 bg-emerald-500/10 scale-105 shadow-lg shadow-emerald-500/20'
                         : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
->>>>>>> ishan
                         }`}
                     >
                       <Battery className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'AC' ? 'text-emerald-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
@@ -1594,13 +1579,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, chargerType: 'DC Fast' })}
                       className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC Fast'
-<<<<<<< HEAD
-                          ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
-                          : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
-=======
                         ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
                         : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
->>>>>>> ishan
                         }`}
                     >
                       <Zap className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'DC Fast' ? 'text-orange-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
@@ -1880,16 +1860,10 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
               <button
                 onClick={nextStep}
                 disabled={
-<<<<<<< HEAD
-                  (step === 1 && !formData.stationId) ||
-                  (step === 2 && (!formData.date || !formData.startTime || !formData.endTime)) ||
-                  (step === 3 && !formData.slotId) ||
-=======
                   (step === 1 && !evOwner) ||
                   (step === 2 && !formData.stationId) ||
                   (step === 3 && (!formData.date || !formData.startTime || !formData.endTime)) ||
                   (step === 4 && !formData.slotId) ||
->>>>>>> ishan
                   loading
                 }
                 className="flex-1 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
