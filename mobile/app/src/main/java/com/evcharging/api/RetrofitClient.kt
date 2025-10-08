@@ -14,7 +14,7 @@ object RetrofitClient {
     
     // Base URL for your .NET backend API
     // Change this to your actual server URL
-    private const val BASE_URL = "http://192.168.56.1:5116/api/" // For Android phone
+    private const val BASE_URL = "http://192.168.43.8:5116/api/" // For Android phone
     // For Android emulator, use: "http://10.0.2.2:5116/api/"
     
     /**

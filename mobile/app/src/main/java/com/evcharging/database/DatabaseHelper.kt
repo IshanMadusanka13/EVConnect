@@ -150,7 +150,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             put(COLUMN_SYNCED, if (booking.syncedWithServer) 1 else 0)
             put(COLUMN_LAST_MODIFIED, booking.lastModified)
         }
-        return db.insert(TABLE_BOOKINGS, null, values)
+        return db.insertWithOnConflict("bookings", null, values, SQLiteDatabase.CONFLICT_REPLACE)
     }
     
     /**
