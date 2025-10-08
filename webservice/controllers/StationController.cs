@@ -9,14 +9,23 @@ namespace webservice.controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class StationController : ControllerBase
-    {
-        private readonly StationService _service;
-
-        public StationController(StationService service)
+        public class StationController : ControllerBase
         {
-            _service = service;
-        }
+            private readonly StationService _service;
+
+            public StationController(StationService service)
+            {
+                _service = service;
+            }
+
+            [HttpPatch("{id}/active-status")]
+            public async Task<IActionResult> ChangeActiveStatus(string id, [FromBody] bool isActive)
+            {
+                var result = await _service.ChangeStationActiveStatusAsync(id, isActive);
+                if (!result.Success)
+                    return BadRequest(new { message = result.Message });
+                return Ok(new { message = result.Message });
+            }
 
         [HttpGet]
         public async Task<ActionResult<List<Station>>> GetAll()

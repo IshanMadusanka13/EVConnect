@@ -1,14 +1,24 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import BookingManagement from '../src/pages/BookingManagement';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import BookingManagement from "../src/pages/BookingManagement";
+import UserManagementPage from "../src/pages/UserManagementPage";
 import StationManagement from './pages/StationManagement';
+import LoginPage from './pages/LoginPage';
+import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
+import EVOwnerManagement from './pages/EVOwnerManagement';
 
 const App = () => {
   return (
-        <Routes>
-          <Route path="/booking" element={<BookingManagement />} />
-          <Route path="/station" element={<StationManagement />} />
-        </Routes>
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/booking" element={<BookingManagement />} />
+      <Route path="/users" element={<UserManagementPage />} />
+      <Route path="/station" element={<StationManagement />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/ev-owners" element={<EVOwnerManagement />} />
+    </Routes>
   );
 };
 

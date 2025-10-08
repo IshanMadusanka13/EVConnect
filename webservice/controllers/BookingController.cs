@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using webservice.dto;
 using webservice.models;
 using webservice.services;
+using webservice.data;
+using MongoDB.Driver;
 
 namespace webservice.controllers
 {
@@ -184,7 +186,13 @@ namespace webservice.controllers
             var station = await _stationService.GetStationByIdAsync(booking.StationId);
             if (station == null) return NotFound(new { message = "Station not found" });
 
-            var rate = booking.ChargerType == "AC" ? station.AcChargingRate : station.DcChargingRate;
+            // Find the slot type for this slot by SlotName (ChargerType)
+            var db = new DBConnect();
+            var filter = Builders<SlotType>.Filter.Eq(st => st.SlotName, booking.ChargerType);
+            var slotType = await db.SlotTypes.Find(filter).FirstOrDefaultAsync();
+            if (slotType == null) return NotFound(new { message = "Slot type not found" });
+
+            var rate = slotType.Rate;
 
             return Ok(new
             {

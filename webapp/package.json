@@ -28,7 +28,9 @@
     "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.0",
-    "remark-gfm": "^4.0.1"
+    "recharts": "^3.2.1",
+    "remark-gfm": "^4.0.1",
+    "sweetalert2": "^11.23.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

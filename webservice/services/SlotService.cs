@@ -19,6 +19,43 @@ namespace webservice.services
             _slots = _db.Slots;
         }
 
+        public async Task<Slot> CreateSlotAsync(CreateSlotRequest slotRequest)
+        {
+            string stationId = slotRequest.stationId;
+            string chargerType = slotRequest.chargerType;
+
+            var existingSlots = await _slots.Find(s => s.StationId == stationId).SortBy(s => s.SlotNumber).ToListAsync();
+            int nextNumber = 1;
+            if (existingSlots.Count > 0)
+            {
+                // Try to parse the last slot number
+                var lastSlot = existingSlots.Last();
+                if (!string.IsNullOrEmpty(lastSlot.SlotNumber) && lastSlot.SlotNumber.StartsWith("SLOT"))
+                {
+                    if (int.TryParse(lastSlot.SlotNumber.Substring(4), out int lastNum))
+                    {
+                        nextNumber = lastNum + 1;
+                    }
+                }
+                else
+                {
+                    nextNumber = existingSlots.Count + 1;
+                }
+            }
+
+            var slot = new Slot
+            {
+                Id = stationId + $"-SLOT{nextNumber:D3}",
+                SlotNumber = $"SLOT{nextNumber:D3}",
+                StationId = stationId,
+                ChargerType = chargerType,
+                IsOperational = true,
+            };
+            await _slots.InsertOneAsync(slot);
+            return slot;
+        }
+
+
         public async Task<List<Slot>> GetAllSlotsAsync()
         {
             return await _slots.Find(_ => true).ToListAsync();
@@ -44,7 +81,7 @@ namespace webservice.services
             return await _slots.Find(s => s.ChargerType == chargerType).ToListAsync();
         }
 
-        public async Task<Slot> CreateSlotAsync(Slot slot)
+        public async Task<Slot> CreateSlotForNewStationAsync(Slot slot)
         {
             await _slots.InsertOneAsync(slot);
             return slot;

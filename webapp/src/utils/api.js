@@ -30,6 +30,7 @@ const fetchApi = async (endpoint, options = {}) => {
       return null;
     }
 
+
     // Check if the response has content before trying to parse JSON
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
@@ -37,9 +38,11 @@ const fetchApi = async (endpoint, options = {}) => {
       const text = await response.text();
       const data = text ? JSON.parse(text) : {};
 
+
       if (!response.ok) {
         throw new Error(data.message || 'Something went wrong');
       }
+
 
       return data;
     } else {
@@ -47,6 +50,7 @@ const fetchApi = async (endpoint, options = {}) => {
       if (!response.ok) {
         throw new Error('Something went wrong');
       }
+
 
       return { success: true };
     }
@@ -100,6 +104,34 @@ export const api = {
     fetchApi(`/Station/all/${id}`, {
       method: 'GET'
     }),
+  updateSlotOperationalStatus: (slotId, newStatus) =>
+    fetchApi(`/Slot/${slotId}/operational-status`, {
+      method: 'PATCH',
+      body: JSON.stringify(newStatus)
+    }),
+  updateSchedule: (slotId, newSchedule) =>
+    fetchApi(`/StationSchedule/${slotId}`, {
+      method: 'PUT',
+      body: JSON.stringify(newSchedule)
+    }),
+  updateStationDetails: (stationId, updatedStation) =>
+    fetchApi(`/Station/${stationId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedStation)
+    }),
+  updateStationStatus: (stationId, status) =>
+    fetchApi(`/Station/${stationId}/active-status`, {
+      method: 'PATCH',
+      body: JSON.stringify(status)
+    }),
+  getAllSlotTypes: () =>
+    fetchApi('/SlotType', { method: 'GET' }),
+  addSlotType: (slotType) =>
+    fetchApi('/SlotType', { method: 'POST', body: JSON.stringify(slotType) }),
+  updateSlotType: (id, slotType) =>
+    fetchApi(`/SlotType/${id}`, { method: 'PUT', body: JSON.stringify(slotType) }),
+  deleteSlotType: (id) =>
+    fetchApi(`/SlotType/${id}`, { method: 'DELETE' }),
 
   // Booking
   getAllBookings: () =>
@@ -181,6 +213,64 @@ export const api = {
     fetchApi(`/Booking/${id}/charging-rate`, {
       method: 'GET'
     }),
+
+  // EV Owner Management
+  getAllEVOwners: () =>
+    fetchApi('/EVOwner', {
+      method: 'GET'
+    }),
+
+  getEVOwnerByNIC: (nic) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'GET'
+    }),
+
+  createEVOwner: (ownerData) =>
+    fetchApi('/EVOwner', {
+      method: 'POST',
+      body: JSON.stringify(ownerData)
+    }),
+
+  updateEVOwner: (nic, ownerData) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'PUT',
+      body: JSON.stringify(ownerData)
+    }),
+
+  deleteEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}`, {
+      method: 'DELETE'
+    }),
+
+  activateEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}/activate`, {
+      method: 'PATCH'
+    }),
+
+  deactivateEVOwner: (nic) =>
+    fetchApi(`/EVOwner/${nic}/deactivate`, {
+      method: 'PATCH'
+    }),
+
+  getActiveEVOwners: () =>
+    fetchApi('/EVOwner/active', {
+      method: 'GET'
+    }),
+
+  getInactiveEVOwners: () =>
+    fetchApi('/EVOwner/inactive', {
+      method: 'GET'
+    }),
+
+  searchEVOwners: (searchTerm) =>
+    fetchApi(`/EVOwner/search?searchTerm=${encodeURIComponent(searchTerm)}`, {
+      method: 'GET'
+    }),
+
+  // getEVOwnerStats: () =>
+  //   fetchApi('/EVOwner/stats', {
+  //     method: 'GET'
+  //   }),
 
 };
 

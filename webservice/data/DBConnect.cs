@@ -39,6 +39,7 @@ namespace webservice.data
         public IMongoCollection<Booking> Bookings => _database.GetCollection<Booking>("Bookings");
         public IMongoCollection<Slot> Slots => _database.GetCollection<Slot>("Slots");
         public IMongoCollection<StationSchedule> StationSchedules => _database.GetCollection<StationSchedule>("StationSchedules");
+        public IMongoCollection<SlotType> SlotTypes => _database.GetCollection<SlotType>("SlotTypes");
 
     }
 }
