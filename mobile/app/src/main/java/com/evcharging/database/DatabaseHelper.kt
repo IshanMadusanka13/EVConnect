@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.evcharging.models.EVOwner
 import com.evcharging.models.LocalBooking
 
 /**
@@ -334,4 +335,120 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = writableDatabase
         db.delete(TABLE_BOOKINGS, null, null)
     }
+
+    // ============ EV OWNER OPERATIONS ============
+
+    /**
+     * Insert a new EV Owner into local database
+     */
+    fun insertEVOwner(owner: EVOwner): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_NIC, owner.nic)
+            put(COLUMN_FIRST_NAME, owner.firstName)
+            put(COLUMN_LAST_NAME, owner.lastName)
+            put(COLUMN_EMAIL, owner.email)
+            put(COLUMN_PHONE, owner.phoneNumber)
+            put(COLUMN_VEHICLE_MODEL, owner.vehicleModel)
+            put(COLUMN_VEHICLE_PLATE, owner.vehiclePlateNumber)
+            put(COLUMN_BATTERY_CAPACITY, owner.batteryCapacity)
+            put(COLUMN_COMPATIBLE_CHARGERS, owner.compatibleChargerTypes)
+            put(COLUMN_IS_ACTIVE, if (owner.isActive) 1 else 0)
+        }
+        return db.insert(TABLE_EV_OWNERS, null, values)
+    }
+
+    /**
+     * Get EV Owner by NIC
+     */
+    fun getEVOwnerByNIC(nic: String): EVOwner? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_EV_OWNERS,
+            null,
+            "$COLUMN_NIC = ?",
+            arrayOf(nic),
+            null,
+            null,
+            null
+        )
+        var owner: EVOwner? = null
+        if (cursor.moveToFirst()) {
+            owner = EVOwner(
+                nic = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NIC)),
+                firstName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                lastName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                email = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                phoneNumber = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE)),
+                vehicleModel = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_VEHICLE_MODEL)),
+                vehiclePlateNumber = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_VEHICLE_PLATE)),
+                batteryCapacity = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BATTERY_CAPACITY)),
+                compatibleChargerTypes = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_COMPATIBLE_CHARGERS)),
+                gender = "",
+                isActive = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_ACTIVE)) == 1
+            )
+        }
+        cursor.close()
+        return owner
+    }
+
+    /**
+     * Update EV Owner information
+     */
+    fun updateEVOwner(owner: EVOwner): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_FIRST_NAME, owner.firstName)
+            put(COLUMN_LAST_NAME, owner.lastName)
+            put(COLUMN_EMAIL, owner.email)
+            put(COLUMN_PHONE, owner.phoneNumber)
+            put(COLUMN_VEHICLE_MODEL, owner.vehicleModel)
+            put(COLUMN_VEHICLE_PLATE, owner.vehiclePlateNumber)
+            put(COLUMN_BATTERY_CAPACITY, owner.batteryCapacity)
+            put(COLUMN_COMPATIBLE_CHARGERS, owner.compatibleChargerTypes)
+        }
+        return db.update(TABLE_EV_OWNERS, values, "$COLUMN_NIC = ?", arrayOf(owner.nic))
+    }
+
+    /**
+     * Deactivate EV Owner (set is_active = 0)
+     */
+    fun deactivateEVOwner(nic: String): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_IS_ACTIVE, 0)
+        }
+        return db.update(TABLE_EV_OWNERS, values, "$COLUMN_NIC = ?", arrayOf(nic))
+    }
+
+    /**
+     * Get all EV Owners
+     */
+    fun getAllEVOwners(): List<EVOwner> {
+        val owners = mutableListOf<EVOwner>()
+        val db = readableDatabase
+        val cursor = db.query(TABLE_EV_OWNERS, null, null, null, null, null, "$COLUMN_FIRST_NAME ASC")
+        with(cursor) {
+            while (moveToNext()) {
+                owners.add(
+                    EVOwner(
+                        nic = getString(getColumnIndexOrThrow(COLUMN_NIC)),
+                        firstName = getString(getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                        lastName = getString(getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                        email = getString(getColumnIndexOrThrow(COLUMN_EMAIL)),
+                        phoneNumber = getString(getColumnIndexOrThrow(COLUMN_PHONE)),
+                        vehicleModel = getString(getColumnIndexOrThrow(COLUMN_VEHICLE_MODEL)),
+                        vehiclePlateNumber = getString(getColumnIndexOrThrow(COLUMN_VEHICLE_PLATE)),
+                        batteryCapacity = getString(getColumnIndexOrThrow(COLUMN_BATTERY_CAPACITY)),
+                        compatibleChargerTypes = getString(getColumnIndexOrThrow(COLUMN_COMPATIBLE_CHARGERS)),
+                        gender = "",
+                        isActive = getInt(getColumnIndexOrThrow(COLUMN_IS_ACTIVE)) == 1
+                    )
+                )
+            }
+        }
+        cursor.close()
+        return owners
+    }
+
 }

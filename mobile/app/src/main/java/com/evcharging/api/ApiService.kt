@@ -5,16 +5,16 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
-    
+
     // ============ BOOKING ENDPOINTS ============
-    
+
     /**
      * Get all bookings from the server
      * @return Response containing list of all bookings
      */
     @GET("Booking")
     suspend fun getAllBookings(): Response<List<Booking>>
-    
+
     /**
      * Get booking by ID
      * @param id Booking ID
@@ -22,7 +22,7 @@ interface ApiService {
      */
     @GET("Booking/{id}")
     suspend fun getBookingById(@Path("id") id: String): Response<Booking>
-    
+
     /**
      * Get bookings by station ID
      * @param stationId Station ID
@@ -30,7 +30,7 @@ interface ApiService {
      */
     @GET("Booking/station/{stationId}")
     suspend fun getBookingsByStation(@Path("stationId") stationId: String): Response<List<Booking>>
-    
+
     /**
      * Get bookings by status
      * @param status Booking status (Pending, Approved, Completed, etc.)
@@ -38,7 +38,7 @@ interface ApiService {
      */
     @GET("Booking/status/{status}")
     suspend fun getBookingsByStatus(@Path("status") status: String): Response<List<Booking>>
-    
+
     /**
      * Check slot availability for booking
      * @param stationId Station ID
@@ -56,7 +56,7 @@ interface ApiService {
         @Query("endTime") endTime: String,
         @Query("chargerType") chargerType: String
     ): Response<List<Slot>>
-    
+
     /**
      * Create a new booking
      * @param request Booking creation request
@@ -64,7 +64,7 @@ interface ApiService {
      */
     @POST("Booking/create")
     suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
-    
+
     /**
      * Update existing booking
      * @param id Booking ID
@@ -76,7 +76,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateBookingRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Cancel booking
      * @param id Booking ID
@@ -88,7 +88,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: CancelBookingRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Update booking status
      * @param id Booking ID
@@ -100,7 +100,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateStatusRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Scan QR code for booking
      * @param id Booking ID
@@ -108,7 +108,7 @@ interface ApiService {
      */
     @POST("Booking/{id}/scan-qr")
     suspend fun scanQRCode(@Path("id") id: String): Response<MessageResponse>
-    
+
     /**
      * Update energy consumed and cost
      * @param id Booking ID
@@ -120,7 +120,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateEnergyCostRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Get charging rate for a booking
      * @param id Booking ID
@@ -128,16 +128,16 @@ interface ApiService {
      */
     @GET("Booking/{id}/charging-rate")
     suspend fun getChargingRate(@Path("id") id: String): Response<ChargingRateResponse>
-    
+
     // ============ STATION ENDPOINTS ============
-    
+
     /**
      * Get all charging stations
      * @return Response containing list of all stations
      */
     @GET("Station")
     suspend fun getAllStations(): Response<List<Station>>
-    
+
     /**
      * Get station by ID
      * @param id Station ID
@@ -145,7 +145,7 @@ interface ApiService {
      */
     @GET("Station/{id}")
     suspend fun getStationById(@Path("id") id: String): Response<Station>
-    
+
     /**
      * Get all station details including slots and schedules
      * @param id Station ID
@@ -153,16 +153,16 @@ interface ApiService {
      */
     @GET("Station/all/{id}")
     suspend fun getStationAllDetails(@Path("id") id: String): Response<StationDetails>
-    
+
     // ============ EV OWNER ENDPOINTS ============
-    
+
     /**
      * Get all EV owners
      * @return Response containing list of all EV owners
      */
     @GET("EVOwner")
     suspend fun getAllEVOwners(): Response<List<EVOwner>>
-    
+
     /**
      * Get EV owner by NIC
      * @param nic National Identity Card number
@@ -170,15 +170,15 @@ interface ApiService {
      */
     @GET("EVOwner/{nic}")
     suspend fun getEVOwnerByNIC(@Path("nic") nic: String): Response<EVOwner>
-    
+
     /**
      * Create new EV owner profile
      * @param owner EV owner data
      * @return Response containing created EV owner
      */
     @POST("EVOwner")
-    suspend fun createEVOwner(@Body owner: EVOwner): Response<EVOwner>
-    
+    suspend fun createEVOwner(@Body owner: EVOwner): Response<EVOwnerResponse>
+
     /**
      * Update EV owner profile
      * @param nic National Identity Card number
@@ -190,20 +190,32 @@ interface ApiService {
         @Path("nic") nic: String,
         @Body owner: EVOwner
     ): Response<MessageResponse>
-    
+
     /**
      * Activate EV owner account
      * @param nic National Identity Card number
      * @return Response with status message
      */
-    @PATCH("EVOwner/{nic}/activate")
+    @PUT("EVOwner/{nic}/activate")
     suspend fun activateEVOwner(@Path("nic") nic: String): Response<MessageResponse>
-    
+
     /**
      * Deactivate EV owner account
      * @param nic National Identity Card number
      * @return Response with status message
      */
-    @PATCH("EVOwner/{nic}/deactivate")
+    @PUT("EVOwner/{nic}/deactivate")
     suspend fun deactivateEVOwner(@Path("nic") nic: String): Response<MessageResponse>
+
+    /**
+     * Toggle EV owner status (activate/deactivate)
+     * @param nic National Identity Card number
+     * @param request Status update request
+     * @return Response with status message
+     */
+    @PATCH("EVOwner/{nic}/status")
+    suspend fun toggleEVOwnerStatus(
+        @Path("nic") nic: String,
+        @Body request: UpdateStatusRequest
+    ): Response<MessageResponse>
 }

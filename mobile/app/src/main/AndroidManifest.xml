@@ -7,10 +7,11 @@
     <!-- Internet permission for API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    
+
     <!-- Camera permission for QR code scanning (if needed) -->
     <uses-permission android:name="android.permission.CAMERA" />
-    
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <!-- Location permissions for nearby stations (if needed) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -60,6 +61,25 @@
             android:exported="false"
             android:label="Booking Details"
             android:parentActivityName=".ui.bookings.BookingListActivity" />
+
+        <!-- User Management Activities -->
+        <activity
+            android:name=".ui.users.CreateUserActivity"
+            android:exported="false"
+            android:label="Create User"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.users.UpdateUserActivity"
+            android:exported="false"
+            android:label="Update User"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ui.users.DeactivateUserActivity"
+            android:exported="false"
+            android:label="Deactivate User"
+            android:parentActivityName=".MainActivity" />
 
     </application>
 
