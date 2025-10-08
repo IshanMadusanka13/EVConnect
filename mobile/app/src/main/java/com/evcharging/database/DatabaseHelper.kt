@@ -422,6 +422,17 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     /**
+     * Toggle EV Owner activation status
+     */
+    fun toggleEVOwnerStatus(nic: String, isActive: Boolean): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_IS_ACTIVE, if (isActive) 1 else 0)
+        }
+        return db.update(TABLE_EV_OWNERS, values, "$COLUMN_NIC = ?", arrayOf(nic))
+    }
+
+    /**
      * Get all EV Owners
      */
     fun getAllEVOwners(): List<EVOwner> {

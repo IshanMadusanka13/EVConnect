@@ -19,6 +19,12 @@ class EVOwnerRepository(context: Context) {
     fun deactivateLocal(nic: String): Boolean = dbHelper.deactivateEVOwner(nic) > 0
     fun getAllLocalOwners(): List<EVOwner> = dbHelper.getAllEVOwners()
 
+    // New method to toggle activation status
+    fun toggleActivationStatus(nic: String, isActive: Boolean): Boolean {
+        val affectedRows = dbHelper.toggleEVOwnerStatus(nic, isActive)
+        return affectedRows > 0
+    }
+ 
     // --- REMOTE OPERATIONS ---
     suspend fun syncWithServer(owner: EVOwner) = withContext(Dispatchers.IO) {
         try {
@@ -35,9 +41,30 @@ class EVOwnerRepository(context: Context) {
             null
         }
     }
+
     suspend fun deactivateRemote(nic: String) = withContext(Dispatchers.IO) {
         try {
             api.deactivateEVOwner(nic)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun activateRemote(nic: String) = withContext(Dispatchers.IO) {
+        try {
+            api.activateEVOwner(nic)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun toggleStatusRemote(nic: String, isActive: Boolean) = withContext(Dispatchers.IO) {
+        try {
+            if (isActive) {
+                api.activateEVOwner(nic)
+            } else {
+                api.deactivateEVOwner(nic)
+            }
         } catch (e: Exception) {
             null
         }
