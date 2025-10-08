@@ -1,12 +1,3 @@
-/**
- * BookingDetailsActivity.kt
- * Activity to display detailed information about a booking
- * Shows QR code for approved bookings and allows status updates
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.ui.bookings
 
 import android.graphics.Bitmap

@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    activity_booking_details.xml
-    Layout for booking details screen
-    Shows comprehensive booking information with QR code
-    
-    @author IT Number: [Your IT Number]
-    @date October 2025
--->
+
 <ScrollView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

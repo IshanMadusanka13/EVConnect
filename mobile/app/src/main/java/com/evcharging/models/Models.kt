@@ -1,12 +1,3 @@
-/**
- * Models.kt
- * Data classes for EV Charging Station Booking System
- * Represents all entities used in the application
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.models
 
 import com.google.gson.annotations.SerializedName

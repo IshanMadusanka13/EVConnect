@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    activity_create_booking.xml
-    Layout for creating new booking
-    Multi-step form with step indicators
-    
-    @author IT Number: [Your IT Number]
-    @date October 2025
--->
+
 <ScrollView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

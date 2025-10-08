@@ -1,12 +1,3 @@
-/**
- * DatabaseHelper.kt
- * SQLite database helper for local data storage
- * Manages booking data persistence and offline capabilities
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.database
 
 import android.content.ContentValues

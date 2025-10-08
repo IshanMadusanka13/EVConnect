@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    AndroidManifest.xml
-    Android application manifest file
-    Declares app components and permissions
-    
-    @author IT Number: [Your IT Number]
-    @date October 2025
--->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.evcharging">

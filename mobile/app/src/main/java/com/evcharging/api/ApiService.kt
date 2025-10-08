@@ -1,12 +1,3 @@
-/**
- * ApiService.kt
- * API Interface for EV Charging Station Booking System
- * Defines all REST API endpoints for communication with .NET backend
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.api
 
 import com.evcharging.models.*

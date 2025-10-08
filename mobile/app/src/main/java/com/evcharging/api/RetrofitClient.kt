@@ -1,12 +1,3 @@
-/**
- * RetrofitClient.kt
- * Retrofit client configuration for API communication
- * Provides singleton instance of API service
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.api
 
 import okhttp3.OkHttpClient
@@ -23,8 +14,8 @@ object RetrofitClient {
     
     // Base URL for your .NET backend API
     // Change this to your actual server URL
-    private const val BASE_URL = "http://192.168.56.1:5116/api/" // For Android emulator
-    // For SDK device, use: "http://10.0.2.2:5116/api/"
+    private const val BASE_URL = "http://192.168.56.1:5116/api/" // For Android phone
+    // For Android emulator, use: "http://10.0.2.2:5116/api/"
     
     /**
      * Configure HTTP logging interceptor for debugging

@@ -1,12 +1,3 @@
-/**
- * MainActivity.kt
- * Main entry point of the application
- * Provides navigation to different sections of the app
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging
 
 import android.content.Intent

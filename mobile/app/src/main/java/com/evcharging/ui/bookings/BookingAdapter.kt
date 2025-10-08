@@ -1,12 +1,3 @@
-/**
- * BookingAdapter.kt
- * RecyclerView adapter for displaying booking list
- * Handles booking item display and user interactions
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.ui.bookings
 
 import android.graphics.Color

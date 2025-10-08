@@ -1,12 +1,3 @@
-/**
- * BookingListActivity.kt
- * Activity to display list of all bookings
- * Shows bookings with filtering and search capabilities
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.ui.bookings
 
 import android.content.Intent

@@ -1,12 +1,3 @@
-/**
- * CreateBookingActivity.kt
- * Activity for creating new bookings
- * Multi-step form: EV Owner -> Station -> Date/Time -> Slot -> Confirm
- * 
- * @author IT Number: [Your IT Number]
- * @date October 2025
- */
-
 package com.evcharging.ui.bookings
 
 import android.app.DatePickerDialog
