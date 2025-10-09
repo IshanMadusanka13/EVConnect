@@ -2,10 +2,15 @@ package com.evcharging.ui.users
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -16,12 +21,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.evcharging.R
 import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
+import com.google.android.material.textfield.TextInputEditText
 
 class DeactivateUserActivity : AppCompatActivity() {
     private lateinit var repo: EVOwnerRepository
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: EVOwnerAdapter
     private var evOwners: List<EVOwner> = emptyList()
+    private var filteredOwners: List<EVOwner> = emptyList()
+
+    // UI Components for search and filters
+    private lateinit var etSearch: TextInputEditText
+    private lateinit var spinnerFilter: Spinner
+    private lateinit var spinnerVehicleFilter: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +42,8 @@ class DeactivateUserActivity : AppCompatActivity() {
             setContentView(R.layout.activity_deactivate_user)
             repo = EVOwnerRepository(this)
             initializeViews()
+            setupSpinners()
+            setupSearchListener()
             loadAllOwners()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -40,18 +54,96 @@ class DeactivateUserActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         recyclerView = findViewById(R.id.recyclerView)
+        etSearch = findViewById(R.id.etSearch)
+        spinnerFilter = findViewById(R.id.spinnerFilter)
+        spinnerVehicleFilter = findViewById(R.id.spinnerVehicleFilter)
+    }
+
+    private fun setupSpinners() {
+        // Status filter spinner
+        val filterOptions = arrayOf("All", "Active", "Inactive")
+        val filterAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filterOptions)
+        filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerFilter.adapter = filterAdapter
+        spinnerFilter.setSelection(0) // Default to All
+        spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                applyFilters()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        // Vehicle type filter spinner
+        val vehicleOptions = arrayOf("All Vehicles", "Car", "Bike")
+        val vehicleAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, vehicleOptions)
+        vehicleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerVehicleFilter.adapter = vehicleAdapter
+        spinnerVehicleFilter.setSelection(0) // Default to All Vehicles
+        spinnerVehicleFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                applyFilters()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun setupSearchListener() {
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                applyFilters()
+            }
+        })
     }
 
     private fun loadAllOwners() {
         try {
             evOwners = repo.getAllLocalOwners()
-            adapter = EVOwnerAdapter(evOwners, this)
+            filteredOwners = evOwners
+            adapter = EVOwnerAdapter(filteredOwners) { nic, newStatus ->
+                showConfirmationDialogForOwner(nic, newStatus)
+            }
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(this)
+            applyFilters()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error loading owners: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun applyFilters() {
+        var filtered = evOwners
+
+        // Filter by status
+        val statusFilter = spinnerFilter.selectedItem.toString()
+        if (statusFilter != "All") {
+            filtered = filtered.filter { owner ->
+                if (statusFilter == "Active") owner.isActive else !owner.isActive
+            }
+        }
+
+        // Filter by vehicle type
+        val vehicleFilter = spinnerVehicleFilter.selectedItem.toString()
+        if (vehicleFilter != "All Vehicles") {
+            filtered = filtered.filter { owner ->
+                owner.vehicleType == vehicleFilter
+            }
+        }
+
+        // Search filter
+        val searchText = etSearch.text.toString().trim().lowercase()
+        if (searchText.isNotEmpty()) {
+            filtered = filtered.filter { owner ->
+                owner.nic.lowercase().contains(searchText) ||
+                        "${owner.firstName} ${owner.lastName}".lowercase().contains(searchText) ||
+                        owner.email.lowercase().contains(searchText)
+            }
+        }
+
+        filteredOwners = filtered
+        adapter.updateList(filteredOwners)
     }
 
     fun showConfirmationDialogForOwner(nic: String, newStatus: Boolean) {
@@ -99,9 +191,14 @@ class DeactivateUserActivity : AppCompatActivity() {
     }
 
     inner class EVOwnerAdapter(
-        private val owners: List<EVOwner>,
-        private val activity: DeactivateUserActivity
+        private var owners: List<EVOwner>,
+        private val onToggleClick: (String, Boolean) -> Unit
     ) : RecyclerView.Adapter<EVOwnerAdapter.ViewHolder>() {
+
+        fun updateList(newList: List<EVOwner>) {
+            owners = newList
+            notifyDataSetChanged()
+        }
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val tvUserInfo: TextView = itemView.findViewById(R.id.tvUserInfoItem)
@@ -118,10 +215,14 @@ class DeactivateUserActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val owner = owners[position]
             val userInfo = """
-                👤 Name: ${owner.firstName} ${owner.lastName}
-                📧 Email: ${owner.email}
-                📞 Phone: ${owner.phoneNumber}
-                🚗 Vehicle: ${owner.vehicleModel} (${owner.vehiclePlateNumber})
+                👤 ${owner.firstName} ${owner.lastName} (NIC: ${owner.nic})
+                📧 ${owner.email}
+                📞 ${owner.phoneNumber}
+                🏠 ${owner.address.ifEmpty { "N/A" }}
+                👶 DOB: ${owner.dateOfBirth ?: "N/A"} | Gender: ${owner.gender}
+                🚗 ${owner.vehicleType} - ${owner.vehicleModel} (${owner.vehiclePlateNumber})
+                🔋 Battery: ${owner.batteryCapacity} kWh
+                ⚡ Chargers: ${owner.compatibleChargerTypes}
             """.trimIndent()
 
             holder.tvUserInfo.text = userInfo
@@ -139,27 +240,27 @@ class DeactivateUserActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 // Fallback if drawables don't exist
                 val color = if (owner.isActive) {
-                    activity.resources.getColor(R.color.status_approved, null)
+                    resources.getColor(R.color.status_approved, null)
                 } else {
-                    activity.resources.getColor(R.color.status_cancelled, null)
+                    resources.getColor(R.color.status_cancelled, null)
                 }
                 holder.tvStatus.setBackgroundColor(color)
             }
 
-            holder.tvStatus.setTextColor(activity.resources.getColor(android.R.color.white, null))
+            holder.tvStatus.setTextColor(resources.getColor(android.R.color.white, null))
 
             if (owner.isActive) {
                 // User is active - show deactivate option
                 holder.btnToggle.text = "Deactivate User"
-                holder.btnToggle.backgroundTintList = activity.resources.getColorStateList(R.color.status_cancelled, null)
+                holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_cancelled, null)
             } else {
                 // User is inactive - show activate option
                 holder.btnToggle.text = "Activate User"
-                holder.btnToggle.backgroundTintList = activity.resources.getColorStateList(R.color.status_approved, null)
+                holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_approved, null)
             }
 
             holder.btnToggle.setOnClickListener {
-                activity.showConfirmationDialogForOwner(owner.nic, !owner.isActive)
+                onToggleClick(owner.nic, !owner.isActive)
             }
         }
 
