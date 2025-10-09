@@ -402,8 +402,8 @@
                 android:textColor="@color/text_primary"
                 android:layout_marginBottom="8dp" />
 
-            <RadioGroup
-                android:id="@+id/radioChargerTypes"
+            <LinearLayout
+                android:id="@+id/llChargerTypes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -452,7 +452,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="AC and DC (Dual compatible)"
-                        android:checked="true"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -472,7 +471,7 @@
 
                 </LinearLayout>
 
-            </RadioGroup>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -526,15 +525,28 @@
                     android:layout_marginEnd="8dp"
                     android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/etPassword"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Password"
-                        android:inputType="textPassword"
-                        android:textSize="14sp"
-                        android:background="@drawable/edittext_outline_background"
-                        android:padding="16dp" />
+                        app:endIconMode="password_toggle"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusTopStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxStrokeColor="@color/primary"
+                        app:hintTextColor="@color/text_secondary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Password"
+                            android:inputType="textPassword"
+                            android:textSize="14sp"
+                            android:padding="12dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
@@ -546,15 +558,28 @@
                     android:layout_marginStart="8dp"
                     android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/etConfirmPassword"
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Confirm Password"
-                        android:inputType="textPassword"
-                        android:textSize="14sp"
-                        android:background="@drawable/edittext_outline_background"
-                        android:padding="16dp" />
+                        app:endIconMode="password_toggle"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusTopStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxStrokeColor="@color/primary"
+                        app:hintTextColor="@color/text_secondary">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etConfirmPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Confirm Password"
+                            android:inputType="textPassword"
+                            android:textSize="14sp"
+                            android:padding="12dp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
