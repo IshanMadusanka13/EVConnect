@@ -1,46 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_dashboard"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:padding="24dp">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center">
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <Button
+        <!-- App Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EV Charging Manager"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Management Portal"
+            android:textColor="@color/primary_light"
+            android:textSize="16sp"
+            android:layout_marginBottom="40dp" />
+
+        <!-- Create User Card -->
+        <LinearLayout
             android:id="@+id/btnCreateUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create User"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:background="@drawable/card_background_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
-        <Button
+            <!-- Icon using Text/Emoji -->
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="👤"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create User"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Register new EV owners"
+                    android:textColor="@color/primary_light"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Arrow using Text -->
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="→"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Update User Card -->
+        <LinearLayout
             android:id="@+id/btnUpdateUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Update User"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:background="@drawable/card_background_secondary"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
-        <Button
+            <!-- Icon using Text/Emoji -->
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="✏️"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Update User"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Modify user information"
+                    android:textColor="@color/primary_light"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Arrow using Text -->
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="→"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Deactivate User Card -->
+        <LinearLayout
             android:id="@+id/btnDeactivateUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Deactivate User" />
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:background="@drawable/card_background_warning"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
 
-        <Button
+            <!-- Icon using Text/Emoji -->
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="⏸️"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Deactivate User"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Temporarily disable accounts"
+                    android:textColor="@color/primary_light"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Arrow using Text -->
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="→"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Delete User Card -->
+        <LinearLayout
             android:id="@+id/btnDeleteUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Delete User"
-            android:backgroundTint="@color/red" />
+            android:orientation="horizontal"
+            android:padding="20dp"
+            android:background="@drawable/card_background_danger"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <!-- Icon using Text/Emoji -->
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:text="🗑️"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete User"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Permanently remove accounts"
+                    android:textColor="@color/primary_light"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Arrow using Text -->
+            <TextView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="→"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

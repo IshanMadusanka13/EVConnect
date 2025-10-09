@@ -2,9 +2,8 @@ package com.evcharging
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.evcharging.R
 import com.evcharging.ui.users.CreateUserActivity
 import com.evcharging.ui.users.UpdateUserActivity
 import com.evcharging.ui.users.DeactivateUserActivity
@@ -15,18 +14,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnCreateUser).setOnClickListener {
+        // Create User Card
+        findViewById<LinearLayout>(R.id.btnCreateUser).setOnClickListener {
             startActivity(Intent(this, CreateUserActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btnUpdateUser).setOnClickListener {
+        // Update User Card
+        findViewById<LinearLayout>(R.id.btnUpdateUser).setOnClickListener {
             startActivity(Intent(this, UpdateUserActivity::class.java))
         }
 
-        findViewById<Button>(R.id.btnDeactivateUser).setOnClickListener {
+        // Deactivate User Card
+        findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
             startActivity(Intent(this, DeactivateUserActivity::class.java))
         }
-        findViewById<Button>(R.id.btnDeleteUser).setOnClickListener {
+
+        // Delete User Card
+        findViewById<LinearLayout>(R.id.btnDeleteUser).setOnClickListener {
             startActivity(Intent(this, DeleteUserActivity::class.java))
         }
     }
