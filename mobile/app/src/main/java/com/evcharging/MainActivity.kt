@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.evcharging.models.DashboardStats
 import com.evcharging.repository.BookingRepository
 import com.evcharging.ui.bookings.BookingListActivity
+import com.evcharging.ui.operation.LoginActivity
 import kotlinx.coroutines.launch
 
 /**
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     // Navigation buttons
     private lateinit var btnViewBookings: Button
     private lateinit var btnCreateBooking: Button
+    private lateinit var btnCreateLoginActivity: LoginActivity
     
     /**
      * Initialize the activity
@@ -70,6 +72,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, BookingListActivity::class.java)
             startActivity(intent)
         }
+        btnCreateLoginActivity.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java )
+        }
+        
     }
     
     /**
@@ -115,3 +121,5 @@ class MainActivity : AppCompatActivity() {
         loadDashboardStats()
     }
 }
+
+private fun LoginActivity.setOnClickListener(function: () -> Unit) {}

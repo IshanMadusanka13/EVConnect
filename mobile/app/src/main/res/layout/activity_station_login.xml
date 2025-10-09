@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@color/accent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:textSize="28sp"
-        android:textStyle="bold"
         android:layout_marginBottom="24dp"
-        android:textColor="@color/text_primary" />
+        android:text="Login"
+        android:textColor="@color/text_primary"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="#FBFBFB"
+        android:backgroundTint="@color/background_light"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:layout_marginBottom="16dp"
         android:padding="12dp"
-        android:backgroundTint="@color/white"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_secondary" />
 
@@ -33,11 +33,12 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="#685B5B"
+        android:backgroundTint="@color/background_white"
         android:hint="Password"
         android:inputType="textPassword"
-        android:layout_marginBottom="24dp"
         android:padding="12dp"
-        android:backgroundTint="@color/white"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_secondary" />
 
@@ -45,9 +46,9 @@
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:textColor="@color/white"
         android:backgroundTint="@color/primary"
-        android:padding="12dp" />
+        android:padding="12dp"
+        android:text="Login"
+        android:textColor="@color/white" />
 
 </LinearLayout>
