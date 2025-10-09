@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
     <!-- Camera permission for QR code scanning (if needed) -->
-    <uses-permission android:name="android.permission.CAMERA" />
+<!--    <uses-permission android:name="android.permission.CAMERA" />-->
     
     <!-- Location permissions for nearby stations (if needed) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -71,7 +71,7 @@
         <!-- Google Maps API key placeholder: replace with your API key in local or gradle properties -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/AIzaSyA4GMwhaR_OivyJD3S_g47tmvUHMgir1eQ" />
+            android:value="@string/google_maps_key"/>
 
     </application>
 
