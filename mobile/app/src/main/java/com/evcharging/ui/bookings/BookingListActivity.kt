@@ -2,6 +2,7 @@ package com.evcharging.ui.bookings
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -13,11 +14,15 @@ import com.evcharging.models.Booking
 import com.evcharging.repository.BookingRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
-import android.util.Log
+
 /**
  * Main activity for displaying booking list Supports filtering by status and search functionality
  */
 class BookingListActivity : AppCompatActivity() {
+
+    companion object {
+        private const val REQUEST_UPDATE_BOOKING = 100
+    }
 
     private lateinit var repository: BookingRepository
     private lateinit var recyclerView: RecyclerView
@@ -106,11 +111,27 @@ class BookingListActivity : AppCompatActivity() {
                         onCancelClick = { booking ->
                             // Show cancel confirmation dialog
                             showCancelDialog(booking)
+                        },
+                        onUpdateClick = { booking -> // Add this parameter
+                            // Navigate to update booking screen
+                            val intent = Intent(this, UpdateBookingActivity::class.java)
+                            intent.putExtra("BOOKING_ID", booking.id)
+                            startActivityForResult(intent, REQUEST_UPDATE_BOOKING)
                         }
                 )
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_UPDATE_BOOKING && resultCode == RESULT_OK) {
+            // Reload bookings after successful update
+            loadBookings()
+            Toast.makeText(this, "Booking updated successfully", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /** Setup filter spinner */

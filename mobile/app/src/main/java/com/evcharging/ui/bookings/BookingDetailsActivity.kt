@@ -1,5 +1,6 @@
 package com.evcharging.ui.bookings
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
@@ -14,6 +15,8 @@ import com.evcharging.repository.BookingRepository
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlinx.coroutines.launch
 
 /**
@@ -21,6 +24,11 @@ import kotlinx.coroutines.launch
  * management
  */
 class BookingDetailsActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "BookingDetailsActivity"
+        private const val REQUEST_UPDATE_BOOKING = 100
+    }
 
     private lateinit var repository: BookingRepository
     private lateinit var progressBar: ProgressBar
@@ -46,6 +54,7 @@ class BookingDetailsActivity : AppCompatActivity() {
 
     // Action buttons
     private lateinit var btnCancel: Button
+    private lateinit var btnUpdateBooking: Button
     // private lateinit var btnStartSession: Button
     // private lateinit var btnCompleteSession: Button
 
@@ -77,6 +86,18 @@ class BookingDetailsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_UPDATE_BOOKING && resultCode == RESULT_OK) {
+            // Reload booking details
+            val bookingId = intent.getStringExtra("BOOKING_ID")
+            if (bookingId != null) {
+                loadBookingDetails()
+            }
+        }
+    }
+
     /** Initialize all view components */
     private fun initializeViews() {
         progressBar = findViewById(R.id.progressBar)
@@ -99,6 +120,7 @@ class BookingDetailsActivity : AppCompatActivity() {
         ownerContainer = findViewById(R.id.ownerContainer)
 
         btnCancel = findViewById(R.id.btnCancel)
+        btnUpdateBooking = findViewById(R.id.btnUpdateBooking)
         // btnStartSession = findViewById(R.id.btnStartSession)
         // btnCompleteSession = findViewById(R.id.btnCompleteSession)
 
@@ -187,8 +209,33 @@ class BookingDetailsActivity : AppCompatActivity() {
             qrCodeContainer.visibility = View.GONE
         }
 
+        if (booking.status == "Pending") {
+            val reservationDateTime = parseDateTime(booking.reservationDate, booking.startTime)
+            val hoursUntilReservation =
+                    (reservationDateTime.time - System.currentTimeMillis()) / (1000 * 60 * 60)
+
+            if (hoursUntilReservation >= 12) {
+                btnUpdateBooking.visibility = View.VISIBLE
+                btnUpdateBooking.setOnClickListener {
+                    val intent = Intent(this, UpdateBookingActivity::class.java)
+                    intent.putExtra("BOOKING_ID", booking.id)
+                    startActivityForResult(intent, REQUEST_UPDATE_BOOKING)
+                }
+            } else {
+                btnUpdateBooking.visibility = View.GONE
+            }
+        } else {
+            btnUpdateBooking.visibility = View.GONE
+        }
+
         // Action buttons visibility based on status
         updateActionButtons(booking.status)
+    }
+
+    private fun parseDateTime(date: String, time: String): Date {
+        val dateStr = date.split('T')[0]
+        val dateTimeStr = "$dateStr $time"
+        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStr)!!
     }
 
     /** Update action buttons visibility based on booking status */
@@ -196,7 +243,8 @@ class BookingDetailsActivity : AppCompatActivity() {
         when (status) {
             "Pending", "Approved" -> {
                 btnCancel.visibility = View.VISIBLE
-                // btnStartSession.visibility = if (status == "Approved") View.VISIBLE else View.GONE
+                // btnStartSession.visibility = if (status == "Approved") View.VISIBLE else
+                // View.GONE
                 // btnCompleteSession.visibility = View.GONE
             }
             "In Progress" -> {

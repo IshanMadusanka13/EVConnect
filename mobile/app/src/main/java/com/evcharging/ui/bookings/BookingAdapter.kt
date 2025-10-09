@@ -20,7 +20,8 @@ import java.util.*
 class BookingAdapter(
     private var bookings: List<Booking>,
     private val onItemClick: (Booking) -> Unit,
-    private val onCancelClick: (Booking) -> Unit
+    private val onCancelClick: (Booking) -> Unit,
+    private val onUpdateClick: (Booking) -> Unit
 ) : RecyclerView.Adapter<BookingAdapter.BookingViewHolder>() {
     
     /**
@@ -36,6 +37,7 @@ class BookingAdapter(
         val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
         val tvCost: TextView = itemView.findViewById(R.id.tvCost)
         val btnCancel: Button = itemView.findViewById(R.id.btnCancel)
+        val btnUpdate: Button = itemView.findViewById(R.id.btnUpdate)
         
         /**
          * Bind booking data to view
@@ -97,7 +99,56 @@ class BookingAdapter(
      * Bind data to ViewHolder
      */
     override fun onBindViewHolder(holder: BookingViewHolder, position: Int) {
-        holder.bind(bookings[position])
+        val booking = bookings[position]
+
+        // Existing binding code...
+        holder.tvBookingId.text = "ID: ${booking.id.take(8)}"
+        holder.tvStationId.text = "Station: ${booking.stationId}"
+        holder.tvStatus.text = booking.status
+        
+        // Format date
+        val date = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            .format(SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            .parse(booking.reservationDate)!!)
+        holder.tvDate.text = "📅 $date"
+        
+        holder.tvTime.text = "⏰ ${booking.startTime} - ${booking.endTime}"
+        holder.tvChargerType.text = "⚡ ${booking.chargerType}"
+
+        holder.tvStatus.setBackgroundColor(getStatusColor(booking.status))
+        holder.tvStatus.setTextColor(Color.WHITE)
+
+        // Status color
+        // val statusColor = when (booking.status) {
+        //     "Pending" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     "Approved" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     "In Progress" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     "Completed" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     "Cancelled" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     "Rejected" -> android.graphics.Color.parseColor("#FFFFFF")
+        //     else -> android.graphics.Color.parseColor("#6B7280")
+        // }
+        // holder.tvStatus.setTextColor(statusColor)
+
+        // Show cost for completed bookings
+        if (booking.status == "Completed") {
+            holder.tvCost.visibility = View.VISIBLE
+            holder.tvCost.text = "Cost: Rs.${booking.cost}"
+        } else {
+            holder.tvCost.visibility = View.GONE
+        }
+
+        // Show/hide buttons based on status and time
+        val canUpdate = canUpdateBooking(booking)
+        val canCancel = canCancelBooking(booking)
+
+        holder.btnUpdate.visibility = if (canUpdate) View.VISIBLE else View.GONE
+        holder.btnCancel.visibility = if (canCancel) View.VISIBLE else View.GONE
+
+        // Click listeners
+        holder.itemView.setOnClickListener { onItemClick(booking) }
+        holder.btnCancel.setOnClickListener { onCancelClick(booking) }
+        holder.btnUpdate.setOnClickListener { onUpdateClick(booking) }
     }
     
     /**
@@ -111,6 +162,36 @@ class BookingAdapter(
     fun updateBookings(newBookings: List<Booking>) {
         bookings = newBookings
         notifyDataSetChanged()
+    }
+
+    private fun canUpdateBooking(booking: Booking): Boolean {
+        if (booking.status != "Pending") return false
+
+        try {
+            val reservationDateTime = parseDateTime(booking.reservationDate, booking.startTime)
+            val hoursUntilReservation = (reservationDateTime.time - System.currentTimeMillis()) / (1000 * 60 * 60)
+            return hoursUntilReservation >= 12
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+    private fun canCancelBooking(booking: Booking): Boolean {
+        if (booking.status in listOf("Completed", "Cancelled")) return false
+
+        try {
+            val reservationDateTime = parseDateTime(booking.reservationDate, booking.startTime)
+            val hoursUntilReservation = (reservationDateTime.time - System.currentTimeMillis()) / (1000 * 60 * 60)
+            return hoursUntilReservation >= 12
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+    private fun parseDateTime(date: String, time: String): Date {
+        val dateStr = if (date.contains('T')) date.split('T')[0] else date
+        val dateTimeStr = "$dateStr $time"
+        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStr)!!
     }
     
     /**
