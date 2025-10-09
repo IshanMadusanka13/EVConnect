@@ -46,7 +46,7 @@ class BookingDetailsActivity : AppCompatActivity() {
 
     // Action buttons
     private lateinit var btnCancel: Button
-    private lateinit var btnStartSession: Button
+    // private lateinit var btnStartSession: Button
     private lateinit var btnCompleteSession: Button
 
     private var booking: Booking? = null
@@ -99,7 +99,7 @@ class BookingDetailsActivity : AppCompatActivity() {
         ownerContainer = findViewById(R.id.ownerContainer)
 
         btnCancel = findViewById(R.id.btnCancel)
-        btnStartSession = findViewById(R.id.btnStartSession)
+//        btnStartSession = findViewById(R.id.btnStartSession)
         btnCompleteSession = findViewById(R.id.btnCompleteSession)
 
         setupButtons()
@@ -109,7 +109,7 @@ class BookingDetailsActivity : AppCompatActivity() {
     private fun setupButtons() {
         btnCancel.setOnClickListener { showCancelDialog() }
 
-        btnStartSession.setOnClickListener { startSession() }
+        // btnStartSession.setOnClickListener { startSession() }
 
         btnCompleteSession.setOnClickListener { showCompleteDialog() }
     }
@@ -196,17 +196,17 @@ class BookingDetailsActivity : AppCompatActivity() {
         when (status) {
             "Pending", "Approved" -> {
                 btnCancel.visibility = View.VISIBLE
-                btnStartSession.visibility = if (status == "Approved") View.VISIBLE else View.GONE
+                // btnStartSession.visibility = if (status == "Approved") View.VISIBLE else View.GONE
                 btnCompleteSession.visibility = View.GONE
             }
             "In Progress" -> {
                 btnCancel.visibility = View.GONE
-                btnStartSession.visibility = View.GONE
+                // btnStartSession.visibility = View.GONE
                 btnCompleteSession.visibility = View.VISIBLE
             }
             else -> {
                 btnCancel.visibility = View.GONE
-                btnStartSession.visibility = View.GONE
+                // btnStartSession.visibility = View.GONE
                 btnCompleteSession.visibility = View.GONE
             }
         }
