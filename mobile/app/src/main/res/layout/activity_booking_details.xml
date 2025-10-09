@@ -410,7 +410,7 @@
                 android:visibility="gone"
                 style="@style/Widget.MaterialComponents.Button" /> -->
 
-            <Button
+            <!-- <Button
                 android:id="@+id/btnCompleteSession"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -419,7 +419,7 @@
                 android:backgroundTint="#6366F1"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone"
-                style="@style/Widget.MaterialComponents.Button" />
+                style="@style/Widget.MaterialComponents.Button" /> -->
 
             <Button
                 android:id="@+id/btnCancel"
