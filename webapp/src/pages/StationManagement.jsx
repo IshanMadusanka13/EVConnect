@@ -3,6 +3,7 @@ import api from '../utils/api';
 import MapPicker from '../components/MapPicker';
 import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import { Plus, X, MapPin, Pencil, Trash } from 'lucide-react';
 
 const StationManagement = () => {
@@ -119,6 +120,7 @@ const StationManagement = () => {
             </div>
 
             <Navbar />
+            <Sidebar activePath="/station" />
 
             <div className="relative pt-24 pb-8 px-4 max-w-7xl mx-auto">
                 <div className="mb-8">

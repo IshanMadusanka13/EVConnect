@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { ThemeContext } from '../contexts/ThemeContext';
 import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import api from '../utils/api';
 import { QRCodeSVG } from 'qrcode.react';
 import { jsPDF } from 'jspdf';
@@ -563,6 +564,7 @@ const BookingManagement = () => {
       </div>
 
       <Navbar />
+  <Sidebar activePath="/booking" />
 
       {/* Main Content */}
       <div className="relative pt-24 pb-8 px-4 max-w-7xl mx-auto">
