@@ -18,8 +18,11 @@ class EVOwnerRepository(context: Context) {
     fun updateLocal(owner: EVOwner): Boolean = dbHelper.updateEVOwner(owner) > 0
     fun deactivateLocal(nic: String): Boolean = dbHelper.deactivateEVOwner(nic) > 0
     fun getAllLocalOwners(): List<EVOwner> = dbHelper.getAllEVOwners()
-
-    // New method to toggle activation status
+    fun deleteLocal(nic: String): Boolean = dbHelper.deleteEVOwner(nic) > 0
+    fun deleteAllLocal(): Boolean {
+        return dbHelper.deleteAllEVOwners() > 0
+    }
+    // toggle activation status
     fun toggleActivationStatus(nic: String, isActive: Boolean): Boolean {
         val affectedRows = dbHelper.toggleEVOwnerStatus(nic, isActive)
         return affectedRows > 0
@@ -65,6 +68,14 @@ class EVOwnerRepository(context: Context) {
             } else {
                 api.deactivateEVOwner(nic)
             }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun deleteRemote(nic: String) = withContext(Dispatchers.IO) {
+        try {
+            api.deleteEVOwner(nic)
         } catch (e: Exception) {
             null
         }

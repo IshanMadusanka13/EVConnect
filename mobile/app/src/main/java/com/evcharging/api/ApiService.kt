@@ -209,8 +209,6 @@ interface ApiService {
 
     /**
      * Toggle EV owner status (activate/deactivate)
-     * @param nic National Identity Card number
-     * @param request Status update request
      * @return Response with status message
      */
     @PATCH("EVOwner/{nic}/status")
@@ -218,4 +216,12 @@ interface ApiService {
         @Path("nic") nic: String,
         @Body request: UpdateStatusRequest
     ): Response<MessageResponse>
+
+    /**
+     * Delete EV owner profile
+     * @param nic National Identity Card number
+     * @return Response with status message
+     */
+    @DELETE("EVOwner/{nic}")
+    suspend fun deleteEVOwner(@Path("nic") nic: String): Response<MessageResponse>
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.evcharging.models.EVOwner
 import com.evcharging.models.LocalBooking
 
@@ -422,4 +423,15 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         return owners
     }
+
+    fun deleteEVOwner(nic: String): Int {
+        val db = writableDatabase
+        return db.delete(TABLE_EV_OWNERS, "$COLUMN_NIC = ?", arrayOf(nic))
+    }
+
+    fun deleteAllEVOwners(): Int {
+        val db = writableDatabase
+        return db.delete(TABLE_EV_OWNERS, null, null)
+    }
+
 }

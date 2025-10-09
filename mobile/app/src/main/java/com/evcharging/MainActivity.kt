@@ -8,6 +8,7 @@ import com.evcharging.R
 import com.evcharging.ui.users.CreateUserActivity
 import com.evcharging.ui.users.UpdateUserActivity
 import com.evcharging.ui.users.DeactivateUserActivity
+import com.evcharging.ui.users.DeleteUserActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +25,9 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnDeactivateUser).setOnClickListener {
             startActivity(Intent(this, DeactivateUserActivity::class.java))
+        }
+        findViewById<Button>(R.id.btnDeleteUser).setOnClickListener {
+            startActivity(Intent(this, DeleteUserActivity::class.java))
         }
     }
 }

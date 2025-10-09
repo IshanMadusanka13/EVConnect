@@ -81,6 +81,11 @@
             android:label="Deactivate User"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".ui.users.DeleteUserActivity"
+            android:exported="false"
+            android:label="Delete User"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>
