@@ -178,7 +178,12 @@ export const api = {
   updateBooking: (id, bookingData) =>
     fetchApi(`/Booking/${id}/update`, {
       method: 'PUT',
-      body: JSON.stringify(bookingData)
+      body: JSON.stringify({
+        reservationDate: bookingData.newReservationDate,
+        startTime: bookingData.newStartTime,
+        endTime: bookingData.newEndTime,
+        chargerType: bookingData.newChargerType
+      })
     }),
 
   cancelBooking: (id, cancelData) =>
