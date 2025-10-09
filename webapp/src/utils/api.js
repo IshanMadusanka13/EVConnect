@@ -64,13 +64,18 @@ const fetchApi = async (endpoint, options = {}) => {
 export const api = {
   // Auth
   login: (credentials) =>
-    fetchApi('/users/login', {
+    fetchApi('/user/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
     }),
 
+  getCurrentUser: () =>
+    fetchApi('/user/me', {
+      method: 'GET'
+    }),
+
   register: (userData) =>
-    fetchApi('/users/register', {
+    fetchApi('/user', {
       method: 'POST',
       body: JSON.stringify(userData)
     }),

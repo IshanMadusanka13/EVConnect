@@ -3,6 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Sidebar from '../components/Sidebar';
 import {
   LineChart,
   Line,
@@ -148,31 +149,10 @@ const AdminDashboard = () => {
       </div>
 
       {/* Sidebar */}
-      <div className={`fixed left-6 top-6 bottom-6 w-64 ${getColor('background.card')} backdrop-blur-sm border ${getColor('border.primary')} rounded-3xl p-6 z-10`}>
-        <div className="mb-8">
-          <h2 className={`text-2xl font-bold mb-1 ${getColor('text.primary')}`}>
-            Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Panel</span>
-          </h2>
-          <p className={`text-sm ${getColor('text.secondary')}`}>Management Dashboard</p>
-        </div>
-        <ul className="space-y-2">
-          {sidebarItems.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <li 
-                key={index}
-                className={`group flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 ${getColor('hover.primary')} hover:scale-105`}
-                onClick={() => navigate(item.path)}
-              >
-                <div className="p-2 transition-all rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 group-hover:shadow-lg group-hover:shadow-blue-500/50">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <span className={`font-medium ${getColor('text.primary')}`}>{item.label}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {
+        /* Use shared Sidebar component */
+      }
+      <Sidebar activePath="/admin" />
 
       {/* Main Content */}
       <div className="relative flex-1 p-8 ml-80">
@@ -182,13 +162,6 @@ const AdminDashboard = () => {
           </h1>
           <p className={`text-lg ${getColor('text.secondary')}`}>Here's what's happening with your platform today</p>
         </div>
-
-        <button
-          onClick={() => navigate("/users")}
-          className="fixed z-20 px-6 py-3 font-semibold text-white transition-all rounded-xl top-8 right-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105"
-        >
-          Add New User
-        </button>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4">

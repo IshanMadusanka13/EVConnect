@@ -1,4 +1,7 @@
 using webservice.data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,8 @@ builder.Services.AddSingleton<DBConnect>();
 builder.Services.AddScoped<webservice.services.StationService>();
 builder.Services.AddScoped<webservice.services.BookingService>();
 builder.Services.AddScoped<webservice.services.EVOwnerService>();
+builder.Services.AddScoped<webservice.services.UserService>();
+builder.Services.AddSingleton<webservice.services.JwtService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -37,9 +42,39 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Configure JWT authentication
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "ReplaceThisWithASecureRandomKeyOfSufficientLength";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "EVConnect";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "EVConnectUsers";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 var app = builder.Build();
 
 app.UseCors("AllowSpecificOrigin");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGet("/", () => "EVCONNECT Backend Started!");
 app.MapControllers();
