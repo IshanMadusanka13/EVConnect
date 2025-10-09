@@ -262,15 +262,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         try {
             val position = LatLng(station.latitude, station.longitude)
 
-            // Determine marker color based on available slots
-            val markerColor = when {
-                station.availableSlots > 5 -> BitmapDescriptorFactory.HUE_GREEN    // Plenty available
-                station.availableSlots in 3..5 -> BitmapDescriptorFactory.HUE_YELLOW // Moderate
-                station.availableSlots in 1..2 -> BitmapDescriptorFactory.HUE_ORANGE // Low
-                station.availableSlots > 0 -> BitmapDescriptorFactory.HUE_RED       // Very low
-                else -> BitmapDescriptorFactory.HUE_VIOLET                          // None available
-            }
-
             // Create snippet with distance if user location available
             val snippet = userLocation?.let { loc ->
                 val dist = FloatArray(1)
@@ -282,14 +273,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     dist
                 )
                 val distKm = dist[0] / 1000
-                "Slots: ${station.availableSlots} • Rating: ${station.rating}⭐ • ${String.format("%.1f", distKm)}km away"
-            } ?: "Slots: ${station.availableSlots} • Rating: ${station.rating}⭐"
+                "${String.format("%.1f", distKm)}km away"
+            } ?: ""
 
             val marker = MarkerOptions()
                 .position(position)
                 .title(station.stationName)
                 .snippet(snippet)
-                .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN ))
 
             map?.addMarker(marker)
         } catch (e: Exception) {
