@@ -1,28 +1,27 @@
 package com.evcharging.ui.users
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.evcharging.R
+import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
-import com.google.android.material.textfield.TextInputEditText
 
 class DeactivateUserActivity : AppCompatActivity() {
     private lateinit var repo: EVOwnerRepository
-    private var currentUserStatus: Boolean? = null
-    private var currentNIC: String = ""
-
-    // UI Components
-    private lateinit var etNIC: TextInputEditText
-    private lateinit var btnSearch: Button
-    private lateinit var btnToggleStatus: Button
-    private lateinit var tvUserInfo: TextView
-    private lateinit var tvCurrentStatus: TextView
-    private lateinit var userInfoContainer: CardView
-    private lateinit var toggleButtonCard: CardView  // Add this for the button's parent CardView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: EVOwnerAdapter
+    private var evOwners: List<EVOwner> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +30,7 @@ class DeactivateUserActivity : AppCompatActivity() {
             setContentView(R.layout.activity_deactivate_user)
             repo = EVOwnerRepository(this)
             initializeViews()
-            setupListeners()
-
-            // Initially hide user info and toggle button
-            userInfoContainer.visibility = View.GONE
-            toggleButtonCard.visibility = View.GONE  // Hide the CardView, not just the button
+            loadAllOwners()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error initializing activity: ${e.message}", Toast.LENGTH_LONG).show()
@@ -44,121 +39,35 @@ class DeactivateUserActivity : AppCompatActivity() {
     }
 
     private fun initializeViews() {
-        etNIC = findViewById(R.id.etNIC)
-        btnSearch = findViewById(R.id.btnSearch)
-        btnToggleStatus = findViewById(R.id.btnToggleStatus)
-        tvUserInfo = findViewById(R.id.tvUserInfo)
-        tvCurrentStatus = findViewById(R.id.tvCurrentStatus)
-        userInfoContainer = findViewById(R.id.userInfoContainer)
-        toggleButtonCard = findViewById(R.id.toggleButtonCard)  // Initialize the CardView
+        recyclerView = findViewById(R.id.recyclerView)
     }
 
-    private fun setupListeners() {
-        btnSearch.setOnClickListener {
-            searchUser()
-        }
-
-        btnToggleStatus.setOnClickListener {
-            currentUserStatus?.let { isActive ->
-                showConfirmationDialog(isActive)
-            }
-        }
-    }
-
-    private fun searchUser() {
-        val nic = etNIC.text.toString().trim()
-        if (nic.isEmpty()) {
-            showToast("Please enter NIC to search")
-            return
-        }
-
+    private fun loadAllOwners() {
         try {
-            val owner = repo.getLocalOwner(nic)
-            if (owner != null) {
-                currentNIC = nic
-                currentUserStatus = owner.isActive
-                displayUserInfo(owner)
-
-                // Show both user info container AND toggle button card
-                userInfoContainer.visibility = View.VISIBLE
-                toggleButtonCard.visibility = View.VISIBLE  // Show the CardView
-
-                updateButtonAppearance(owner.isActive)
-            } else {
-                showToast("User not found with NIC: $nic")
-
-                // Hide both user info container AND toggle button card
-                userInfoContainer.visibility = View.GONE
-                toggleButtonCard.visibility = View.GONE  // Hide the CardView
-            }
+            evOwners = repo.getAllLocalOwners()
+            adapter = EVOwnerAdapter(evOwners, this)
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            showToast("Error searching user: ${e.message}")
+            Toast.makeText(this, "Error loading owners: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun displayUserInfo(owner: com.evcharging.models.EVOwner) {
-        val userInfo = """
-            User Information
-            
-            👤 Name: ${owner.firstName} ${owner.lastName}
-            📧 Email: ${owner.email}
-            📞 Phone: ${owner.phoneNumber}
-            🚗 Vehicle: ${owner.vehicleModel} (${owner.vehiclePlateNumber})
-        """.trimIndent()
-
-        tvUserInfo.text = userInfo
-
-        val statusText = if (owner.isActive) "Active" else "Inactive"
-        tvCurrentStatus.text = "Current Status: $statusText"
-
-        // Set background color based on status
-        try {
-            if (owner.isActive) {
-                tvCurrentStatus.setBackgroundResource(R.drawable.bg_status_active)
-            } else {
-                tvCurrentStatus.setBackgroundResource(R.drawable.bg_status_inactive)
-            }
-        } catch (e: Exception) {
-            // Fallback if drawables don't exist
-            val color = if (owner.isActive) {
-                resources.getColor(R.color.status_approved, null)
-            } else {
-                resources.getColor(R.color.status_cancelled, null)
-            }
-            tvCurrentStatus.setBackgroundColor(color)
-        }
-
-        tvCurrentStatus.setTextColor(resources.getColor(android.R.color.white, null))
-    }
-
-    private fun updateButtonAppearance(isActive: Boolean) {
-        if (isActive) {
-            // User is active - show deactivate option
-            btnToggleStatus.text = "Deactivate User"
-            btnToggleStatus.backgroundTintList = resources.getColorStateList(R.color.status_cancelled, null)
-        } else {
-            // User is inactive - show activate option
-            btnToggleStatus.text = "Activate User"
-            btnToggleStatus.backgroundTintList = resources.getColorStateList(R.color.status_approved, null)
-        }
-    }
-
-    private fun showConfirmationDialog(isCurrentlyActive: Boolean) {
-        val title = if (isCurrentlyActive) "Deactivate User" else "Activate User"
-        val message = if (isCurrentlyActive) {
-            "Are you sure you want to deactivate this user?\n\n⚠️ Warning: Deactivated users cannot make new bookings."
-        } else {
+    fun showConfirmationDialogForOwner(nic: String, newStatus: Boolean) {
+        val title = if (newStatus) "Activate User" else "Deactivate User"
+        val message = if (newStatus) {
             "Are you sure you want to activate this user?\n\n✅ This will allow the user to make bookings again."
+        } else {
+            "Are you sure you want to deactivate this user?\n\n⚠️ Warning: Deactivated users cannot make new bookings."
         }
-        val positiveButton = if (isCurrentlyActive) "Deactivate" else "Activate"
+        val positiveButton = if (newStatus) "Activate" else "Deactivate"
 
         AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton(positiveButton) { dialog, _ ->
-                toggleUserStatus(!isCurrentlyActive)
-                dialog.dismiss()
+            .setPositiveButton(positiveButton) { _, _ ->
+                toggleUserStatusForOwner(nic, newStatus)
             }
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
@@ -166,30 +75,94 @@ class DeactivateUserActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun toggleUserStatus(newStatus: Boolean) {
-        btnToggleStatus.isEnabled = false
-
+    private fun toggleUserStatusForOwner(nic: String, newStatus: Boolean) {
         try {
-            val success = repo.toggleActivationStatus(currentNIC, newStatus)
+            val success = repo.toggleActivationStatus(nic, newStatus)
 
             if (success) {
                 val statusText = if (newStatus) "activated" else "deactivated"
-                showToast("User $statusText successfully")
+                Toast.makeText(this, "User $statusText successfully", Toast.LENGTH_SHORT).show()
 
-                // Refresh the UI
-                searchUser()
+                // Refresh the list
+                loadAllOwners()
             } else {
-                showToast("Failed to update user status")
+                Toast.makeText(this, "Failed to update user status", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            showToast("Error: ${e.message}")
-        } finally {
-            btnToggleStatus.isEnabled = true
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    inner class EVOwnerAdapter(
+        private val owners: List<EVOwner>,
+        private val activity: DeactivateUserActivity
+    ) : RecyclerView.Adapter<EVOwnerAdapter.ViewHolder>() {
+
+        inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val tvUserInfo: TextView = itemView.findViewById(R.id.tvUserInfoItem)
+            val tvStatus: TextView = itemView.findViewById(R.id.tvStatusItem)
+            val btnToggle: Button = itemView.findViewById(R.id.btnToggleItem)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_ev_owner, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val owner = owners[position]
+            val userInfo = """
+                👤 Name: ${owner.firstName} ${owner.lastName}
+                📧 Email: ${owner.email}
+                📞 Phone: ${owner.phoneNumber}
+                🚗 Vehicle: ${owner.vehicleModel} (${owner.vehiclePlateNumber})
+            """.trimIndent()
+
+            holder.tvUserInfo.text = userInfo
+
+            val statusText = if (owner.isActive) "Active" else "Inactive"
+            holder.tvStatus.text = "Current Status: $statusText"
+
+            // Set background color based on status
+            try {
+                if (owner.isActive) {
+                    holder.tvStatus.setBackgroundResource(R.drawable.bg_status_active)
+                } else {
+                    holder.tvStatus.setBackgroundResource(R.drawable.bg_status_inactive)
+                }
+            } catch (e: Exception) {
+                // Fallback if drawables don't exist
+                val color = if (owner.isActive) {
+                    activity.resources.getColor(R.color.status_approved, null)
+                } else {
+                    activity.resources.getColor(R.color.status_cancelled, null)
+                }
+                holder.tvStatus.setBackgroundColor(color)
+            }
+
+            holder.tvStatus.setTextColor(activity.resources.getColor(android.R.color.white, null))
+
+            if (owner.isActive) {
+                // User is active - show deactivate option
+                holder.btnToggle.text = "Deactivate User"
+                holder.btnToggle.backgroundTintList = activity.resources.getColorStateList(R.color.status_cancelled, null)
+            } else {
+                // User is inactive - show activate option
+                holder.btnToggle.text = "Activate User"
+                holder.btnToggle.backgroundTintList = activity.resources.getColorStateList(R.color.status_approved, null)
+            }
+
+            holder.btnToggle.setOnClickListener {
+                activity.showConfirmationDialogForOwner(owner.nic, !owner.isActive)
+            }
+        }
+
+        override fun getItemCount(): Int = owners.size
     }
 }
