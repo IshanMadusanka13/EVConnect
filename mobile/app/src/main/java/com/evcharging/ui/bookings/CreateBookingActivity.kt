@@ -23,20 +23,12 @@ class CreateBookingActivity : AppCompatActivity() {
     private lateinit var step2Indicator: TextView
     private lateinit var step3Indicator: TextView
     private lateinit var step4Indicator: TextView
-    private lateinit var step5Indicator: TextView
 
     // Step containers
     private lateinit var step1Container: LinearLayout
     private lateinit var step2Container: LinearLayout
     private lateinit var step3Container: LinearLayout
     private lateinit var step4Container: LinearLayout
-    private lateinit var step5Container: LinearLayout
-
-    // Step 1: EV Owner
-    private lateinit var etNIC: EditText
-    private lateinit var btnSearchOwner: Button
-    private lateinit var tvOwnerDetails: TextView
-    private lateinit var ownerDetailsContainer: LinearLayout
 
     // Step 2: Station Selection
     private lateinit var spinnerStation: Spinner
@@ -77,6 +69,8 @@ class CreateBookingActivity : AppCompatActivity() {
     private var selectedEndTime = ""
     private var selectedChargerType = "AC"
 
+    private var loggedInUserNIC: String = ""
+
     /** Initialize activity */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,9 +78,13 @@ class CreateBookingActivity : AppCompatActivity() {
 
         repository = BookingRepository(this)
 
+        loggedInUserNIC = getLoggedInUserNIC()
+
         initializeViews()
         setupStepIndicators()
         setupListeners()
+
+        loadLoggedInUserDetails()
 
         showStep(1)
         loadStations()
@@ -97,6 +95,13 @@ class CreateBookingActivity : AppCompatActivity() {
         }
     }
 
+    private fun getLoggedInUserNIC(): String {
+        return "987654321V"
+
+        // val sharedPreferences = getSharedPreferences("EVChargingPrefs", MODE_PRIVATE)
+        // return sharedPreferences.getString("user_nic", "") ?: ""
+    }
+
     /** Initialize all view components */
     private fun initializeViews() {
         // Step indicators
@@ -104,20 +109,12 @@ class CreateBookingActivity : AppCompatActivity() {
         step2Indicator = findViewById(R.id.step2Indicator)
         step3Indicator = findViewById(R.id.step3Indicator)
         step4Indicator = findViewById(R.id.step4Indicator)
-        step5Indicator = findViewById(R.id.step5Indicator)
 
         // Step containers
         step1Container = findViewById(R.id.step1Container)
         step2Container = findViewById(R.id.step2Container)
         step3Container = findViewById(R.id.step3Container)
         step4Container = findViewById(R.id.step4Container)
-        step5Container = findViewById(R.id.step5Container)
-
-        // Step 1 views
-        etNIC = findViewById(R.id.etNIC)
-        btnSearchOwner = findViewById(R.id.btnSearchOwner)
-        tvOwnerDetails = findViewById(R.id.tvOwnerDetails)
-        ownerDetailsContainer = findViewById(R.id.ownerDetailsContainer)
 
         // Step 2 views
         spinnerStation = findViewById(R.id.spinnerStation)
@@ -154,7 +151,6 @@ class CreateBookingActivity : AppCompatActivity() {
 
     /** Setup event listeners */
     private fun setupListeners() {
-        btnSearchOwner.setOnClickListener { searchEVOwner() }
 
         etDate.setOnClickListener { showDatePicker() }
 
@@ -168,8 +164,8 @@ class CreateBookingActivity : AppCompatActivity() {
 
         btnNext.setOnClickListener {
             if (validateCurrentStep()) {
-                if (currentStep == 3) {
-                    // After step 3, check availability before moving to step 4
+                if (currentStep == 2) {
+                    // After step 2, check availability before moving to step 4
                     checkAvailability()
                 } else {
                     goToNextStep()
@@ -297,68 +293,52 @@ class CreateBookingActivity : AppCompatActivity() {
         }
     }
 
-    /** Search for EV owner by NIC */
-    private fun searchEVOwner() {
-        val nic = etNIC.text.toString().trim()
-
-        if (nic.isEmpty()) {
-            etNIC.error = "Please enter NIC"
+    /** Load logged-in EV owner details */
+    private fun loadLoggedInUserDetails() {
+        if (loggedInUserNIC.isEmpty()) {
+            Toast.makeText(this, "User not logged in. Please login first.", Toast.LENGTH_LONG)
+                    .show()
+            finish()
             return
         }
 
         progressBar.visibility = View.VISIBLE
-        btnSearchOwner.isEnabled = false
 
         lifecycleScope.launch {
-            val result = repository.getEVOwnerByNIC(nic)
+            val result = repository.getEVOwnerByNIC(loggedInUserNIC)
 
             progressBar.visibility = View.GONE
-            btnSearchOwner.isEnabled = true
 
             result
                     .onSuccess { owner ->
                         if (!owner.isActive) {
                             Toast.makeText(
                                             this@CreateBookingActivity,
-                                            "This EV Owner account is deactivated. Please contact support.",
+                                            "Your EV Owner account is deactivated. Please contact support.",
                                             Toast.LENGTH_LONG
                                     )
                                     .show()
-                            evOwner = null
-                            ownerDetailsContainer.visibility = View.GONE
+                            finish()
                         } else {
                             evOwner = owner
-                            displayOwnerDetails(owner)
-                            ownerDetailsContainer.visibility = View.VISIBLE
+                            Toast.makeText(
+                                            this@CreateBookingActivity,
+                                            "Welcome, ${owner.firstName}!",
+                                            Toast.LENGTH_SHORT
+                                    )
+                                    .show()
                         }
                     }
                     .onFailure { error ->
                         Toast.makeText(
                                         this@CreateBookingActivity,
-                                        "EV Owner not found: ${error.message}",
+                                        "Failed to load your profile: ${error.message}",
                                         Toast.LENGTH_LONG
                                 )
                                 .show()
-                        evOwner = null
-                        ownerDetailsContainer.visibility = View.GONE
+                        finish()
                     }
         }
-    }
-
-    /** Display EV owner details */
-    private fun displayOwnerDetails(owner: EVOwner) {
-        val details =
-                """
-            Name: ${owner.firstName} ${owner.lastName}
-            Email: ${owner.email}
-            Phone: ${owner.phoneNumber}
-            Vehicle: ${owner.vehicleModel}
-            Plate: ${owner.vehiclePlateNumber}
-            Battery: ${owner.batteryCapacity}
-            Compatible: ${owner.compatibleChargerTypes}
-        """.trimIndent()
-
-        tvOwnerDetails.text = details
     }
 
     /** Update station details display */
@@ -452,19 +432,12 @@ class CreateBookingActivity : AppCompatActivity() {
     private fun validateCurrentStep(): Boolean {
         return when (currentStep) {
             1 -> {
-                if (evOwner == null) {
-                    Toast.makeText(this, "Please search and select an EV Owner", Toast.LENGTH_SHORT)
-                            .show()
-                    false
-                } else true
-            }
-            2 -> {
                 if (selectedStation == null) {
                     Toast.makeText(this, "Please select a station", Toast.LENGTH_SHORT).show()
                     false
                 } else true
             }
-            3 -> {
+            2 -> {
                 when {
                     selectedDate.isEmpty() -> {
                         Toast.makeText(this, "Please select a date", Toast.LENGTH_SHORT).show()
@@ -483,7 +456,7 @@ class CreateBookingActivity : AppCompatActivity() {
                     else -> true
                 }
             }
-            4 -> {
+            3 -> {
                 if (selectedSlot == null) {
                     Toast.makeText(this, "Please select a slot", Toast.LENGTH_SHORT).show()
                     false
@@ -495,11 +468,11 @@ class CreateBookingActivity : AppCompatActivity() {
 
     /** Navigate to next step */
     private fun goToNextStep() {
-        if (currentStep < 5) {
+        if (currentStep < 4) {
             currentStep++
             showStep(currentStep)
 
-            if (currentStep == 5) {
+            if (currentStep == 4) {
                 displayConfirmationDetails()
             }
         }
@@ -520,7 +493,6 @@ class CreateBookingActivity : AppCompatActivity() {
         step2Container.visibility = View.GONE
         step3Container.visibility = View.GONE
         step4Container.visibility = View.GONE
-        step5Container.visibility = View.GONE
 
         // Show current step
         when (step) {
@@ -528,7 +500,6 @@ class CreateBookingActivity : AppCompatActivity() {
             2 -> step2Container.visibility = View.VISIBLE
             3 -> step3Container.visibility = View.VISIBLE
             4 -> step4Container.visibility = View.VISIBLE
-            5 -> step5Container.visibility = View.VISIBLE
         }
 
         // Update step indicators
@@ -536,12 +507,11 @@ class CreateBookingActivity : AppCompatActivity() {
         updateStepIndicator(step2Indicator, step >= 2)
         updateStepIndicator(step3Indicator, step >= 3)
         updateStepIndicator(step4Indicator, step >= 4)
-        updateStepIndicator(step5Indicator, step >= 5)
 
         // Update navigation buttons
         btnPrevious.visibility = if (step > 1) View.VISIBLE else View.GONE
-        btnNext.visibility = if (step < 5) View.VISIBLE else View.GONE
-        btnConfirm.visibility = if (step == 5) View.VISIBLE else View.GONE
+        btnNext.visibility = if (step < 4) View.VISIBLE else View.GONE
+        btnConfirm.visibility = if (step == 4) View.VISIBLE else View.GONE
     }
 
     /** Update step indicator appearance */

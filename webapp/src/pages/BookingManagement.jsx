@@ -20,6 +20,8 @@ const BookingManagement = () => {
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [stationsLookup, setStationsLookup] = useState({});
   const [evOwnersLookup, setEvOwnersLookup] = useState({});
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [bookingToUpdate, setBookingToUpdate] = useState(null);
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
@@ -237,6 +239,28 @@ const BookingManagement = () => {
     } catch (error) {
       alert(error.message || 'Failed to complete session');
     }
+  };
+
+  const handleOpenUpdateModal = (booking) => {
+    // Check if booking can be updated
+    const reservationDateTime = new Date(booking.reservationDate);
+    const [hours, minutes, seconds] = booking.startTime.split(':');
+    reservationDateTime.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds));
+
+    const hoursUntilReservation = (reservationDateTime - new Date()) / (1000 * 60 * 60);
+
+    if (hoursUntilReservation < 12) {
+      alert('Bookings can only be updated at least 12 hours before the reservation time');
+      return;
+    }
+
+    if (booking.status !== 'Pending') {
+      alert('Only pending bookings can be updated');
+      return;
+    }
+
+    setBookingToUpdate(booking);
+    setShowUpdateModal(true);
   };
 
   const getStatusColor = (status) => {
@@ -1017,6 +1041,21 @@ const BookingManagement = () => {
 
               {/* Action Buttons */}
               <div className="mt-6 flex gap-3">
+                {/* {selectedBooking.status === 'Pending' && (
+                  <>
+                    <button
+                      onClick={() => handleApproveBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all">
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleRejectBooking(selectedBooking.id)}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
+                      Reject
+                    </button>
+                  </>
+                )} */}
+
                 {selectedBooking.status === 'Pending' && (
                   <>
                     <button
@@ -1028,6 +1067,14 @@ const BookingManagement = () => {
                       onClick={() => handleRejectBooking(selectedBooking.id)}
                       className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all">
                       Reject
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleOpenUpdateModal(selectedBooking);
+                        closeModal();
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all">
+                      Update
                     </button>
                   </>
                 )}
@@ -1084,6 +1131,24 @@ const BookingManagement = () => {
       {showCreateModal && (
         <CreateBookingModal
           onClose={() => setShowCreateModal(false)}
+          stationsLookup={stationsLookup}
+          getStation={getStation}
+        />
+      )}
+
+      {/* Update Booking Modal */}
+      {showUpdateModal && bookingToUpdate && (
+        <UpdateBookingModal
+          booking={bookingToUpdate}
+          onClose={() => {
+            setShowUpdateModal(false);
+            setBookingToUpdate(null);
+          }}
+          onSuccess={() => {
+            setShowUpdateModal(false);
+            setBookingToUpdate(null);
+            fetchBookings();
+          }}
           stationsLookup={stationsLookup}
           getStation={getStation}
         />
@@ -1883,6 +1948,290 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
               </button>
             )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Update Booking Modal Component
+const UpdateBookingModal = ({ booking, onClose, onSuccess, stationsLookup, getStation }) => {
+  const { darkMode, getColor } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [formData, setFormData] = useState({
+    date: booking.reservationDate.split('T')[0],
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    chargerType: booking.chargerType || 'AC',
+    slotId: booking.slotId
+  });
+
+  const timeSlots = [
+    '08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00',
+    '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00'
+  ];
+
+  const checkAvailability = async () => {
+    try {
+      setLoading(true);
+      const slots = await api.checkAvailability(
+        booking.stationId,
+        formData.date,
+        formData.startTime,
+        formData.endTime,
+        formData.chargerType
+      );
+      setAvailableSlots(slots);
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      alert('Failed to check availability');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.date && formData.startTime && formData.endTime) {
+      checkAvailability();
+    }
+  }, [formData.date, formData.startTime, formData.endTime, formData.chargerType]);
+
+  const handleUpdateBooking = async () => {
+    if (!formData.slotId) {
+      alert('Please select a slot');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.updateBooking(booking.id, {
+        newReservationDate: formData.date,
+        newStartTime: formData.startTime,  // Already in HH:MM:SS format
+        newEndTime: formData.endTime,      // Already in HH:MM:SS format
+        newChargerType: formData.chargerType
+      });
+      alert('Booking updated successfully!');
+      onSuccess();
+    } catch (error) {
+      alert(error.message || 'Failed to update booking');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+      <div className={`relative ${getColor('background.modal')} rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-slideUp border ${getColor('border.primary')}`}>
+        {/* Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-6">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Update Booking</h2>
+              <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/20 transition-colors">
+                <X className="w-6 h-6 text-white" />
+              </button>
+            </div>
+            <p className="text-white/80 mt-2">Booking ID: {booking.id.substring(0, 8)}</p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Current Booking Info */}
+          <div className={`p-4 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+            <h3 className={`font-bold mb-3 ${getColor('text.primary')}`}>Current Booking</h3>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <span className={getColor('text.tertiary')}>Date:</span>
+                <span className={`ml-2 font-semibold ${getColor('text.primary')}`}>
+                  {new Date(booking.reservationDate).toLocaleDateString()}
+                </span>
+              </div>
+              <div>
+                <span className={getColor('text.tertiary')}>Time:</span>
+                <span className={`ml-2 font-semibold ${getColor('text.primary')}`}>
+                  {booking.startTime} - {booking.endTime}
+                </span>
+              </div>
+              <div>
+                <span className={getColor('text.tertiary')}>Charger:</span>
+                <span className={`ml-2 font-semibold ${getColor('text.primary')}`}>
+                  {booking.chargerType}
+                </span>
+              </div>
+              <div>
+                <span className={getColor('text.tertiary')}>Slot:</span>
+                <span className={`ml-2 font-semibold ${getColor('text.primary')}`}>
+                  {booking.slotId}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Update Form */}
+          <div className="space-y-4">
+            {/* Date */}
+            <div>
+              <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                New Date
+              </label>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
+                className={`w-full px-4 py-3 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                style={{ colorScheme: darkMode ? 'dark' : 'light' }}
+              />
+            </div>
+
+            {/* Time Selection */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Start Time
+                </label>
+                <select
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    startTime: e.target.value,
+                    endTime: formData.endTime <= e.target.value ? '' : formData.endTime
+                  })}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  {timeSlots.map((time) => (
+                    <option key={time} value={time}>
+                      {new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  End Time
+                </label>
+                <select
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  className={`w-full px-4 py-3 rounded-xl border-2 ${getColor('border.input')} ${getColor('background.input')} ${getColor('text.primary')} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  <option value="">Select time</option>
+                  {timeSlots
+                    .filter(time => time > formData.startTime)
+                    .map((time) => (
+                      <option key={time} value={time}>
+                        {new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Charger Type */}
+            <div>
+              <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                Charger Type
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, chargerType: 'AC' })}
+                  className={`p-4 rounded-xl border-2 transition-all ${formData.chargerType === 'AC'
+                      ? 'border-emerald-500 bg-emerald-500/10'
+                      : darkMode ? 'border-slate-700' : 'border-slate-200'
+                    }`}
+                >
+                  <Battery className={`w-8 h-8 mx-auto mb-2 ${formData.chargerType === 'AC' ? 'text-emerald-500' : getColor('text.tertiary')}`} />
+                  <p className={`font-bold ${getColor('text.primary')}`}>AC</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, chargerType: 'DC' })}
+                  className={`p-4 rounded-xl border-2 transition-all ${formData.chargerType === 'DC'
+                      ? 'border-orange-500 bg-orange-500/10'
+                      : darkMode ? 'border-slate-700' : 'border-slate-200'
+                    }`}
+                >
+                  <Zap className={`w-8 h-8 mx-auto mb-2 ${formData.chargerType === 'DC' ? 'text-orange-500' : getColor('text.tertiary')}`} />
+                  <p className={`font-bold ${getColor('text.primary')}`}>DC</p>
+                </button>
+              </div>
+            </div>
+
+            {/* Available Slots */}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                <p className={`mt-4 ${getColor('text.secondary')}`}>Checking availability...</p>
+              </div>
+            ) : availableSlots.length > 0 ? (
+              <div>
+                <label className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Available Slots
+                </label>
+                <div className="grid grid-cols-4 gap-3">
+                  {availableSlots.map((slot) => (
+                    <button
+                      key={slot.id}
+                      onClick={() => setFormData({ ...formData, slotId: slot.id })}
+                      className={`p-4 rounded-xl border-2 transition-all ${formData.slotId === slot.id
+                          ? 'border-blue-500 bg-blue-500/10 scale-105'
+                          : darkMode ? 'border-slate-700' : 'border-slate-200'
+                        }`}
+                    >
+                      <div className={`w-12 h-12 mx-auto mb-2 rounded-xl flex items-center justify-center ${formData.slotId === slot.id ? 'bg-blue-500' : darkMode ? 'bg-slate-800' : 'bg-slate-100'
+                        }`}>
+                        {slot.chargerType === 'DC' ? (
+                          <Zap className={`w-6 h-6 ${formData.slotId === slot.id ? 'text-white' : 'text-orange-500'}`} />
+                        ) : (
+                          <Battery className={`w-6 h-6 ${formData.slotId === slot.id ? 'text-white' : 'text-emerald-500'}`} />
+                        )}
+                      </div>
+                      <p className={`text-sm font-bold ${getColor('text.primary')}`}>{slot.slotNumber}</p>
+                      <p className={`text-xs ${getColor('text.tertiary')}`}>{slot.chargerType}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              formData.date && formData.startTime && formData.endTime && (
+                <div className={`p-6 rounded-xl ${darkMode ? 'bg-slate-800' : 'bg-slate-50'} text-center`}>
+                  <AlertCircle className={`w-12 h-12 mx-auto mb-3 ${getColor('text.tertiary')}`} />
+                  <p className={`font-semibold ${getColor('text.primary')}`}>No available slots</p>
+                  <p className={`text-sm ${getColor('text.secondary')}`}>Please try a different time</p>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className={`border-t ${getColor('border.primary')} p-6 flex gap-3`}>
+          <button
+            onClick={onClose}
+            className={`flex-1 px-6 py-3 rounded-xl border-2 ${darkMode ? 'border-slate-700 hover:bg-slate-800' : 'border-slate-300 hover:bg-slate-50'} font-semibold transition-all`}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleUpdateBooking}
+            disabled={loading || !formData.slotId}
+            className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold hover:shadow-xl hover:shadow-blue-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Updating...' : 'Update Booking'}
+          </button>
         </div>
       </div>
     </div>
