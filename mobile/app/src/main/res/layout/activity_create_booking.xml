@@ -87,24 +87,6 @@
                 android:background="@drawable/step_indicator_inactive"
                 android:textColor="#9CA3AF" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_weight="1"
-                android:background="#D1D5DB"
-                android:layout_marginHorizontal="4dp" />
-
-            <TextView
-                android:id="@+id/step5Indicator"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:text="5"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/step_indicator_inactive"
-                android:textColor="#9CA3AF" />
-
         </LinearLayout>
 
         <!-- Step Content Container -->
@@ -121,7 +103,7 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- STEP 1: EV Owner Search -->
+                <!-- STEP 1: Station Selection -->
                 <LinearLayout
                     android:id="@+id/step1Container"
                     android:layout_width="match_parent"
@@ -132,81 +114,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Step 1: Find EV Owner"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#111827"
-                        android:layout_marginBottom="16dp" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="National Identity Card (NIC)"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etNIC"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:maxLines="1" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <Button
-                        android:id="@+id/btnSearchOwner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Search EV Owner"
-                        android:textColor="#FFFFFF"
-                        android:backgroundTint="#3B82F6"
-                        android:layout_marginTop="12dp"
-                        style="@style/Widget.MaterialComponents.Button" />
-
-                    <!-- Owner Details Container -->
-                    <LinearLayout
-                        android:id="@+id/ownerDetailsContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="16dp"
-                        android:padding="16dp"
-                        android:background="@drawable/bg_owner_details"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="EV Owner Details"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#111827"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:id="@+id/tvOwnerDetails"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textColor="#4B5563"
-                            android:lineSpacingMultiplier="1.3" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- STEP 2: Station Selection -->
-                <LinearLayout
-                    android:id="@+id/step2Container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Step 2: Choose Station"
+                        android:text="Step 1: Choose Station"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#111827"
@@ -241,9 +149,9 @@
 
                 </LinearLayout>
 
-                <!-- STEP 3: Date and Time Selection -->
+                <!-- STEP 2: Date and Time Selection -->
                 <LinearLayout
-                    android:id="@+id/step3Container"
+                    android:id="@+id/step2Container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -252,7 +160,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Step 3: Select Date and Time"
+                        android:text="Step 2: Select Date and Time"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#111827"
@@ -345,9 +253,9 @@
 
                 </LinearLayout>
 
-                <!-- STEP 4: Slot Selection -->
+                <!-- STEP 3: Slot Selection -->
                 <LinearLayout
-                    android:id="@+id/step4Container"
+                    android:id="@+id/step3Container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -356,7 +264,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Step 4: Select Slot"
+                        android:text="Step 3: Select Slot"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#111827"
@@ -382,9 +290,9 @@
 
                 </LinearLayout>
 
-                <!-- STEP 5: Confirmation -->
+                <!-- STEP 4: Confirmation -->
                 <LinearLayout
-                    android:id="@+id/step5Container"
+                    android:id="@+id/step4Container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -393,7 +301,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Step 5: Confirm Booking"
+                        android:text="Step 4: Confirm Booking"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#111827"
