@@ -45,7 +45,7 @@ interface ApiService {
      * @param reservationDate Reservation date
      * @param startTime Start time in HH:MM:SS format
      * @param endTime End time in HH:MM:SS format
-     * @param chargerType Charger type (AC or DC Fast)
+     * @param chargerType Charger type (AC or DC)
      * @return Response containing list of available slots
      */
     @GET("Booking/availability")

@@ -54,7 +54,7 @@ class BookingAdapter(
             tvTime.text = "${booking.startTime} - ${booking.endTime}"
             
             // Set charger type with icon
-            val chargerIcon = if (booking.chargerType == "DC Fast") "⚡" else "🔋"
+            val chargerIcon = if (booking.chargerType == "DC") "⚡" else "🔋"
             tvChargerType.text = "$chargerIcon ${booking.chargerType}"
             
             // Set status with color

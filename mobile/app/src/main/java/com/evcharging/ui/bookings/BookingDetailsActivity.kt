@@ -148,7 +148,7 @@ class BookingDetailsActivity : AppCompatActivity() {
         tvDate.text = formatDate(booking.reservationDate)
         tvTime.text = "${booking.startTime} - ${booking.endTime}"
         tvChargerType.text =
-                if (booking.chargerType == "DC Fast") "⚡ ${booking.chargerType}"
+                if (booking.chargerType == "DC") "⚡ ${booking.chargerType}"
                 else "🔋 ${booking.chargerType}"
         tvSlot.text = "Slot: ${booking.slotId}"
         tvStatus.text = booking.status

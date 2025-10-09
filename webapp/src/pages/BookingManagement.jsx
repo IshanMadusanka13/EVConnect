@@ -251,7 +251,7 @@ const BookingManagement = () => {
   };
 
   const getChargerIcon = (type) => {
-    return type === 'DC Fast' ?
+    return type === 'DC' ?
       <Zap className={`w-5 h-5 ${getColor('charger.dc')}`} /> :
       <Battery className={`w-5 h-5 ${getColor('charger.ac')}`} />;
   };
@@ -1577,14 +1577,14 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFormData({ ...formData, chargerType: 'DC Fast' })}
-                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC Fast'
+                      onClick={() => setFormData({ ...formData, chargerType: 'DC' })}
+                      className={`p-6 rounded-2xl border-2 transition-all duration-300 ${formData.chargerType === 'DC'
                         ? 'border-orange-500 bg-orange-500/10 scale-105 shadow-lg shadow-orange-500/20'
                         : darkMode ? 'border-slate-700 hover:border-slate-600' : 'border-slate-200 hover:border-slate-300'
                         }`}
                     >
-                      <Zap className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'DC Fast' ? 'text-orange-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-                      <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>DC Fast</p>
+                      <Zap className={`w-12 h-12 mx-auto mb-3 transition-transform ${formData.chargerType === 'DC' ? 'text-orange-500 scale-110' : darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+                      <p className={`text-lg font-bold mb-1 ${getColor('text.primary')}`}>DC</p>
                       <p className={`text-sm ${getColor('text.secondary')}`}>Rapid • 50-350 kW</p>
                       <p className={`text-xs mt-2 ${getColor('text.tertiary')}`}>Quick charge in minutes</p>
                     </button>

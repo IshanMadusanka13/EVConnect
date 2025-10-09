@@ -134,7 +134,7 @@ const EditOwnerModal = ({ owner, onClose, onUpdate }) => {
     // Charger type options
     const chargerTypes = [
         { value: 'AC', label: 'AC Charging', description: 'Standard • 7-22 kW' },
-        { value: 'DC', label: 'DC Fast', description: 'Rapid • 50-350 kW' },
+        { value: 'DC', label: 'DC', description: 'Rapid • 50-350 kW' },
         { value: 'AC,DC', label: 'AC & DC', description: 'Dual compatible' },
         { value: 'AC,DC,Super', label: 'All Types', description: 'Full compatibility' }
     ];

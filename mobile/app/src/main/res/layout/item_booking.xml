@@ -93,7 +93,7 @@
             android:id="@+id/tvChargerType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⚡ DC Fast"
+            android:text="⚡ DC"
             android:textSize="14sp"
             android:textColor="#6B7280"
             android:layout_marginBottom="8dp" />

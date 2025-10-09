@@ -161,7 +161,7 @@ class CreateBookingActivity : AppCompatActivity() {
         radioGroupCharger.setOnCheckedChangeListener { _, checkedId ->
             selectedChargerType =
                     when (checkedId) {
-                        R.id.rbDC -> "DC Fast"
+                        R.id.rbDC -> "DC"
                         else -> "AC"
                     }
         }
