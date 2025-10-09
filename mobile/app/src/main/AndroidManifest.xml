@@ -61,6 +61,18 @@
             android:label="Booking Details"
             android:parentActivityName=".ui.bookings.BookingListActivity" />
 
+        <!-- Map Activity to show nearby charging stations -->
+        <activity
+            android:name=".ui.stations.StationsMapActivity"
+            android:exported="false"
+            android:label="Nearby Stations"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Google Maps API key placeholder: replace with your API key in local or gradle properties -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/AIzaSyA4GMwhaR_OivyJD3S_g47tmvUHMgir1eQ" />
+
     </application>
 
 </manifest>

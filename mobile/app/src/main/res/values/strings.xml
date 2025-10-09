@@ -10,4 +10,6 @@
     <string name="session_completed">Charging session completed!</string>
     <string name="no_bookings">No bookings found</string>
     <string name="create_first_booking">Create your first booking to get started</string>
+    <string name="google_maps_key">AIzaSyA4GMwhaR_OivyJD3S_g47tmvUHMgir1eQ</string>
+    <string name="title_nearby_stations">Nearby Stations</string>
 </resources>
