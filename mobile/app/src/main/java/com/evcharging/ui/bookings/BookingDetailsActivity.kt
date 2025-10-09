@@ -174,7 +174,7 @@ class BookingDetailsActivity : AppCompatActivity() {
         if (booking.status == "Completed") {
             energyContainer.visibility = View.VISIBLE
             tvEnergy.text = "Energy: ${booking.energyConsumed} kWh"
-            tvCost.text = "Cost: $${String.format("%.2f", booking.cost)}"
+            tvCost.text = "Cost: Rs.${String.format("%.2f", booking.cost)}"
         } else {
             energyContainer.visibility = View.GONE
         }

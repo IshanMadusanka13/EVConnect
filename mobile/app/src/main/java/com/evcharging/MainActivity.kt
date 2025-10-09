@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         tvPendingCount.text = stats.pendingReservations.toString()
         tvApprovedCount.text = stats.approvedReservations.toString()
         tvCompletedCount.text = stats.completedReservations.toString()
-        tvTotalRevenue.text = "$${String.format("%.2f", stats.totalRevenue)}"
+        tvTotalRevenue.text = "Rs.${String.format("%.2f", stats.totalRevenue)}"
     }
     
     /**

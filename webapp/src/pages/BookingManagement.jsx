@@ -229,7 +229,7 @@ const BookingManagement = () => {
 
       await api.updateEnergyAndCost(bookingId, parseFloat(energyInput), cost);
       await api.updateBookingStatus(bookingId, 'Completed');
-      alert(`Session completed successfully! Cost: $${cost.toFixed(2)} (${energyInput} kWh × $${rateData.chargingRate}/kWh)`);
+      alert(`Session completed successfully! Cost: Rs.${cost.toFixed(2)} (${energyInput} kWh × $${rateData.chargingRate}/kWh)`);
       setEnergyInput('');
       fetchBookings();
       closeModal();
@@ -261,6 +261,7 @@ const BookingManagement = () => {
 
     const stationName = getStationName(booking.stationId);
     const stationInfo = stationsLookup[booking.stationId];
+    const ownerInfo = getEVOwner(booking.nic);
 
     // Enhanced color palette
     const brand = {
@@ -426,8 +427,8 @@ const BookingManagement = () => {
       ['Start Time:', booking.startTime],
       ['End Time:', booking.endTime],
       ['Charger Type:', booking.chargerType || 'AC'],
-      ['Customer:', booking.customerName || 'N/A'],
-      ['Vehicle:', booking.vehicleModel || 'N/A']
+      ['Customer:', `${ownerInfo.firstName} ${ownerInfo.lastName}` || 'N/A'],
+      ['Vehicle:', `${ownerInfo.vehicleModel}` || 'N/A']
     ];
 
     doc.setFontSize(9);
@@ -478,7 +479,7 @@ const BookingManagement = () => {
 
     doc.setFontSize(26);
     doc.setFont(undefined, 'bold');
-    doc.text(`$${(booking.cost || 0).toFixed(2)}`, 185, yPos, { align: 'right' });
+    doc.text(`Rs.${(booking.cost || 0).toFixed(2)}`, 185, yPos, { align: 'right' });
 
     // ========== STATUS BADGE ==========
     yPos = 270;
@@ -590,7 +591,7 @@ const BookingManagement = () => {
             { label: 'Total Bookings', value: stats.total.toString(), change: '+12%', icon: Calendar, gradient: 'from-blue-500 to-cyan-500' },
             { label: 'Active Sessions', value: stats.active.toString(), change: `${stats.active > 0 ? '+' : ''}${stats.active}`, icon: Activity, gradient: 'from-emerald-500 to-teal-500' },
             { label: 'Pending', value: stats.pending.toString(), change: `${stats.pending}`, icon: Clock, gradient: 'from-amber-500 to-orange-500' },
-            { label: 'Revenue', value: `$${stats.revenue}`, change: '+18%', icon: TrendingUp, gradient: 'from-purple-500 to-pink-500' }
+            { label: 'Revenue', value: `Rs.${stats.revenue}`, change: '+18%', icon: TrendingUp, gradient: 'from-purple-500 to-pink-500' }
           ].map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -812,7 +813,7 @@ const BookingManagement = () => {
                             <div className="text-right">
                               <p className={`text-xs ${getColor('text.tertiary')}`}>Cost</p>
                               <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
-                                ${booking.cost}
+                                Rs.{booking.cost}
                               </p>
                             </div>
                           </div>
@@ -982,7 +983,7 @@ const BookingManagement = () => {
                     <div>
                       <p className={`text-sm ${getColor('text.secondary')}`}>Cost</p>
                       <p className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
-                        ${selectedBooking.cost}
+                        Rs.{selectedBooking.cost}
                       </p>
                     </div>
                   </div>

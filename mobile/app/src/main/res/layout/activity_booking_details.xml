@@ -382,7 +382,7 @@
                         android:id="@+id/tvCost"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Cost: $45.50"
+                        android:text="Cost: Rs.450.50"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="#10B981" />

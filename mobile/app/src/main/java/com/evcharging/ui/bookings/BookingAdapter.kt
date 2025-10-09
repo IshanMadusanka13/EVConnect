@@ -65,7 +65,7 @@ class BookingAdapter(
             // Set cost (show only for completed bookings)
             if (booking.status == "Completed") {
                 tvCost.visibility = View.VISIBLE
-                tvCost.text = "Cost: $${String.format("%.2f", booking.cost)}"
+                tvCost.text = "Cost: Rs.${String.format("%.2f", booking.cost)}"
             } else {
                 tvCost.visibility = View.GONE
             }

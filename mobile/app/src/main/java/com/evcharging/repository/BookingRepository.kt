@@ -414,7 +414,7 @@ suspend fun cancelBooking(
     ): Result<MessageResponse> =
             withContext(Dispatchers.IO) {
                 try {
-                    Log.d(TAG, "📡 Updating energy ($energyConsumed kWh) and cost ($$cost)")
+                    Log.d(TAG, "📡 Updating energy ($energyConsumed kWh) and cost (Rs.$cost)")
 
                     val request = UpdateEnergyCostRequest(energyConsumed, cost)
                     val response = apiService.updateEnergyAndCost(id, request)
