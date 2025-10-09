@@ -80,22 +80,33 @@ namespace webservice.controllers
         [HttpPost("create")]
         public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequest request)
         {
+            // Basic validation
+            if (string.IsNullOrEmpty(request.StationId) || string.IsNullOrEmpty(request.NIC) || string.IsNullOrEmpty(request.StartTime) || string.IsNullOrEmpty(request.EndTime) || string.IsNullOrEmpty(request.ChargerType))
+            {
+                return BadRequest(new { message = "Missing required fields" });
+            }
             if (!TimeSpan.TryParse(request.StartTime, out TimeSpan start) || !TimeSpan.TryParse(request.EndTime, out TimeSpan end))
             {
                 return BadRequest("Invalid time format. Use HH:MM:SS format.");
             }
 
-            var result = await _service.CreateBookingAsync(request.StationId, request.NIC, request.ReservationDate, start, end, request.ChargerType);
+            var result = await _service.CreateBookingAsync(request.StationId, request.NIC, request.ReservationDate, start, end, request.ChargerType, request.SlotId);
 
             if (!result.Success)
             {
                 return BadRequest(new { message = result.Message });
             }
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Booking.Id }, new
+            var createdBooking = result.Booking;
+            if (createdBooking == null)
+            {
+                return BadRequest(new { message = "Failed to create booking" });
+            }
+
+            return CreatedAtAction(nameof(GetById), new { id = createdBooking.Id }, new
             {
                 message = result.Message,
-                booking = result.Booking
+                booking = createdBooking
             });
         }
 

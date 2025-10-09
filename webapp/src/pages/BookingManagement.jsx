@@ -1270,7 +1270,8 @@ const CreateBookingModal = ({ onClose, stationsLookup, getStation }) => {
         reservationDate: formData.date,
         startTime: formData.startTime,
         endTime: formData.endTime,
-        chargerType: formData.chargerType
+        chargerType: formData.chargerType,
+        slotId: formData.slotId || null
       };
 
       await api.createBooking(bookingData);

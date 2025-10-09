@@ -55,7 +55,7 @@ namespace webservice.services
         }
 
         // Create new booking with availability check and automatic slot assignment
-        public async Task<(bool Success, string Message, Booking Booking)> CreateBookingAsync(string stationId, string nic, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType)
+    public async Task<(bool Success, string Message, Booking? Booking)> CreateBookingAsync(string stationId, string nic, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType, string? slotId = null)
         {
             // Validate reservation date is within 7 days from now
             var bookingDateTime = DateTime.Now;
@@ -86,40 +86,116 @@ namespace webservice.services
                 return (false, "Station is not open during the requested time", null);
             }
 
-            // Find available slot
-            var availableSlot = await FindAvailableSlotAsync(stationId, reservationDate, startTime, endTime, chargerType);
+            // If frontend provided a specific slotId, validate it first
+            Slot? chosenSlot = null;
+            if (!string.IsNullOrEmpty(slotId))
+            {
+                chosenSlot = await _slotService.GetSlotByIdAsync(slotId);
+                if (chosenSlot == null)
+                {
+                    return (false, "Provided slot not found", null);
+                }
+                if (!chosenSlot.IsOperational)
+                {
+                    return (false, "Provided slot is not operational", null);
+                }
+
+                // Check if the chosen slot is already booked for the requested time
+                var conflicts = await GetBookingsForDateAndTimeRangeAsync(stationId, reservationDate, startTime, endTime);
+                var conflictForSlot = conflicts.Exists(b => b.SlotId == slotId && !b.IsCancelled && (b.Status ?? string.Empty) != "NoShow");
+                if (conflictForSlot)
+                {
+                    return (false, "Provided slot is already booked for the requested time", null);
+                }
+            }
+
+            // Find available slot (if not provided)
+            var availableSlot = chosenSlot ?? await FindAvailableSlotAsync(stationId, reservationDate, startTime, endTime, chargerType);
             
             if (availableSlot == null)
             {
                 return (false, "No available slots for the requested time and charger type", null);
             }
 
-            // Create booking
-            var booking = new Booking
+            // Before inserting, perform a final availability check and insert within a transaction to prevent race conditions
+            var maxRetries = 3;
+            var attempt = 0;
+            while (true)
             {
-                Id = Guid.NewGuid().ToString(),
-                StationId = stationId,
-                NIC = nic,
-                SlotId = availableSlot.Id,
-                ReservationDate = reservationDate,
-                StartTime = startTime,
-                EndTime = endTime,
-                BookingDateTime = bookingDateTime,
-                Status = "Pending",
-                EnergyConsumed = 0,
-                ChargerType = chargerType,
-                Cost = 0,
-                QRCodeData = GenerateQRCodeData(),
-                QRCodeScanned = false,
-                QRScanTime = null,
-                IsCancelled = false,
-                CancellationDate = null,
-                CancelledBy = null,
-                CancellationReason = null
-            };
+                attempt++;
+                using (var session = await _db.Client.StartSessionAsync())
+                {
+                    session.StartTransaction();
+                    try
+                    {
+                        // Re-check for conflicts for the chosen slot within the transaction/session
+                        var startOfDay = reservationDate.Date;
+                        var startOfNextDay = startOfDay.AddDays(1);
+                        var builder = Builders<Booking>.Filter;
+                        var bookingFilter = builder.Eq(b => b.StationId, stationId) &
+                                            builder.Gte(b => b.ReservationDate, startOfDay) &
+                                            builder.Lt(b => b.ReservationDate, startOfNextDay) &
+                                            builder.Eq(b => b.IsCancelled, false) &
+                                            builder.Ne(b => b.Status, "NoShow") &
+                                            builder.Lt(b => b.StartTime, endTime) &
+                                            builder.Gt(b => b.EndTime, startTime) &
+                                            builder.Eq(b => b.SlotId, availableSlot.Id);
 
-            await _bookings.InsertOneAsync(booking);
-            return (true, "Booking created successfully", booking);
+                        var existingConflict = await _bookings.Find(session, bookingFilter).FirstOrDefaultAsync();
+                        if (existingConflict != null)
+                        {
+                            // Conflict detected, abort transaction and return error
+                            await session.AbortTransactionAsync();
+                            return (false, "Selected slot was just booked by someone else. Please choose another slot.", null);
+                        }
+
+                        // Create booking document
+                        var booking = new Booking
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            StationId = stationId,
+                            NIC = nic,
+                            SlotId = availableSlot.Id,
+                            ReservationDate = reservationDate,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                            BookingDateTime = bookingDateTime,
+                            Status = "Pending",
+                            EnergyConsumed = 0,
+                            ChargerType = chargerType,
+                            Cost = 0,
+                            QRCodeData = GenerateQRCodeData(),
+                            QRCodeScanned = false,
+                            QRScanTime = null,
+                            IsCancelled = false,
+                            CancellationDate = null,
+                            CancelledBy = null,
+                            CancellationReason = null
+                        };
+
+                        await _bookings.InsertOneAsync(session, booking);
+                        await session.CommitTransactionAsync();
+                        return (true, "Booking created successfully", booking);
+                    }
+                    catch (MongoDB.Driver.MongoException)
+                    {
+                        // Abort and possibly retry for transient transaction errors
+                        try { await session.AbortTransactionAsync(); } catch { }
+                        if (attempt >= maxRetries)
+                        {
+                            return (false, "Failed to create booking due to a database error. Please try again.", null);
+                        }
+                        // small backoff
+                        await Task.Delay(100 * attempt);
+                        continue;
+                    }
+                    catch (Exception)
+                    {
+                        try { await session.AbortTransactionAsync(); } catch { }
+                        return (false, "Failed to create booking due to an unexpected error.", null);
+                    }
+                }
+            }
         }
 
         // Update booking with time constraints
@@ -159,6 +235,12 @@ namespace webservice.services
             if (newStartTime >= newEndTime)
             {
                 return (false, "Start time must be before end time");
+            }
+
+            // Ensure stationId is present
+            if (string.IsNullOrEmpty(booking.StationId))
+            {
+                return (false, "Booking has no associated station");
             }
 
             // Check station availability for new time
@@ -231,20 +313,21 @@ namespace webservice.services
         {
             // Get all operational slots for the station and charger type
             var allSlots = await _slotService.GetSlotsByStationIdAsync(stationId);
-            var availableSlots = allSlots.Where(s => s.IsOperational && s.ChargerType == chargerType).ToList();
+            var requestedCharger = (chargerType ?? string.Empty).Trim().ToLowerInvariant();
+            var availableSlots = allSlots.Where(s => s.IsOperational && ((s.ChargerType ?? string.Empty).Trim().ToLowerInvariant() == requestedCharger)).ToList();
 
             // Get existing bookings for the same date and overlapping times
             var existingBookings = await GetBookingsForDateAndTimeRangeAsync(stationId, reservationDate, startTime, endTime);
 
             // Remove slots that are already booked during the requested time
-            var bookedSlotIds = existingBookings.Select(b => b.SlotId).ToHashSet();
+            var bookedSlotIds = existingBookings.Select(b => b.SlotId).Where(id => id != null).ToHashSet();
             availableSlots = availableSlots.Where(s => !bookedSlotIds.Contains(s.Id)).ToList();
 
             return availableSlots;
         }
 
         // Private helper methods
-        private async Task<Slot> FindAvailableSlotAsync(string stationId, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType, string excludeBookingId = null)
+        private async Task<Slot?> FindAvailableSlotAsync(string stationId, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime, string chargerType, string? excludeBookingId = null)
         {
             var availableSlots = await GetAvailableSlotsAsync(stationId, reservationDate, startTime, endTime, chargerType);
             
@@ -253,11 +336,12 @@ namespace webservice.services
             {
                 var existingBookings = await GetBookingsForDateAndTimeRangeAsync(stationId, reservationDate, startTime, endTime);
                 var conflictingBookings = existingBookings.Where(b => b.Id != excludeBookingId).ToList();
-                var conflictingSlotIds = conflictingBookings.Select(b => b.SlotId).ToHashSet();
-                
+                var conflictingSlotIds = conflictingBookings.Select(b => b.SlotId).Where(id => id != null).ToHashSet();
+
                 // Re-filter available slots excluding conflicts from other bookings
                 var allSlots = await _slotService.GetSlotsByStationIdAsync(stationId);
-                availableSlots = allSlots.Where(s => s.IsOperational && s.ChargerType == chargerType && !conflictingSlotIds.Contains(s.Id)).ToList();
+                var requestedChargerNormalized = (chargerType ?? string.Empty).Trim().ToLowerInvariant();
+                availableSlots = allSlots.Where(s => s.IsOperational && ((s.ChargerType ?? string.Empty).Trim().ToLowerInvariant() == requestedChargerNormalized) && !conflictingSlotIds.Contains(s.Id)).ToList();
             }
 
             return availableSlots.FirstOrDefault();
@@ -265,14 +349,20 @@ namespace webservice.services
 
         private async Task<List<Booking>> GetBookingsForDateAndTimeRangeAsync(string stationId, DateTime reservationDate, TimeSpan startTime, TimeSpan endTime)
         {
-            var bookings = await _bookings.Find(b => 
-                b.StationId == stationId && 
-                b.ReservationDate.Date == reservationDate.Date && 
-                !b.IsCancelled && 
-                b.Status != "NoShow" &&
-                ((b.StartTime < endTime && b.EndTime > startTime)) // Time overlap check
-            ).ToListAsync();
+            // Use explicit date range to ensure translation to MongoDB query (avoid using .Date in expressions)
+            var startOfDay = reservationDate.Date;
+            var startOfNextDay = startOfDay.AddDays(1);
 
+            var builder = Builders<Booking>.Filter;
+            var filter = builder.Eq(b => b.StationId, stationId) &
+                         builder.Gte(b => b.ReservationDate, startOfDay) &
+                         builder.Lt(b => b.ReservationDate, startOfNextDay) &
+                         builder.Eq(b => b.IsCancelled, false) &
+                         builder.Ne(b => b.Status, "NoShow") &
+                         builder.Lt(b => b.StartTime, endTime) &
+                         builder.Gt(b => b.EndTime, startTime);
+
+            var bookings = await _bookings.Find(filter).ToListAsync();
             return bookings;
         }
 

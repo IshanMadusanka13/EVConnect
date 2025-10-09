@@ -8,6 +8,7 @@ namespace webservice.data
     public class DBConnect
     {
         private readonly IMongoDatabase _database;
+        private readonly IMongoClient _client;
 
         private const string connectionUri = "mongodb+srv://apex:123@cluster0.xxfzdsj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
@@ -19,8 +20,9 @@ namespace webservice.data
                 settings.ServerApi = new ServerApi(ServerApiVersion.V1);
 
                 var client = new MongoClient(settings);
+                _client = client;
 
-                _database = client.GetDatabase("EVChargingDB");
+                _database = _client.GetDatabase("EVChargingDB");
 
                 var result = client.GetDatabase("EVChargingDB").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
                 Console.WriteLine("Successfully connected to MongoDB!");
@@ -33,13 +35,16 @@ namespace webservice.data
             }
         }
 
-        public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+    public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
         public IMongoCollection<EVOwner> EVOwners => _database.GetCollection<EVOwner>("EVOwners");
         public IMongoCollection<Station> Stations => _database.GetCollection<Station>("Stations");
         public IMongoCollection<Booking> Bookings => _database.GetCollection<Booking>("Bookings");
         public IMongoCollection<Slot> Slots => _database.GetCollection<Slot>("Slots");
         public IMongoCollection<StationSchedule> StationSchedules => _database.GetCollection<StationSchedule>("StationSchedules");
         public IMongoCollection<SlotType> SlotTypes => _database.GetCollection<SlotType>("SlotTypes");
+
+    // Expose the underlying client so services can start sessions/transactions when needed
+    public IMongoClient Client => _client;
 
     }
 }
