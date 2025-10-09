@@ -104,7 +104,7 @@ class UpdateUserActivity : AppCompatActivity() {
     private fun searchUser() {
         val nic = etNIC.text.toString().trim()
         if (nic.isEmpty()) {
-            Toast.makeText(this, "Please enter NIC to search", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_enter_nic_search), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -113,9 +113,9 @@ class UpdateUserActivity : AppCompatActivity() {
             currentOwner = owner
             populateForm(owner)
             formContainer.visibility = LinearLayout.VISIBLE
-            Toast.makeText(this, "User found!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_user_found), Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "User not found with NIC: $nic", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_user_not_found_nic, nic), Toast.LENGTH_SHORT).show()
             formContainer.visibility = LinearLayout.GONE
         }
     }
@@ -162,9 +162,9 @@ class UpdateUserActivity : AppCompatActivity() {
     }
 
     private fun showGenderDialog() {
-        val genders = arrayOf("Male", "Female", "Other")
+        val genders = resources.getStringArray(R.array.gender_options)
         AlertDialog.Builder(this)
-            .setTitle("Select Gender")
+            .setTitle(getString(R.string.dialog_gender_title))
             .setItems(genders) { _, which ->
                 etGender.setText(genders[which])
             }
@@ -172,9 +172,9 @@ class UpdateUserActivity : AppCompatActivity() {
     }
 
     private fun showVehicleTypeDialog() {
-        val vehicleTypes = arrayOf("Car", "Bike")
+        val vehicleTypes = resources.getStringArray(R.array.vehicle_type_options)
         AlertDialog.Builder(this)
-            .setTitle("Select Vehicle Type")
+            .setTitle(getString(R.string.dialog_vehicle_type_title))
             .setItems(vehicleTypes) { _, which ->
                 etVehicleType.setText(vehicleTypes[which])
             }
@@ -199,40 +199,40 @@ class UpdateUserActivity : AppCompatActivity() {
 
         // Required field validation
         if (etFirstName.text.toString().trim().isEmpty()) {
-            showError(etFirstName, "First name is required")
+            showError(etFirstName, getString(R.string.error_first_name_required))
             isValid = false
         }
 
         if (etLastName.text.toString().trim().isEmpty()) {
-            showError(etLastName, "Last name is required")
+            showError(etLastName, getString(R.string.error_last_name_required))
             isValid = false
         }
 
         if (etEmail.text.toString().trim().isEmpty()) {
-            showError(etEmail, "Email is required")
+            showError(etEmail, getString(R.string.error_email_required))
             isValid = false
         } else if (!isValidEmail(etEmail.text.toString())) {
-            showError(etEmail, "Please enter a valid email address")
+            showError(etEmail, getString(R.string.error_email_valid))
             isValid = false
         }
 
         if (etPhone.text.toString().trim().isEmpty()) {
-            showError(etPhone, "Phone number is required")
+            showError(etPhone, getString(R.string.error_phone_required))
             isValid = false
         }
 
         if (etVehicleModel.text.toString().trim().isEmpty()) {
-            showError(etVehicleModel, "Vehicle model is required")
+            showError(etVehicleModel, getString(R.string.error_vehicle_model_required))
             isValid = false
         }
 
         if (etVehiclePlate.text.toString().trim().isEmpty()) {
-            showError(etVehiclePlate, "Plate number is required")
+            showError(etVehiclePlate, getString(R.string.error_vehicle_plate_required))
             isValid = false
         }
 
         if (etBatteryCapacity.text.toString().trim().isEmpty()) {
-            showError(etBatteryCapacity, "Battery capacity is required")
+            showError(etBatteryCapacity, getString(R.string.error_battery_capacity_required))
             isValid = false
         }
 
@@ -242,12 +242,12 @@ class UpdateUserActivity : AppCompatActivity() {
 
         if (password.isNotEmpty()) {
             if (password.length < 6) {
-                showError(etPassword, "Password must be at least 6 characters")
+                showError(etPassword, getString(R.string.error_password_length))
                 isValid = false
             }
 
             if (password != confirmPassword) {
-                showError(etConfirmPassword, "Passwords do not match")
+                showError(etConfirmPassword, getString(R.string.error_passwords_mismatch))
                 isValid = false
             }
         }
@@ -275,7 +275,7 @@ class UpdateUserActivity : AppCompatActivity() {
 
     private fun updateEVOwner() {
         if (currentOwner == null) {
-            Toast.makeText(this, "Please search for a user first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_search_first), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -305,29 +305,28 @@ class UpdateUserActivity : AppCompatActivity() {
 
         // Show loading
         btnUpdate.isEnabled = false
-        btnUpdate.text = "Updating..."
+        btnUpdate.text = getString(R.string.button_updating)
 
         val localSuccess = repo.updateLocal(updatedOwner)
         if (localSuccess) {
-            Toast.makeText(this, "EV Owner updated locally!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_updated_locally), Toast.LENGTH_SHORT).show()
 
             // Sync update to server in background
             scope.launch {
                 val response = repo.updateRemote(updatedOwner)
                 if (response != null) {
-                    Toast.makeText(this@UpdateUserActivity, "Updated on server!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@UpdateUserActivity, getString(R.string.toast_updated_server), Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    Toast.makeText(this@UpdateUserActivity, "Updated locally but failed to sync with server", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@UpdateUserActivity, getString(R.string.toast_sync_failed), Toast.LENGTH_LONG).show()
                     btnUpdate.isEnabled = true
-                    btnUpdate.text = "Update EV Owner"
+                    btnUpdate.text = getString(R.string.update_ev_owner_button)
                 }
             }
         } else {
-            Toast.makeText(this, "Error updating EV Owner", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_update_local_failed), Toast.LENGTH_SHORT).show()
             btnUpdate.isEnabled = true
-            btnUpdate.text = "Update EV Owner"
+            btnUpdate.text = getString(R.string.update_ev_owner_button)
         }
     }
-
 }

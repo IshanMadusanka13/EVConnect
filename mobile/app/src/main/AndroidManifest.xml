@@ -64,28 +64,39 @@
 
         <!-- User Management Activities -->
         <activity
+            android:name=".ui.users.UserActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.EVCharging">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+
+        <activity
             android:name=".ui.users.CreateUserActivity"
             android:exported="false"
             android:label="Create User"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.users.UserActivity" />
 
         <activity
             android:name=".ui.users.UpdateUserActivity"
             android:exported="false"
             android:label="Update User"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.users.UserActivity" />
 
         <activity
             android:name=".ui.users.DeactivateUserActivity"
             android:exported="false"
             android:label="Deactivate User"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.users.UserActivity" />
 
         <activity
             android:name=".ui.users.DeleteUserActivity"
             android:exported="false"
             android:label="Delete User"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.users.UserActivity" />
     </application>
 
 </manifest>

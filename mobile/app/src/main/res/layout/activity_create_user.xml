@@ -8,13 +8,15 @@
     android:scrollbars="vertical"
     android:fadeScrollbars="false">
 
+    <!-- Main Container Layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Header Card -->
+        <!-- ===== HEADER CARD ===== -->
+        <!-- Displays the main title and description of the screen -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,7 +26,7 @@
             android:padding="24dp"
             android:elevation="4dp">
 
-            <!-- Icon and Title -->
+            <!-- Icon and Title Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -32,6 +34,7 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
+                <!-- Application Icon -->
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -39,29 +42,31 @@
                     app:tint="@color/primary_dark"
                     android:layout_marginEnd="12dp" />
 
+                <!-- Main Screen Title -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Create EV Owner"
+                    android:text="@string/create_ev_owner_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/primary_dark" />
 
             </LinearLayout>
 
-            <!-- Subtitle -->
+            <!-- Screen Description -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add a new electric vehicle owner to the system"
+                android:text="@string/create_ev_owner_subtitle"
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
 
-        <!-- Personal Information Card -->
+        <!-- ===== PERSONAL INFORMATION CARD ===== -->
+        <!-- Contains all personal details input fields -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,6 +84,7 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
+                <!-- Section Icon -->
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
@@ -86,25 +92,26 @@
                     app:tint="@color/primary"
                     android:layout_marginEnd="8dp" />
 
+                <!-- Section Title -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Personal Information"
+                    android:text="@string/personal_info_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary" />
 
             </LinearLayout>
 
-            <!-- Two Column Layout for Name Fields -->
+            <!-- Name Fields Row - Two Column Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
 
-                <!-- First Name -->
+                <!-- First Name Input -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -116,7 +123,7 @@
                         android:id="@+id/etFirstName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="First Name"
+                        android:hint="@string/first_name_hint"
                         android:inputType="textCapWords"
                         android:textSize="14sp"
                         android:background="@drawable/edittext_outline_background"
@@ -124,7 +131,7 @@
 
                 </LinearLayout>
 
-                <!-- Last Name -->
+                <!-- Last Name Input -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -136,7 +143,7 @@
                         android:id="@+id/etLastName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Last Name"
+                        android:hint="@string/last_name_hint"
                         android:inputType="textCapWords"
                         android:textSize="14sp"
                         android:background="@drawable/edittext_outline_background"
@@ -146,7 +153,7 @@
 
             </LinearLayout>
 
-            <!-- NIC -->
+            <!-- National ID Card Number Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -157,7 +164,7 @@
                     android:id="@+id/etNIC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="National ID Card Number"
+                    android:hint="@string/nic_hint"
                     android:inputType="text"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -165,14 +172,14 @@
 
             </LinearLayout>
 
-            <!-- Two Column Layout for Gender and DOB -->
+            <!-- Gender and Date of Birth Row - Two Column Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="8dp">
 
-                <!-- Gender -->
+                <!-- Gender Selection -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -184,7 +191,7 @@
                         android:id="@+id/etGender"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Gender"
+                        android:hint="@string/gender_hint"
                         android:inputType="text"
                         android:focusable="false"
                         android:clickable="true"
@@ -194,7 +201,7 @@
 
                 </LinearLayout>
 
-                <!-- Date of Birth -->
+                <!-- Date of Birth Picker -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -206,7 +213,7 @@
                         android:id="@+id/etDateOfBirth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Date of Birth"
+                        android:hint="@string/dob_hint"
                         android:inputType="text"
                         android:focusable="false"
                         android:clickable="true"
@@ -218,7 +225,7 @@
 
             </LinearLayout>
 
-            <!-- Email -->
+            <!-- Email Address Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -229,7 +236,7 @@
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email Address"
+                    android:hint="@string/email_hint"
                     android:inputType="textEmailAddress"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -237,7 +244,7 @@
 
             </LinearLayout>
 
-            <!-- Phone -->
+            <!-- Phone Number Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -248,7 +255,7 @@
                     android:id="@+id/etPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
+                    android:hint="@string/phone_hint"
                     android:inputType="phone"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -256,7 +263,7 @@
 
             </LinearLayout>
 
-            <!-- Address -->
+            <!-- Address Input (Multi-line) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -266,7 +273,7 @@
                     android:id="@+id/etAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Address"
+                    android:hint="@string/address_hint"
                     android:inputType="textMultiLine"
                     android:minLines="3"
                     android:gravity="top"
@@ -278,7 +285,8 @@
 
         </LinearLayout>
 
-        <!-- Vehicle Information Card -->
+        <!-- ===== VEHICLE INFORMATION CARD ===== -->
+        <!-- Contains all vehicle-related input fields -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -296,6 +304,7 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
+                <!-- Vehicle Section Icon -->
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
@@ -303,18 +312,19 @@
                     app:tint="@color/primary"
                     android:layout_marginEnd="8dp" />
 
+                <!-- Vehicle Section Title -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Vehicle Information"
+                    android:text="@string/vehicle_info_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary" />
 
             </LinearLayout>
 
-            <!-- Vehicle Type -->
+            <!-- Vehicle Type Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -325,7 +335,7 @@
                     android:id="@+id/etVehicleType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Type"
+                    android:hint="@string/vehicle_type_hint"
                     android:inputType="text"
                     android:focusable="false"
                     android:clickable="true"
@@ -335,7 +345,7 @@
 
             </LinearLayout>
 
-            <!-- Vehicle Model -->
+            <!-- Vehicle Model Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -346,7 +356,7 @@
                     android:id="@+id/etVehicleModel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Model"
+                    android:hint="@string/vehicle_model_hint"
                     android:inputType="text"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -354,7 +364,7 @@
 
             </LinearLayout>
 
-            <!-- Vehicle Plate -->
+            <!-- License Plate Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -365,7 +375,7 @@
                     android:id="@+id/etVehiclePlate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="License Plate Number"
+                    android:hint="@string/vehicle_plate_hint"
                     android:inputType="textCapCharacters"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -373,7 +383,7 @@
 
             </LinearLayout>
 
-            <!-- Battery Capacity -->
+            <!-- Battery Capacity Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -384,7 +394,7 @@
                     android:id="@+id/etBatteryCapacity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Battery Capacity (kWh)"
+                    android:hint="@string/battery_capacity_hint"
                     android:inputType="numberDecimal"
                     android:textSize="14sp"
                     android:background="@drawable/edittext_outline_background"
@@ -392,22 +402,24 @@
 
             </LinearLayout>
 
-            <!-- Compatible Charger Types -->
+            <!-- Charger Types Selection Title -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Compatible Charger Types"
+                android:text="@string/charger_types_title"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
                 android:layout_marginBottom="8dp" />
 
+            <!-- Charger Types Options Container -->
             <LinearLayout
                 android:id="@+id/llChargerTypes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- AC Charging Option -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -419,11 +431,12 @@
                         android:id="@+id/radioAC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="AC Charging (Standard - 7-22 kW)"
+                        android:text="@string/charger_ac"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
+                <!-- DC Fast Charging Option -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -435,11 +448,12 @@
                         android:id="@+id/radioDC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="DC Fast (Rapid - 50-350 kW)"
+                        android:text="@string/charger_dc"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
+                <!-- AC and DC Dual Compatible Option -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -451,11 +465,12 @@
                         android:id="@+id/radioACDC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="AC and DC (Dual compatible)"
+                        android:text="@string/charger_ac_dc"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
+                <!-- All Types Compatible Option -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -466,7 +481,7 @@
                         android:id="@+id/radioAll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="All Types (Full compatibility)"
+                        android:text="@string/charger_all"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -475,7 +490,8 @@
 
         </LinearLayout>
 
-        <!-- Account Security Card -->
+        <!-- ===== ACCOUNT SECURITY CARD ===== -->
+        <!-- Contains password fields for account creation -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -493,6 +509,7 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
+                <!-- Security Section Icon -->
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
@@ -500,24 +517,25 @@
                     app:tint="@color/primary"
                     android:layout_marginEnd="8dp" />
 
+                <!-- Security Section Title -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Account Security"
+                    android:text="@string/account_security_title"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary" />
 
             </LinearLayout>
 
-            <!-- Two Column Layout for Passwords -->
+            <!-- Password Fields Row - Two Column Layout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!-- Password -->
+                <!-- Password Input with Toggle Visibility -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -541,7 +559,7 @@
                             android:id="@+id/etPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Password"
+                            android:hint="@string/password_hint"
                             android:inputType="textPassword"
                             android:textSize="14sp"
                             android:padding="12dp" />
@@ -550,7 +568,7 @@
 
                 </LinearLayout>
 
-                <!-- Confirm Password -->
+                <!-- Confirm Password Input with Toggle Visibility -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -574,7 +592,7 @@
                             android:id="@+id/etConfirmPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Confirm Password"
+                            android:hint="@string/confirm_password_hint"
                             android:inputType="textPassword"
                             android:textSize="14sp"
                             android:padding="12dp" />
@@ -587,12 +605,13 @@
 
         </LinearLayout>
 
-        <!-- Create Button -->
+        <!-- ===== CREATE ACCOUNT BUTTON ===== -->
+        <!-- Primary action button to submit the form -->
         <Button
             android:id="@+id/btnCreate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Create EV Owner Account"
+            android:text="@string/create_button_text"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:background="@color/primary"

@@ -90,6 +90,9 @@ class CreateUserActivity : AppCompatActivity() {
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
         btnCreate = findViewById(R.id.btnCreate)
 
+        // Set initial button text
+        btnCreate.text = getString(R.string.create_button_text)
+
         // NIC Input Filter: Limit to 12 chars, allow digits, and 'V' or 'X' only at position 9 (for old format)
         etNIC.filters = arrayOf(
             InputFilter.LengthFilter(12),
@@ -183,12 +186,12 @@ class CreateUserActivity : AppCompatActivity() {
                     else -> false
                 }
                 updateError(etNIC, !isNICValid, when {
-                    nic.isEmpty() -> "National Identity Card number is required."
-                    nic.length < 10 -> "Please enter a valid NIC. New format: 12 digits. Old format: 9 digits followed by V or X."
-                    nic.length > 12 -> "NIC cannot exceed 12 characters."
-                    nic.length == 10 && !nic.matches(Regex("^\\d{9}[VX]$")) -> "Invalid old NIC format. It must consist of 9 digits followed by V or X."
-                    nic.length == 12 && !nic.matches(Regex("^\\d{12}$")) -> "Invalid new NIC format. It must consist of exactly 12 digits."
-                    else -> "Please enter a valid National Identity Card number."
+                    nic.isEmpty() -> getString(R.string.error_nic_required)
+                    nic.length < 10 -> getString(R.string.error_nic_invalid_format)
+                    nic.length > 12 -> getString(R.string.error_nic_too_long)
+                    nic.length == 10 && !nic.matches(Regex("^\\d{9}[VX]$")) -> getString(R.string.error_nic_old_format)
+                    nic.length == 12 && !nic.matches(Regex("^\\d{12}$")) -> getString(R.string.error_nic_new_format)
+                    else -> getString(R.string.error_nic_general)
                 })
                 updateButtonState()
             }
@@ -201,7 +204,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val name = s.toString().trim()
                 isFirstNameValid = name.isNotEmpty() && name.matches(Regex("^[a-zA-Z ]+$"))
-                updateError(etFirstName, !isFirstNameValid, "First name is required and must contain letters only")
+                updateError(etFirstName, !isFirstNameValid, getString(R.string.error_first_name_required))
                 updateButtonState()
             }
         })
@@ -213,7 +216,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val name = s.toString().trim()
                 isLastNameValid = name.isNotEmpty() && name.matches(Regex("^[a-zA-Z ]+$"))
-                updateError(etLastName, !isLastNameValid, "Last name is required and must contain letters only")
+                updateError(etLastName, !isLastNameValid, getString(R.string.error_last_name_required))
                 updateButtonState()
             }
         })
@@ -225,7 +228,9 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val email = s.toString().trim()
                 isEmailValid = email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-                updateError(etEmail, !isEmailValid, if (email.isEmpty()) "Email is required" else "Please enter a valid email address")
+                updateError(etEmail, !isEmailValid,
+                    if (email.isEmpty()) getString(R.string.error_email_required)
+                    else getString(R.string.error_email_invalid))
                 updateButtonState()
             }
         })
@@ -237,7 +242,9 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val phone = s.toString().trim()
                 isPhoneValid = phone.isNotEmpty() && phone.matches(Regex("^0\\d{9}$"))
-                updateError(etPhone, !isPhoneValid, if (phone.isEmpty()) "Phone number is required" else "Phone must be 10 digits starting with 0 (e.g., 0112345678)")
+                updateError(etPhone, !isPhoneValid,
+                    if (phone.isEmpty()) getString(R.string.error_phone_required)
+                    else getString(R.string.error_phone_invalid))
                 updateButtonState()
             }
         })
@@ -249,7 +256,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val model = s.toString().trim()
                 isVehicleModelValid = model.isNotEmpty() && model.matches(Regex("^[a-zA-Z0-9 ]+$"))
-                updateError(etVehicleModel, !isVehicleModelValid, "Vehicle model is required and must be alphanumeric")
+                updateError(etVehicleModel, !isVehicleModelValid, getString(R.string.error_vehicle_model_required))
                 updateButtonState()
             }
         })
@@ -261,7 +268,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val plate = s.toString().trim().uppercase()
                 isVehiclePlateValid = plate.isNotEmpty() && plate.matches(Regex("^[A-Z0-9/]+$"))
-                updateError(etVehiclePlate, !isVehiclePlateValid, "Plate number is required and must be alphanumeric")
+                updateError(etVehiclePlate, !isVehiclePlateValid, getString(R.string.error_vehicle_plate_required))
                 updateButtonState()
             }
         })
@@ -274,7 +281,9 @@ class CreateUserActivity : AppCompatActivity() {
                 val capacity = s.toString().trim()
                 val valid = capacity.isNotEmpty() && capacity.toDoubleOrNull() != null && capacity.toDouble() > 0
                 isBatteryCapacityValid = valid
-                updateError(etBatteryCapacity, !valid, if (capacity.isEmpty()) "Battery capacity is required" else "Must be a positive number (kWh)")
+                updateError(etBatteryCapacity, !valid,
+                    if (capacity.isEmpty()) getString(R.string.error_battery_capacity_required)
+                    else getString(R.string.error_battery_capacity_invalid))
                 updateButtonState()
             }
         })
@@ -286,7 +295,9 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val password = s.toString()
                 isPasswordValid = password.length >= 6
-                updateError(etPassword, !isPasswordValid, if (password.isEmpty()) "Password is required" else "Password must be at least 6 characters")
+                updateError(etPassword, !isPasswordValid,
+                    if (password.isEmpty()) getString(R.string.error_password_required)
+                    else getString(R.string.error_password_length))
                 validateConfirmPassword()
             }
         })
@@ -307,7 +318,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val gender = s.toString().trim()
                 isGenderValid = gender in listOf("Male", "Female", "Other")
-                updateError(etGender, !isGenderValid, "Please select a gender")
+                updateError(etGender, !isGenderValid, getString(R.string.error_gender_required))
                 updateButtonState()
             }
         })
@@ -319,7 +330,7 @@ class CreateUserActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 val vType = s.toString().trim()
                 isVehicleTypeValid = vType in listOf("Car", "Bike")
-                updateError(etVehicleType, !isVehicleTypeValid, "Please select a vehicle type")
+                updateError(etVehicleType, !isVehicleTypeValid, getString(R.string.error_vehicle_type_required))
                 updateButtonState()
             }
         })
@@ -329,7 +340,9 @@ class CreateUserActivity : AppCompatActivity() {
         val password = etPassword.text.toString()
         val confirm = etConfirmPassword.text.toString()
         isConfirmPasswordValid = password == confirm && password.isNotEmpty()
-        updateError(etConfirmPassword, !isConfirmPasswordValid, if (confirm.isEmpty()) "Please confirm your password" else "Passwords do not match")
+        updateError(etConfirmPassword, !isConfirmPasswordValid,
+            if (confirm.isEmpty()) getString(R.string.error_confirm_password_required)
+            else getString(R.string.error_passwords_mismatch))
         updateButtonState()
     }
 
@@ -356,9 +369,9 @@ class CreateUserActivity : AppCompatActivity() {
                 }
 
                 if (!isAdult) {
-                    Toast.makeText(this, "Must be at least 16 years old", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_dob_underage), Toast.LENGTH_SHORT).show()
                     isDOBValid = false
-                    updateError(etDateOfBirth, true, "Must be at least 16 years old")
+                    updateError(etDateOfBirth, true, getString(R.string.error_dob_underage))
                 } else {
                     isDOBValid = true
                     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -384,9 +397,9 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     private fun showGenderDialog() {
-        val genders = arrayOf("Male", "Female", "Other")
+        val genders = resources.getStringArray(R.array.gender_options)
         AlertDialog.Builder(this)
-            .setTitle("Select Gender")
+            .setTitle(getString(R.string.dialog_gender_title))
             .setItems(genders) { _, which ->
                 etGender.setText(genders[which])
             }
@@ -394,9 +407,9 @@ class CreateUserActivity : AppCompatActivity() {
     }
 
     private fun showVehicleTypeDialog() {
-        val vehicleTypes = arrayOf("Car", "Bike")
+        val vehicleTypes = resources.getStringArray(R.array.vehicle_type_options)
         AlertDialog.Builder(this)
-            .setTitle("Select Vehicle Type")
+            .setTitle(getString(R.string.dialog_vehicle_type_title))
             .setItems(vehicleTypes) { _, which ->
                 etVehicleType.setText(vehicleTypes[which])
             }
@@ -435,7 +448,7 @@ class CreateUserActivity : AppCompatActivity() {
                 isPhoneValid && isVehicleModelValid && isVehiclePlateValid && isBatteryCapacityValid &&
                 isPasswordValid && isConfirmPasswordValid && isDOBValid && isGenderValid && isVehicleTypeValid
         if (!allValid) {
-            Toast.makeText(this, "Please fix all errors before submitting", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_fix_errors), Toast.LENGTH_SHORT).show()
         }
         return allValid
     }
@@ -462,28 +475,28 @@ class CreateUserActivity : AppCompatActivity() {
 
         // Show loading
         btnCreate.isEnabled = false
-        btnCreate.text = "Creating..."
+        btnCreate.text = getString(R.string.button_creating)
 
         val localSuccess = repo.insertLocal(owner)
         if (localSuccess) {
-            Toast.makeText(this, "EV Owner saved locally!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_saved_locally), Toast.LENGTH_SHORT).show()
 
             // Sync to server in background
             scope.launch {
                 val response = repo.syncWithServer(owner)
                 if (response != null && response.isSuccessful) {
-                    Toast.makeText(this@CreateUserActivity, "Synced with server!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CreateUserActivity, getString(R.string.toast_synced_server), Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    Toast.makeText(this@CreateUserActivity, "Saved locally but failed to sync with server", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@CreateUserActivity, getString(R.string.toast_sync_failed), Toast.LENGTH_LONG).show()
                     btnCreate.isEnabled = true
-                    btnCreate.text = "Create EV Owner Account"
+                    btnCreate.text = getString(R.string.create_button_text)
                 }
             }
         } else {
-            Toast.makeText(this, "Error saving EV Owner", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_save_error), Toast.LENGTH_SHORT).show()
             btnCreate.isEnabled = true
-            btnCreate.text = "Create EV Owner Account"
+            btnCreate.text = getString(R.string.create_button_text)
         }
     }
 

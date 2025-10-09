@@ -7,33 +7,37 @@
     android:fillViewport="true"
     android:padding="16dp">
 
+    <!-- Main Container Layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header Section -->
+        <!-- ===== HEADER SECTION ===== -->
+        <!-- Displays the main title and description of the user management screen -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Manage User Status"
+            android:text="@string/deactivate_user_title_header"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/white"
             android:gravity="center"
             android:layout_marginBottom="8dp" />
 
+        <!-- Screen Description -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search, filter, and toggle activation for EV owners"
+            android:text="@string/deactivate_user_subtitle"
             android:textSize="16sp"
             android:textColor="@color/white"
             android:gravity="center"
             android:alpha="0.8"
             android:layout_marginBottom="32dp" />
 
-        <!-- Search Card -->
+        <!-- ===== SEARCH CARD ===== -->
+        <!-- Contains search functionality to find users by various criteria -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,24 +52,27 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- Search Icon -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔍"
+                    android:text="@string/search_icon"
                     android:textSize="32sp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Search Section Title -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Search Users"
+                    android:text="@string/search_users_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Search Input Field -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -84,7 +91,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:minHeight="56dp"
-                        android:hint="Search by NIC, Name, or Email"
+                        android:hint="@string/search_hint"
                         android:inputType="text"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
@@ -97,7 +104,8 @@
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Filter Row -->
+        <!-- ===== FILTER ROW ===== -->
+        <!-- Contains status and vehicle type filters for refined user search -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,6 +113,7 @@
             android:layout_marginBottom="16dp"
             android:gravity="center">
 
+            <!-- Status Filter Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -121,24 +130,28 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
+                    <!-- Status Filter Label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Filter by Status"
+                        android:text="@string/filter_status_label"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="4dp" />
 
+                    <!-- Status Filter Spinner -->
                     <Spinner
                         android:id="@+id/spinnerFilter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp" />
+                        android:minHeight="48dp"
+                        android:entries="@array/filter_status_options" />
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Vehicle Filter Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -155,19 +168,22 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
+                    <!-- Vehicle Filter Label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Filter by Vehicle"
+                        android:text="@string/filter_vehicle_label"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="4dp" />
 
+                    <!-- Vehicle Filter Spinner -->
                     <Spinner
                         android:id="@+id/spinnerVehicleFilter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="48dp" />
+                        android:minHeight="48dp"
+                        android:entries="@array/filter_vehicle_options" />
 
                 </LinearLayout>
 
@@ -175,7 +191,8 @@
 
         </LinearLayout>
 
-        <!-- RecyclerView for all EV Owners -->
+        <!-- ===== USERS LIST ===== -->
+        <!-- RecyclerView to display all EV owners with their current status -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -185,7 +202,8 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- Information Card -->
+        <!-- ===== INFORMATION CARD ===== -->
+        <!-- Provides helpful information about user status management -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -201,18 +219,20 @@
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
+                <!-- Information Icon -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ℹ️"
+                    android:text="@string/info_icon"
                     android:textSize="20sp"
                     android:layout_marginEnd="12dp" />
 
+                <!-- Information Text -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Toggle user status to activate or deactivate their account. Deactivated users cannot make new bookings."
+                    android:text="@string/deactivate_user_info"
                     android:textSize="12sp"
                     android:textColor="@color/white"
                     android:lineSpacingExtra="4dp" />

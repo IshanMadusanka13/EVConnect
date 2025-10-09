@@ -47,7 +47,7 @@ class DeactivateUserActivity : AppCompatActivity() {
             loadAllOwners()
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Error initializing activity: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_activity_error, e.message), Toast.LENGTH_LONG).show()
             finish()
         }
     }
@@ -61,7 +61,7 @@ class DeactivateUserActivity : AppCompatActivity() {
 
     private fun setupSpinners() {
         // Status filter spinner
-        val filterOptions = arrayOf("All", "Active", "Inactive")
+        val filterOptions = resources.getStringArray(R.array.filter_status_options)
         val filterAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filterOptions)
         filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerFilter.adapter = filterAdapter
@@ -74,7 +74,7 @@ class DeactivateUserActivity : AppCompatActivity() {
         }
 
         // Vehicle type filter spinner
-        val vehicleOptions = arrayOf("All Vehicles", "Car", "Bike")
+        val vehicleOptions = resources.getStringArray(R.array.filter_vehicle_options)
         val vehicleAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, vehicleOptions)
         vehicleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerVehicleFilter.adapter = vehicleAdapter
@@ -109,24 +109,29 @@ class DeactivateUserActivity : AppCompatActivity() {
             applyFilters()
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Error loading owners: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.toast_load_owners_error, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
     private fun applyFilters() {
         var filtered = evOwners
 
-        // Filter by status
+        // Get the string arrays first
+        val statusOptions = resources.getStringArray(R.array.filter_status_options)
+        val vehicleOptions = resources.getStringArray(R.array.filter_vehicle_options)
+
+        // Filter by status - use array indices
         val statusFilter = spinnerFilter.selectedItem.toString()
-        if (statusFilter != "All") {
+        if (statusFilter != statusOptions[0]) { // "All Users" is index 0
             filtered = filtered.filter { owner ->
-                if (statusFilter == "Active") owner.isActive else !owner.isActive
+                if (statusFilter == statusOptions[1]) owner.isActive // "Active Only" is index 1
+                else !owner.isActive // "Inactive Only" is index 2
             }
         }
 
         // Filter by vehicle type
         val vehicleFilter = spinnerVehicleFilter.selectedItem.toString()
-        if (vehicleFilter != "All Vehicles") {
+        if (vehicleFilter != vehicleOptions[0]) { // "All Vehicles" is index 0
             filtered = filtered.filter { owner ->
                 owner.vehicleType == vehicleFilter
             }
@@ -147,13 +152,13 @@ class DeactivateUserActivity : AppCompatActivity() {
     }
 
     fun showConfirmationDialogForOwner(nic: String, newStatus: Boolean) {
-        val title = if (newStatus) "Activate User" else "Deactivate User"
+        val title = if (newStatus) getString(R.string.dialog_activate_title) else getString(R.string.dialog_deactivate_title)
         val message = if (newStatus) {
-            "Are you sure you want to activate this user?\n\n✅ This will allow the user to make bookings again."
+            getString(R.string.dialog_activate_message)
         } else {
-            "Are you sure you want to deactivate this user?\n\n⚠️ Warning: Deactivated users cannot make new bookings."
+            getString(R.string.dialog_deactivate_message)
         }
-        val positiveButton = if (newStatus) "Activate" else "Deactivate"
+        val positiveButton = if (newStatus) getString(R.string.button_activate) else getString(R.string.button_deactivate)
 
         AlertDialog.Builder(this)
             .setTitle(title)
@@ -161,7 +166,7 @@ class DeactivateUserActivity : AppCompatActivity() {
             .setPositiveButton(positiveButton) { _, _ ->
                 toggleUserStatusForOwner(nic, newStatus)
             }
-            .setNegativeButton("Cancel") { dialog, _ ->
+            .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()
@@ -172,17 +177,17 @@ class DeactivateUserActivity : AppCompatActivity() {
             val success = repo.toggleActivationStatus(nic, newStatus)
 
             if (success) {
-                val statusText = if (newStatus) "activated" else "deactivated"
-                Toast.makeText(this, "User $statusText successfully", Toast.LENGTH_SHORT).show()
+                val message = if (newStatus) getString(R.string.toast_user_activated) else getString(R.string.toast_user_deactivated)
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
                 // Refresh the list
                 loadAllOwners()
             } else {
-                Toast.makeText(this, "Failed to update user status", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_update_failed), Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_update_status_error, e.message), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -227,8 +232,9 @@ class DeactivateUserActivity : AppCompatActivity() {
 
             holder.tvUserInfo.text = userInfo
 
-            val statusText = if (owner.isActive) "Active" else "Inactive"
-            holder.tvStatus.text = "Current Status: $statusText"
+            val statusOptions = resources.getStringArray(R.array.status_options)
+            val statusText = if (owner.isActive) statusOptions[0] else statusOptions[1] // "Active" and "Inactive"
+            holder.tvStatus.text = "${getString(R.string.current_status)}: $statusText"
 
             // Set background color based on status
             try {
@@ -251,11 +257,11 @@ class DeactivateUserActivity : AppCompatActivity() {
 
             if (owner.isActive) {
                 // User is active - show deactivate option
-                holder.btnToggle.text = "Deactivate User"
+                  holder.btnToggle.text = getString(R.string.button_deactivate)
                 holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_cancelled, null)
             } else {
                 // User is inactive - show activate option
-                holder.btnToggle.text = "Activate User"
+                holder.btnToggle.text = getString(R.string.button_activate)
                 holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_approved, null)
             }
 

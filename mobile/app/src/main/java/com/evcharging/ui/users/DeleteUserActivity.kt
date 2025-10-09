@@ -41,7 +41,7 @@ class DeleteUserActivity : AppCompatActivity() {
         etNIC = findViewById(R.id.etNIC)
         btnSearch = findViewById(R.id.btnSearch)
         btnDelete = findViewById(R.id.btnDeleteUser)
-        btnDeleteAll = findViewById(R.id.btnDeleteAll) // Initialize the delete all button
+        btnDeleteAll = findViewById(R.id.btnDeleteAll)
         cardUserDetails = findViewById(R.id.cardUserDetails)
         tvUserName = findViewById(R.id.tvUserName)
         tvUserEmail = findViewById(R.id.tvUserEmail)
@@ -68,7 +68,7 @@ class DeleteUserActivity : AppCompatActivity() {
         val nic = etNIC.text.toString().trim()
 
         if (nic.isEmpty()) {
-            showToast("Please enter NIC")
+            showToast(getString(R.string.toast_enter_nic))
             return
         }
 
@@ -87,23 +87,23 @@ class DeleteUserActivity : AppCompatActivity() {
                         cardUserDetails.visibility = LinearLayout.VISIBLE
                         btnDelete.visibility = Button.VISIBLE
                     } else {
-                        showToast("User not found")
+                        showToast(getString(R.string.toast_user_not_found))
                         resetUserDetails()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     showProgress(false)
-                    showToast("Error searching user: ${e.message}")
+                    showToast(getString(R.string.toast_search_error, e.message))
                 }
             }
         }
     }
 
     private fun displayUserDetails(user: com.evcharging.models.EVOwner) {
-        tvUserName.text = "Name: ${user.firstName} ${user.lastName}"
-        tvUserEmail.text = "Email: ${user.email}"
-        tvUserVehicle.text = "Vehicle: ${user.vehicleModel} (${user.vehiclePlateNumber})"
+        tvUserName.text = "${getString(R.string.user_name_label)}${user.firstName} ${user.lastName}"
+        tvUserEmail.text = "${getString(R.string.user_email_label)}${user.email}"
+        tvUserVehicle.text = "${getString(R.string.user_vehicle_label)}${user.vehicleModel} (${user.vehiclePlateNumber})"
 
         // Show additional warning if user has active bookings
         checkActiveBookings(user.nic)
@@ -117,7 +117,7 @@ class DeleteUserActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 if (hasActiveBookings) {
-                    tvWarning.text = "⚠️ WARNING: This user has active bookings. Deleting will remove all booking history permanently!"
+                    tvWarning.text = getString(R.string.warning_active_bookings)
                 }
             }
         }
@@ -125,23 +125,23 @@ class DeleteUserActivity : AppCompatActivity() {
 
     private fun showDeleteConfirmationDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Confirm Deletion")
-            .setMessage("Are you sure you want to permanently delete this user? This action cannot be undone.")
-            .setPositiveButton("Delete") { dialog, which ->
+            .setTitle(getString(R.string.dialog_delete_title))
+            .setMessage(getString(R.string.dialog_delete_message))
+            .setPositiveButton(getString(R.string.button_delete)) { dialog, which ->
                 deleteUser()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(android.R.string.cancel), null)
             .show()
     }
 
     private fun showDeleteAllConfirmationDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Delete All Users")
-            .setMessage("⚠️ DANGER: This will delete ALL users from the database! This action cannot be undone and will remove all user data permanently.")
-            .setPositiveButton("DELETE ALL") { dialog, which ->
+            .setTitle(getString(R.string.dialog_delete_all_title))
+            .setMessage(getString(R.string.dialog_delete_all_message))
+            .setPositiveButton(getString(R.string.button_delete_all)) { dialog, which ->
                 deleteAllUsers()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(android.R.string.cancel), null)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show()
     }
@@ -161,10 +161,10 @@ class DeleteUserActivity : AppCompatActivity() {
                     showProgress(false)
 
                     if (localSuccess) {
-                        showToast("User deleted successfully")
+                        showToast(getString(R.string.toast_delete_success))
                         resetForm()
                     } else {
-                        showToast("Failed to delete user from local database")
+                        showToast(getString(R.string.toast_delete_local_failed))
                     }
 
                     // Log remote deletion result
@@ -177,7 +177,7 @@ class DeleteUserActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     showProgress(false)
-                    showToast("Error deleting user: ${e.message}")
+                    showToast(getString(R.string.toast_delete_error, e.message))
                 }
             }
         }
@@ -198,10 +198,10 @@ class DeleteUserActivity : AppCompatActivity() {
                     showProgress(false)
 
                     if (success) {
-                        showToast("All users deleted successfully")
+                        showToast(getString(R.string.toast_delete_all_success))
                         resetForm()
                     } else {
-                        showToast("Failed to delete all users")
+                        showToast(getString(R.string.toast_delete_all_failed))
                     }
                 }
 
@@ -217,7 +217,7 @@ class DeleteUserActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     showProgress(false)
-                    showToast("Error deleting all users: ${e.message}")
+                    showToast(getString(R.string.toast_delete_all_error, e.message))
                 }
             }
         }

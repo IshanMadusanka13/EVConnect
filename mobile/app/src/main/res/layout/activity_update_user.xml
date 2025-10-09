@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Update EV Owner"
+            android:text="@string/update_ev_owner_title"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/primary_dark"
@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search User"
+            android:text="@string/search_user_section"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary"
@@ -45,7 +45,7 @@
                 android:id="@+id/etNIC"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter NIC to search *"
+                android:hint="@string/enter_nic_hint"
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,7 +53,7 @@
             android:id="@+id/btnSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search User"
+            android:text="@string/search_user_button"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/primary"
@@ -72,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Personal Information"
+                android:text="@string/personal_information_section"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -87,7 +87,7 @@
                     android:id="@+id/etGender"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Gender"
+                    android:hint="@string/gender_hint"
                     android:inputType="text"
                     android:focusable="false"
                     android:clickable="true" />
@@ -103,7 +103,7 @@
                     android:id="@+id/etFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="First Name *"
+                    android:hint="@string/first_name_hint"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,7 +117,7 @@
                     android:id="@+id/etLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Last Name *"
+                    android:hint="@string/last_name_hint"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -130,7 +130,7 @@
                     android:id="@+id/etDateOfBirth"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Date of Birth"
+                    android:hint="@string/date_of_birth_hint"
                     android:inputType="text"
                     android:focusable="false"
                     android:clickable="true" />
@@ -146,7 +146,7 @@
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email *"
+                    android:hint="@string/email_hint"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -160,7 +160,7 @@
                     android:id="@+id/etPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number *"
+                    android:hint="@string/phone_hint"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -173,7 +173,7 @@
                     android:id="@+id/etAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Address"
+                    android:hint="@string/address_hint"
                     android:inputType="textMultiLine"
                     android:minLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -182,7 +182,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vehicle Information"
+                android:text="@string/vehicle_information_section"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -197,7 +197,7 @@
                     android:id="@+id/etVehicleType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Type *"
+                    android:hint="@string/vehicle_type_hint"
                     android:inputType="text"
                     android:focusable="false"
                     android:clickable="true" />
@@ -213,7 +213,7 @@
                     android:id="@+id/etVehicleModel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Model *"
+                    android:hint="@string/vehicle_model_hint"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -227,7 +227,7 @@
                     android:id="@+id/etVehiclePlate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Plate Number *"
+                    android:hint="@string/vehicle_plate_hint"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -241,7 +241,7 @@
                     android:id="@+id/etBatteryCapacity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Battery Capacity *"
+                    android:hint="@string/battery_capacity_hint"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -249,7 +249,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Compatible Charger Types"
+                android:text="@string/compatible_charger_types"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -266,33 +266,33 @@
                     android:id="@+id/radioAC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="AC Charging (Standard - 7-22 kW)" />
+                    android:text="@string/ac_charging_option" />
 
                 <RadioButton
                     android:id="@+id/radioDC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="DC Fast (Rapid - 50-350 kW)" />
+                    android:text="@string/dc_fast_option" />
 
                 <RadioButton
                     android:id="@+id/radioACDC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="AC and DC (Dual compatible)"
+                    android:text="@string/ac_dc_option"
                     android:checked="true" />
 
                 <RadioButton
                     android:id="@+id/radioAll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="All Types (Full compatibility)" />
+                    android:text="@string/all_types_option" />
             </RadioGroup>
 
             <!-- Account Security Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Account Security (Leave blank to keep current password)"
+                android:text="@string/account_security_section"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
@@ -309,7 +309,7 @@
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="New Password (Optional)"
+                    android:hint="@string/new_password_hint"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -324,7 +324,7 @@
                     android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Confirm New Password"
+                    android:hint="@string/confirm_password_hint"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -333,7 +333,7 @@
                 android:id="@+id/btnUpdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Update EV Owner"
+                android:text="@string/update_ev_owner_button"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@color/primary"
