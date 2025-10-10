@@ -183,7 +183,7 @@
 
     <string name="button_creating">Creating…</string>
 
-    <!-- DeactivateUserActivity Strings -->
+    <!-- ActivateUserActivity Strings -->
     <string name="toast_activity_error">Error initializing activity: %s</string>
     <string name="toast_load_owners_error">Error loading owners: %s</string>
     <string name="toast_update_status_error">Error: %s</string>
@@ -245,5 +245,9 @@
         <item>Car</item>
         <item>Bike</item>
     </string-array>
+
+    <string name="activate_user_title_header">Activate User</string>
+    <string name="activate_user_subtitle">Activate a deactivated user account</string>
+    <string name="activate_user_info">Only inactive users can be activated. This action will restore their access to the application.</string>
 
 </resources>

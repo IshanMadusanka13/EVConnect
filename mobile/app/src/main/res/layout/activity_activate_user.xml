@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/deactivate_user_title_header"
+            android:text="@string/activate_user_title_header"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/orange_50"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/deactivate_user_subtitle"
+            android:text="@string/activate_user_subtitle"
             android:textSize="16sp"
             android:textColor="@color/orange_500"
             android:gravity="center"
@@ -219,7 +219,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/deactivate_user_info"
+                    android:text="@string/activate_user_info"
                     android:textSize="12sp"
                     android:textColor="@color/orange_50"
                     android:lineSpacingExtra="4dp" />

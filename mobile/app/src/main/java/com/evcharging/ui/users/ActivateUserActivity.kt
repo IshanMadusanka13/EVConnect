@@ -1,6 +1,5 @@
 package com.evcharging.ui.users
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.evcharging.R
@@ -23,7 +21,7 @@ import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
 import com.google.android.material.textfield.TextInputEditText
 
-class DeactivateUserActivity : AppCompatActivity() {
+class ActivateUserActivity : AppCompatActivity() {
     private lateinit var repo: EVOwnerRepository
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: EVOwnerAdapter
@@ -39,7 +37,7 @@ class DeactivateUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         try {
-            setContentView(R.layout.activity_deactivate_user)
+            setContentView(R.layout.activity_activate_user)
             repo = EVOwnerRepository(this)
             initializeViews()
             setupSpinners()
@@ -101,8 +99,8 @@ class DeactivateUserActivity : AppCompatActivity() {
         try {
             evOwners = repo.getAllLocalOwners()
             filteredOwners = evOwners
-            adapter = EVOwnerAdapter(filteredOwners) { nic, newStatus ->
-                showConfirmationDialogForOwner(nic, newStatus)
+            adapter = EVOwnerAdapter(filteredOwners) { nic ->
+                showConfirmationDialogForOwner(nic)
             }
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(this)
@@ -151,20 +149,12 @@ class DeactivateUserActivity : AppCompatActivity() {
         adapter.updateList(filteredOwners)
     }
 
-    fun showConfirmationDialogForOwner(nic: String, newStatus: Boolean) {
-        val title = if (newStatus) getString(R.string.dialog_activate_title) else getString(R.string.dialog_deactivate_title)
-        val message = if (newStatus) {
-            getString(R.string.dialog_activate_message)
-        } else {
-            getString(R.string.dialog_deactivate_message)
-        }
-        val positiveButton = if (newStatus) getString(R.string.button_activate) else getString(R.string.button_deactivate)
-
+    fun showConfirmationDialogForOwner(nic: String) {
         AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(positiveButton) { _, _ ->
-                toggleUserStatusForOwner(nic, newStatus)
+            .setTitle(getString(R.string.dialog_activate_title))
+            .setMessage(getString(R.string.dialog_activate_message))
+            .setPositiveButton(getString(R.string.button_activate)) { _, _ ->
+                activateUser(nic)
             }
             .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
@@ -172,14 +162,12 @@ class DeactivateUserActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun toggleUserStatusForOwner(nic: String, newStatus: Boolean) {
+    private fun activateUser(nic: String) {
         try {
-            val success = repo.toggleActivationStatus(nic, newStatus)
+            val success = repo.toggleActivationStatus(nic, true)
 
             if (success) {
-                val message = if (newStatus) getString(R.string.toast_user_activated) else getString(R.string.toast_user_deactivated)
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-
+                Toast.makeText(this, getString(R.string.toast_user_activated), Toast.LENGTH_SHORT).show()
                 // Refresh the list
                 loadAllOwners()
             } else {
@@ -197,7 +185,7 @@ class DeactivateUserActivity : AppCompatActivity() {
 
     inner class EVOwnerAdapter(
         private var owners: List<EVOwner>,
-        private val onToggleClick: (String, Boolean) -> Unit
+        private val onActivateClick: (String) -> Unit
     ) : RecyclerView.Adapter<EVOwnerAdapter.ViewHolder>() {
 
         fun updateList(newList: List<EVOwner>) {
@@ -208,7 +196,7 @@ class DeactivateUserActivity : AppCompatActivity() {
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val tvUserInfo: TextView = itemView.findViewById(R.id.tvUserInfoItem)
             val tvStatus: TextView = itemView.findViewById(R.id.tvStatusItem)
-            val btnToggle: Button = itemView.findViewById(R.id.btnToggleItem)
+            val btnActivate: Button = itemView.findViewById(R.id.btnToggleItem)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -255,18 +243,16 @@ class DeactivateUserActivity : AppCompatActivity() {
 
             holder.tvStatus.setTextColor(resources.getColor(android.R.color.white, null))
 
+            // Only show activate button for inactive users
             if (owner.isActive) {
-                // User is active - show deactivate option
-                  holder.btnToggle.text = getString(R.string.button_deactivate)
-                holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_cancelled, null)
+                holder.btnActivate.visibility = View.GONE
             } else {
-                // User is inactive - show activate option
-                holder.btnToggle.text = getString(R.string.button_activate)
-                holder.btnToggle.backgroundTintList = resources.getColorStateList(R.color.status_approved, null)
-            }
-
-            holder.btnToggle.setOnClickListener {
-                onToggleClick(owner.nic, !owner.isActive)
+                holder.btnActivate.visibility = View.VISIBLE
+                holder.btnActivate.text = getString(R.string.button_activate)
+                holder.btnActivate.backgroundTintList = resources.getColorStateList(R.color.status_approved, null)
+                holder.btnActivate.setOnClickListener {
+                    onActivateClick(owner.nic)
+                }
             }
         }
 

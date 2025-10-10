@@ -174,7 +174,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/deactivate_user_title"
+                    android:text="@string/activate_user_title_header"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />

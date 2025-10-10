@@ -87,9 +87,9 @@
             android:parentActivityName=".ui.users.UserActivity" />
 
         <activity
-            android:name=".ui.users.DeactivateUserActivity"
+            android:name=".ui.users.ActivateUserActivity"
             android:exported="false"
-            android:label="Deactivate User"
+            android:label="Activate User"
             android:parentActivityName=".ui.users.UserActivity" />
 
         <activity

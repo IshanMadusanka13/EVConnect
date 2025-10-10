@@ -4,10 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.evcharging.ui.users.CreateUserActivity
-import com.evcharging.ui.users.UpdateUserActivity
-import com.evcharging.ui.users.DeactivateUserActivity
-import com.evcharging.ui.users.DeleteUserActivity
 import com.evcharging.R
 
 class UserActivity : AppCompatActivity() {
@@ -27,7 +23,7 @@ class UserActivity : AppCompatActivity() {
 
         // Deactivate User Card
         findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
-            startActivity(Intent(this, DeactivateUserActivity::class.java))
+            startActivity(Intent(this, ActivateUserActivity::class.java))
         }
 
         // Delete User Card
