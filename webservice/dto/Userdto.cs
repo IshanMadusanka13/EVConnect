@@ -1,14 +1,50 @@
 namespace webservice.dto
 {
+    /// <summary>
+    /// Data transfer object representing a user in the system.
+    /// Used for user registration, profile retrieval, and general user management operations.
+    /// Contains all essential user information including authentication and role details.
+    /// </summary>
     public class UserDTO
     {
-        public string EmployeeId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string Role { get; set; }
+        /// <summary>
+        /// Unique identifier for the employee in the organization
+        /// </summary>
+        public string EmployeeId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// First name of the user
+        /// </summary>
+        public string FirstName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Last name of the user
+        /// </summary>
+        public string LastName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Contact phone number of the user
+        /// </summary>
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Email address used for login and communications
+        /// </summary>
+        public string Email { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Password for user authentication
+        /// </summary>
+        public string Password { get; set; } = string.Empty;
+
+        /// <summary>
+        /// User's role in the system (e.g., Admin, Station Manager)
+        /// </summary>
+        public string Role { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Indicates whether the user account is currently active
+        /// </summary>
         public bool IsActive { get; set; }
     }
 }

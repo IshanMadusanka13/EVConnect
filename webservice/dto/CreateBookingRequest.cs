@@ -1,4 +1,13 @@
-﻿namespace webservice.dto
+﻿/*
+ * CreateBookingRequest.cs
+ * 
+ * DTO for creating new charging station bookings.
+ * Contains all necessary information for booking a charging slot,
+ * including station, user, timing, and charger type details.
+ * Optional SlotId allows for specific slot selection.
+ */
+
+namespace webservice.dto
 {
     public class CreateBookingRequest
     {

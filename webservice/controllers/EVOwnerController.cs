@@ -1,3 +1,13 @@
+/*
+ * EVOwnerController.cs
+ * 
+ * API Controller for managing Electric Vehicle owners in the system.
+ * Provides endpoints for creating, updating, and querying EV owner information,
+ * as well as managing their account status (active/inactive).
+ * 
+ * Dependencies: EVOwnerService, MongoDB
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

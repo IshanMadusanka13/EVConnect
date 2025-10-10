@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+ * StationScheduleService.cs
+ * 
+ * Service class managing charging station operating schedules.
+ * Handles the configuration and querying of station operating hours,
+ * including real-time availability checking.
+ * 
+ * Features:
+ * - Operating hours management per day of week
+ * - Real-time station availability checking
+ * - Schedule queries by station, day, or current time
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;

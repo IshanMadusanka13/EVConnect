@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ * Slot.cs
+ * 
+ * Model class representing a charging slot within a station.
+ * Contains information about the slot's number, type of charger,
+ * operational status, and its associated station.
+ * 
+ * Relationships:
+ * - Station (via StationId)
+ * - SlotType (via ChargerType)
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

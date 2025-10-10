@@ -1,3 +1,13 @@
+/*
+ * StationController.cs
+ * 
+ * API Controller for managing EV charging stations.
+ * Provides endpoints for creating, updating, and querying station information,
+ * managing station status, and retrieving detailed station information including slots.
+ * 
+ * Dependencies: StationService, MongoDB
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;

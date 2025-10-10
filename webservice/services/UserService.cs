@@ -1,3 +1,22 @@
+/*
+ * UserService.cs
+ * 
+ * Service class managing system user accounts and authentication.
+ * Handles user creation, authentication, and profile management
+ * with secure password handling and logging.
+ * 
+ * Features:
+ * - User CRUD operations
+ * - Secure password hashing using SHA256
+ * - Authentication with email/password
+ * - Operation logging
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ * - ILogger for operation logging
+ * - System.Security.Cryptography for password hashing
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;

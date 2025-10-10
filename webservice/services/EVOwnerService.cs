@@ -1,3 +1,19 @@
+/*
+ * EVOwnerService.cs
+ * 
+ * Service class managing Electric Vehicle owner accounts and operations.
+ * Handles user registration, profile management, account status,
+ * and search functionality for EV owners.
+ * 
+ * Features:
+ * - CRUD operations for EV owner profiles
+ * - Account activation/deactivation
+ * - Search functionality across owner details
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,3 +1,20 @@
+/*
+ * JwtService.cs
+ * 
+ * Service class handling JWT (JSON Web Token) generation and management.
+ * Provides authentication and authorization functionality through token generation
+ * with configurable settings for token lifetime and claims.
+ * 
+ * Features:
+ * - Token generation with user claims
+ * - Configurable token expiration
+ * - Custom issuer and audience support
+ * 
+ * Dependencies:
+ * - Microsoft.IdentityModel.Tokens for JWT operations
+ * - IConfiguration for app settings
+ */
+
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

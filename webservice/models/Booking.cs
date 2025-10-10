@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * Booking.cs
+ * 
+ * Model class representing a charging station booking.
+ * Contains all information about a booking including the user, station, slot,
+ * timing details, status, and cancellation information if applicable.
+ * 
+ * Relationships:
+ * - EVOwner (via NIC)
+ * - Station (via StationId)
+ * - Slot (via SlotId)
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

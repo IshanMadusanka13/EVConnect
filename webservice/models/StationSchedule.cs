@@ -1,3 +1,14 @@
+/*
+ * StationSchedule.cs
+ * 
+ * Model class representing the operating schedule of a charging station.
+ * Defines the opening and closing times for each day of the week,
+ * allowing stations to set and manage their operating hours.
+ * 
+ * Relationships:
+ * - Station (via StationId)
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

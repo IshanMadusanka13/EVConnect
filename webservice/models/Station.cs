@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * Station.cs
+ * 
+ * Model class representing an EV charging station.
+ * Contains information about the station's location, operational status,
+ * and the operator responsible for managing it.
+ * 
+ * Relationships:
+ * - User (via OperatorId)
+ * - Slots (one-to-many)
+ * - StationSchedule (one-to-many)
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

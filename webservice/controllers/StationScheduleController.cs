@@ -1,4 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*
+ * StationScheduleController.cs
+ * 
+ * API Controller for managing charging station operating schedules.
+ * Provides endpoints for creating, updating, and querying station schedules,
+ * checking station availability by day and time, and managing operating hours.
+ * 
+ * Dependencies: StationScheduleService, MongoDB
+ */
+
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

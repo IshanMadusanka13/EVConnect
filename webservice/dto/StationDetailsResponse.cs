@@ -1,3 +1,11 @@
+/*
+ * StationDetailsResponse.cs
+ * 
+ * DTO for providing comprehensive station information.
+ * Combines station details with its associated slots and schedules
+ * in a single response for efficient data retrieval.
+ */
+
 using System.Collections.Generic;
 using webservice.models;
 

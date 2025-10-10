@@ -1,3 +1,13 @@
+/*
+ * SlotController.cs
+ * 
+ * API Controller for managing charging slots at EV charging stations.
+ * Provides endpoints for creating, updating, and querying slot information,
+ * managing operational status, and retrieving slots by various criteria.
+ * 
+ * Dependencies: SlotService, MongoDB
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

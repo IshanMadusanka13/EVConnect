@@ -1,3 +1,13 @@
+/*
+ * UserController.cs
+ * 
+ * API Controller for managing user accounts and authentication.
+ * Provides endpoints for user registration, authentication, profile management,
+ * and JWT token-based authorization.
+ * 
+ * Dependencies: UserService, JwtService, MongoDB
+ */
+
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;

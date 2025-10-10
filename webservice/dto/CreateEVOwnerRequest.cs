@@ -1,3 +1,11 @@
+/*
+ * CreateEVOwnerRequest.cs
+ * 
+ * DTO for registering new EV owners in the system.
+ * Contains comprehensive user profile information including
+ * personal details, contact information, and vehicle specifications.
+ */
+
 namespace webservice.dto
 {
     public class CreateEVOwnerRequest

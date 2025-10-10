@@ -1,4 +1,15 @@
 ﻿
+/*
+ * User.cs
+ * 
+ * Model class representing system users (employees/staff).
+ * Contains information about user accounts including personal details,
+ * authentication credentials, and role-based access control.
+ * 
+ * Dependencies:
+ * - MongoDB.Bson for document storage and ID representation
+ */
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using webservice.models;

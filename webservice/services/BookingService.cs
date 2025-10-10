@@ -1,3 +1,17 @@
+/*
+ * BookingService.cs
+ * 
+ * Service class handling all booking-related business logic.
+ * Manages the creation, modification, and querying of charging station bookings.
+ * Includes functionality for availability checking, conflict detection,
+ * and automatic slot assignment.
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ * - SlotService for slot management
+ * - StationScheduleService for operating hours validation
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

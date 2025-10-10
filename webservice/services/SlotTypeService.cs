@@ -1,3 +1,19 @@
+/*
+ * SlotTypeService.cs
+ * 
+ * Service class managing different types of charging slots.
+ * Handles the configuration and management of charging slot types,
+ * including their pricing and characteristics.
+ * 
+ * Features:
+ * - Automatic ID generation for new slot types
+ * - CRUD operations for slot type configurations
+ * - Rate management for different charger types
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

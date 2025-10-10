@@ -1,3 +1,21 @@
+/*
+ * StationService.cs
+ * 
+ * Service class managing charging stations and their operations.
+ * Handles station creation, updates, and status management while
+ * coordinating with related services for slots and schedules.
+ * 
+ * Features:
+ * - Station CRUD operations with automatic ID generation
+ * - Active status management with booking validation
+ * - Detailed station information retrieval
+ * - Logging for operation tracking
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ * - ILogger for operation logging
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,3 +1,13 @@
+/*
+ * SlotTypeController.cs
+ * 
+ * API Controller for managing different types of charging slots.
+ * Provides endpoints for creating, updating, and querying slot types,
+ * which define the characteristics and capabilities of charging slots.
+ * 
+ * Dependencies: SlotTypeService, MongoDB
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

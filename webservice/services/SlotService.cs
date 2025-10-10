@@ -1,3 +1,19 @@
+/*
+ * SlotService.cs
+ * 
+ * Service class managing charging slots at stations.
+ * Handles the creation, modification, and querying of individual charging slots,
+ * including their operational status and type information.
+ * 
+ * Features:
+ * - Automatic slot numbering for new slots
+ * - Operational status management
+ * - Filtering by station and charger type
+ * 
+ * Dependencies:
+ * - MongoDB for data persistence
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

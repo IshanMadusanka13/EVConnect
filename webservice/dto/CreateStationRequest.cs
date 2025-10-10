@@ -1,4 +1,15 @@
-﻿using webservice.models;
+﻿/*
+ * CreateStationRequest.cs
+ * 
+ * DTO for creating new charging stations.
+ * Contains comprehensive station information including location,
+ * charging slots configuration, and operating schedules.
+ * 
+ * Includes nested DTOs for slot configurations and schedules
+ * to handle complex station setup in a single request.
+ */
+
+using webservice.models;
 
 namespace webservice.dto
 {

@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*
+ * EVOwner.cs
+ * 
+ * Model class representing an Electric Vehicle owner/user.
+ * Contains personal information, vehicle details, and account status.
+ * Uses NIC (National Identity Card) as the primary identifier.
+ * 
+ * Dependencies:
+ * - MongoDB.Bson for document storage
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
