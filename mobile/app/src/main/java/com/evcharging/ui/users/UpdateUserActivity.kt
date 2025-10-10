@@ -2,6 +2,7 @@ package com.evcharging.ui.users
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -39,7 +40,9 @@ class UpdateUserActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var etConfirmPassword: EditText
     private lateinit var btnUpdate: Button
+    private lateinit var btnDeactivate: Button // New deactivate button
     private lateinit var formContainer: LinearLayout
+    private lateinit var tvStatus: TextView // New status display
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +74,8 @@ class UpdateUserActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
         btnUpdate = findViewById(R.id.btnUpdate)
+        btnDeactivate = findViewById(R.id.btnDeactivate) // Initialize deactivate button
+        tvStatus = findViewById(R.id.tvStatus) // Initialize status text
         formContainer = findViewById(R.id.formContainer)
     }
 
@@ -99,6 +104,11 @@ class UpdateUserActivity : AppCompatActivity() {
         btnUpdate.setOnClickListener {
             updateEVOwner()
         }
+
+        // Deactivate Button
+        btnDeactivate.setOnClickListener {
+            deactivateUser()
+        }
     }
 
     private fun searchUser() {
@@ -112,6 +122,7 @@ class UpdateUserActivity : AppCompatActivity() {
         if (owner != null) {
             currentOwner = owner
             populateForm(owner)
+            updateStatusDisplay(owner.isActive)
             formContainer.visibility = LinearLayout.VISIBLE
             Toast.makeText(this, getString(R.string.toast_user_found), Toast.LENGTH_SHORT).show()
         } else {
@@ -144,6 +155,33 @@ class UpdateUserActivity : AppCompatActivity() {
         // Clear password fields for security
         etPassword.setText("")
         etConfirmPassword.setText("")
+    }
+
+    private fun updateStatusDisplay(isActive: Boolean) {
+        val statusText = if (isActive) {
+            getString(R.string.status_active)
+        } else {
+            getString(R.string.status_inactive)
+        }
+
+        tvStatus.text = "${getString(R.string.current_status)}: $statusText"
+
+        // Set background color based on status
+        if (isActive) {
+            tvStatus.setBackgroundColor(resources.getColor(R.color.status_approved, null))
+            btnDeactivate.visibility = View.VISIBLE
+            btnDeactivate.text = getString(R.string.button_deactivate)
+            btnDeactivate.backgroundTintList = resources.getColorStateList(R.color.status_cancelled, null)
+
+            // Make deactivate button smaller
+            btnDeactivate.textSize = 14f
+            btnDeactivate.setPadding(0, 8, 0, 8)
+        } else {
+            tvStatus.setBackgroundColor(resources.getColor(R.color.status_cancelled, null))
+            btnDeactivate.visibility = View.GONE // Hide deactivate button for inactive users
+        }
+
+        tvStatus.setTextColor(resources.getColor(android.R.color.white, null))
     }
 
     private fun showDatePicker() {
@@ -316,17 +354,59 @@ class UpdateUserActivity : AppCompatActivity() {
                 val response = repo.updateRemote(updatedOwner)
                 if (response != null) {
                     Toast.makeText(this@UpdateUserActivity, getString(R.string.toast_updated_server), Toast.LENGTH_SHORT).show()
-                    finish()
+                    currentOwner = updatedOwner
+                    updateStatusDisplay(updatedOwner.isActive)
                 } else {
                     Toast.makeText(this@UpdateUserActivity, getString(R.string.toast_sync_failed), Toast.LENGTH_LONG).show()
-                    btnUpdate.isEnabled = true
-                    btnUpdate.text = getString(R.string.update_ev_owner_button)
                 }
+                btnUpdate.isEnabled = true
+                btnUpdate.text = getString(R.string.update_ev_owner_button)
             }
         } else {
             Toast.makeText(this, getString(R.string.toast_update_local_failed), Toast.LENGTH_SHORT).show()
             btnUpdate.isEnabled = true
             btnUpdate.text = getString(R.string.update_ev_owner_button)
+        }
+    }
+
+    private fun deactivateUser() {
+        if (currentOwner == null) {
+            Toast.makeText(this, getString(R.string.toast_search_first), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_deactivate_title))
+            .setMessage(getString(R.string.dialog_deactivate_message))
+            .setPositiveButton(getString(R.string.button_deactivate)) { _, _ ->
+                performDeactivation()
+            }
+            .setNegativeButton(getString(android.R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun performDeactivation() {
+        if (currentOwner == null) return
+
+        try {
+            val success = repo.toggleActivationStatus(currentOwner!!.nic, false)
+
+            if (success) {
+                Toast.makeText(this, getString(R.string.toast_user_deactivated), Toast.LENGTH_SHORT).show()
+                // Refresh the current owner data
+                val updatedOwner = repo.getLocalOwner(currentOwner!!.nic)
+                if (updatedOwner != null) {
+                    currentOwner = updatedOwner
+                    updateStatusDisplay(updatedOwner.isActive)
+                }
+            } else {
+                Toast.makeText(this, getString(R.string.toast_update_failed), Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, getString(R.string.toast_update_status_error, e.message), Toast.LENGTH_SHORT).show()
         }
     }
 }

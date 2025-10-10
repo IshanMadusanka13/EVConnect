@@ -71,6 +71,19 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <!-- Status Display -->
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/current_status_placeholder"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:padding="8dp"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
             <!-- Personal Information Section -->
             <TextView
                 android:layout_width="wrap_content"
@@ -385,7 +398,22 @@
                 android:backgroundTint="@color/purple_500"
                 android:paddingVertical="16dp"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Deactivate Button -->
+            <Button
+                android:id="@+id/btnDeactivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/button_deactivate"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:backgroundTint="@color/status_cancelled"
+                android:paddingVertical="16dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 
