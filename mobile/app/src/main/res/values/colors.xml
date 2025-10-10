@@ -4,32 +4,38 @@
     <color name="primary">#3B82F6</color>
     <color name="primary_dark">#1E40AF</color>
     <color name="primary_light">#93C5FD</color>
-    
+
     <!-- Secondary Colors -->
     <color name="secondary">#8B5CF6</color>
     <color name="secondary_dark">#6D28D9</color>
     <color name="secondary_light">#C4B5FD</color>
-    
+
     <!-- Accent Colors -->
     <color name="accent">#EC4899</color>
-    
+
     <!-- Status Colors -->
     <color name="status_pending">#F59E0B</color>
     <color name="status_approved">#3B82F6</color>
     <color name="status_in_progress">#10B981</color>
     <color name="status_completed">#6366F1</color>
     <color name="status_cancelled">#EF4444</color>
-    
+
     <!-- Background Colors -->
     <color name="background_light">#F5F5F5</color>
     <color name="background_white">#FFFFFF</color>
     <color name="background_dark">#111827</color>
-    
+
+    <!-- Surface Colors (for cards, dialogs, etc.) -->
+    <color name="surface_dark">#1F2937</color>
+    <color name="surface_variant_dark">#374151</color>
+    <color name="outline_dark">#4B5563</color>
+
     <!-- Text Colors -->
-    <color name="text_primary">#111827</color>
-    <color name="text_secondary">#6B7280</color>
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#D1D5DB</color>
     <color name="text_tertiary">#9CA3AF</color>
-    
+    <color name="text_disabled">#6B7280</color>
+
     <!-- Common Colors -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -40,4 +46,65 @@
     <color name="warning_dark">#D97706</color>
     <color name="danger">#EF4444</color>
     <color name="danger_dark">#DC2626</color>
+
+    <!-- Semantic Colors -->
+    <color name="success">#10B981</color>
+    <color name="error">#EF4444</color>
+    <color name="info">#3B82F6</color>
+
+    <!-- Transparent overlays -->
+    <color name="overlay_white_10">#1AFFFFFF</color>
+    <color name="overlay_white_20">#33FFFFFF</color>
+    <color name="overlay_dark_10">#1A000000</color>
+
+    <!-- Green Color Palette -->
+    <color name="green_50">#ECFDF5</color>
+    <color name="green_100">#D1FAE5</color>
+    <color name="green_200">#A7F3D0</color>
+    <color name="green_300">#6EE7B7</color>
+    <color name="green_400">#34D399</color>
+    <color name="green_500">#10B981</color>
+    <color name="green_600">#059669</color>
+    <color name="green_700">#047857</color>
+    <color name="green_800">#065F46</color>
+    <color name="green_900">#064E3B</color>
+
+    <!-- Purple / Lavender Color Palette -->
+    <color name="purple_50">#FAF5FF</color>
+    <color name="purple_100">#F3E8FF</color>
+    <color name="purple_200">#E9D5FF</color>
+    <color name="purple_300">#D8B4FE</color>
+    <color name="purple_400">#C084FC</color>
+    <color name="purple_500">#A855F7</color>
+    <color name="purple_600">#9333EA</color>
+    <color name="purple_700">#7E22CE</color>
+    <color name="purple_800">#6B21A8</color>
+    <color name="purple_900">#581C87</color>
+
+    <!-- Orange Color Palette -->
+    <color name="orange_50">#FFF7ED</color>
+    <color name="orange_100">#FFEDD5</color>
+    <color name="orange_200">#FED7AA</color>
+    <color name="orange_300">#FDBA74</color>
+    <color name="orange_400">#FB923C</color>
+    <color name="orange_500">#F97316</color>
+    <color name="orange_600">#EA580C</color>
+    <color name="orange_700">#C2410C</color>
+    <color name="orange_800">#9A3412</color>
+    <color name="orange_900">#7C2D12</color>
+
+    <!-- Red Color Palette -->
+    <color name="red_50">#FEF2F2</color>
+    <color name="red_100">#FEE2E2</color>
+    <color name="red_200">#FECACA</color>
+    <color name="red_300">#FCA5A5</color>
+    <color name="red_400">#F87171</color>
+    <color name="red_500">#EF4444</color>
+    <color name="red_600">#DC2626</color>
+    <color name="red_700">#B91C1C</color>
+    <color name="red_800">#991B1B</color>
+    <color name="red_900">#7F1D1D</color>
+
+    <!-- Darkest Green for Text -->
+    <color name="text_green_darkest">#022C22</color>
 </resources>

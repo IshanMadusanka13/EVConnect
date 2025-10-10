@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="@color/orange_50"
     android:layout_marginBottom="12dp">
 
     <LinearLayout
@@ -14,16 +14,18 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- User Info Text -->
         <TextView
             android:id="@+id/tvUserInfoItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/user_information"
             android:textSize="14sp"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/orange_900"
             android:lineSpacingExtra="4dp"
             android:layout_marginBottom="12dp" />
 
+        <!-- Status Label -->
         <TextView
             android:id="@+id/tvStatusItem"
             android:layout_width="wrap_content"
@@ -35,19 +37,20 @@
             android:layout_marginBottom="16dp"
             android:paddingHorizontal="12dp"
             android:paddingVertical="6dp"
-            android:background="@drawable/bg_status_active"
-            android:textColor="@color/white" />
+            android:background="@drawable/bg_status_orange"
+            android:textColor="@color/orange_50" />
 
+        <!-- Toggle Button -->
         <Button
             android:id="@+id/btnToggleItem"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="@string/toggle_user_status"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/orange_50"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:backgroundTint="@color/primary"
+            android:backgroundTint="@color/orange_600"
             style="@style/Widget.MaterialComponents.Button"
             android:elevation="2dp"
             android:stateListAnimator="@null" />

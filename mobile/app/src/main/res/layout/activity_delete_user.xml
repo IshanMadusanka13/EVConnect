@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_dashboard"
+    android:background="@drawable/card_background_danger"
     android:fillViewport="true"
     android:padding="20dp">
 
@@ -19,7 +19,7 @@
             android:text="@string/delete_user_title"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/red_900"
             android:gravity="center"
             android:layout_marginBottom="30dp" />
 
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/enter_nic_label"
-                android:textColor="@color/white"
+                android:textColor="@color/red_800"
                 android:layout_marginBottom="8dp" />
 
             <EditText
@@ -44,8 +44,8 @@
                 android:background="@drawable/edit_text_background"
                 android:inputType="text"
                 android:padding="12dp"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
+                android:textColor="@color/red_900"
+                android:textColorHint="@color/red_600"
                 tools:ignore="SpeakableTextPresentCheck" />
         </LinearLayout>
 
@@ -56,7 +56,8 @@
             android:layout_height="wrap_content"
             android:text="@string/search_user_button"
             android:layout_marginBottom="24dp"
-            android:background="@color/design_default_color_primary" />
+            android:backgroundTint="@color/red_500"
+            android:textColor="@color/red_50" />
 
         <!-- User Details Card (Visible after search) -->
         <LinearLayout
@@ -66,7 +67,7 @@
             android:layout_marginBottom="24dp"
             android:visibility="gone"
             android:orientation="vertical"
-            android:background="@drawable/card_background"
+            android:background="@color/red_50"
             android:padding="16dp">
 
             <TextView
@@ -75,7 +76,7 @@
                 android:text="@string/user_details_title"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"
+                android:textColor="@color/red_900"
                 android:layout_marginBottom="16dp" />
 
             <TextView
@@ -83,7 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/user_name_label"
-                android:textColor="@color/black"
+                android:textColor="@color/red_800"
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -91,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/user_email_label"
-                android:textColor="@color/black"
+                android:textColor="@color/red_800"
                 android:layout_marginBottom="8dp" />
 
             <TextView
@@ -99,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/user_vehicle_label"
-                android:textColor="@color/black"
+                android:textColor="@color/red_800"
                 android:layout_marginBottom="16dp" />
 
             <!-- Warning Message -->
@@ -108,10 +109,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/delete_warning"
-                android:textColor="@color/red"
+                android:textColor="@color/red_600"
                 android:textSize="14sp"
                 android:layout_marginBottom="16dp" />
-
         </LinearLayout>
 
         <!-- Delete Button -->
@@ -120,7 +120,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/delete_user_permanently"
-            android:background="@color/red"
+            android:backgroundTint="@color/red_700"
+            android:textColor="@color/red_50"
             android:visibility="gone" />
 
         <!-- Delete All Button -->
@@ -129,7 +130,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/delete_all_users"
-            android:backgroundTint="@color/red"
+            android:backgroundTint="@color/red_700"
+            android:textColor="@color/red_50"
             android:layout_marginBottom="16dp" />
 
         <!-- Progress Bar -->

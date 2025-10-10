@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_dashboard"
+    android:background="@drawable/card_background_warning"
     android:fillViewport="true"
     android:padding="16dp">
 
@@ -14,14 +14,13 @@
         android:orientation="vertical">
 
         <!-- ===== HEADER SECTION ===== -->
-        <!-- Displays the main title and description of the user management screen -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/deactivate_user_title_header"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="@color/orange_50"
             android:gravity="center"
             android:layout_marginBottom="8dp" />
 
@@ -31,19 +30,18 @@
             android:layout_height="wrap_content"
             android:text="@string/deactivate_user_subtitle"
             android:textSize="16sp"
-            android:textColor="@color/white"
+            android:textColor="@color/orange_500"
             android:gravity="center"
-            android:alpha="0.8"
+            android:alpha="0.9"
             android:layout_marginBottom="32dp" />
 
         <!-- ===== SEARCH CARD ===== -->
-        <!-- Contains search functionality to find users by various criteria -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/orange_50"
             android:layout_marginBottom="24dp">
 
             <LinearLayout
@@ -58,6 +56,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/search_icon"
                     android:textSize="32sp"
+                    android:textColor="@color/orange_600"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp" />
 
@@ -68,7 +67,7 @@
                     android:text="@string/search_users_title"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/orange_800"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp" />
 
@@ -77,12 +76,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:minHeight="56dp"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxBackgroundColor="@color/background_light"
+                    app:boxBackgroundColor="@color/orange_100"
                     app:errorEnabled="true"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
@@ -90,10 +88,9 @@
                         android:id="@+id/etSearch"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:minHeight="56dp"
                         android:hint="@string/search_hint"
                         android:inputType="text"
-                        android:textColor="@color/text_primary"
+                        android:textColor="@color/orange_900"
                         android:textSize="16sp"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp" />
@@ -105,7 +102,6 @@
         </androidx.cardview.widget.CardView>
 
         <!-- ===== FILTER ROW ===== -->
-        <!-- Contains status and vehicle type filters for refined user search -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,9 +116,8 @@
                 android:layout_weight="1"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/white"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp">
+                app:cardBackgroundColor="@color/orange_50"
+                android:layout_marginEnd="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -130,16 +125,14 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
-                    <!-- Status Filter Label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_status_label"
                         android:textSize="12sp"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/orange_700"
                         android:layout_marginBottom="4dp" />
 
-                    <!-- Status Filter Spinner -->
                     <Spinner
                         android:id="@+id/spinnerFilter"
                         android:layout_width="match_parent"
@@ -158,9 +151,8 @@
                 android:layout_weight="1"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/white"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp">
+                app:cardBackgroundColor="@color/orange_50"
+                android:layout_marginStart="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -168,16 +160,14 @@
                     android:orientation="vertical"
                     android:padding="12dp">
 
-                    <!-- Vehicle Filter Label -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/filter_vehicle_label"
                         android:textSize="12sp"
-                        android:textColor="@color/text_secondary"
+                        android:textColor="@color/orange_700"
                         android:layout_marginBottom="4dp" />
 
-                    <!-- Vehicle Filter Spinner -->
                     <Spinner
                         android:id="@+id/spinnerVehicleFilter"
                         android:layout_width="match_parent"
@@ -192,7 +182,6 @@
         </LinearLayout>
 
         <!-- ===== USERS LIST ===== -->
-        <!-- RecyclerView to display all EV owners with their current status -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -203,13 +192,12 @@
             android:layout_marginBottom="16dp" />
 
         <!-- ===== INFORMATION CARD ===== -->
-        <!-- Provides helpful information about user status management -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="#20FFFFFF"
+            app:cardBackgroundColor="@color/orange_700"
             android:layout_marginTop="8dp">
 
             <LinearLayout
@@ -219,22 +207,21 @@
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <!-- Information Icon -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/info_icon"
                     android:textSize="20sp"
+                    android:textColor="@color/orange_50"
                     android:layout_marginEnd="12dp" />
 
-                <!-- Information Text -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/deactivate_user_info"
                     android:textSize="12sp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/orange_50"
                     android:lineSpacingExtra="4dp" />
 
             </LinearLayout>
