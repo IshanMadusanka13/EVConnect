@@ -59,23 +59,6 @@ data class Slot(
 ) : Serializable
 
 /**
- * EV Owner entity
- */
-data class EVOwner(
-    @SerializedName("nic") val nic: String = "",
-    @SerializedName("firstName") val firstName: String = "",
-    @SerializedName("lastName") val lastName: String = "",
-    @SerializedName("email") val email: String = "",
-    @SerializedName("phoneNumber") val phoneNumber: String = "",
-    @SerializedName("vehicleModel") val vehicleModel: String = "",
-    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String = "",
-    @SerializedName("batteryCapacity") val batteryCapacity: String = "",
-    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "",
-    @SerializedName("gender") val gender: String = "",
-    @SerializedName("isActive") val isActive: Boolean = true
-) : Serializable
-
-/**
  * Station details with slots and schedules
  */
 data class StationDetails(
@@ -196,4 +179,53 @@ data class DashboardStats(
     val approvedReservations: Int = 0,
     val completedReservations: Int = 0,
     val totalRevenue: Double = 0.0
+)
+
+/**
+ * EV Owner entity - Updated to match web app
+ */
+data class EVOwner(
+    @SerializedName("nic") val nic: String = "",
+    @SerializedName("firstName") val firstName: String = "",
+    @SerializedName("lastName") val lastName: String = "",
+    @SerializedName("dateOfBirth") val dateOfBirth: String? = null,
+    @SerializedName("gender") val gender: String = "",
+    @SerializedName("email") val email: String = "",
+    @SerializedName("phoneNumber") val phoneNumber: String = "",
+    @SerializedName("address") val address: String = "",
+    @SerializedName("password") val password: String = "",
+    @SerializedName("vehicleType") val vehicleType: String = "Car",
+    @SerializedName("vehicleModel") val vehicleModel: String = "",
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String = "",
+    @SerializedName("batteryCapacity") val batteryCapacity: String = "",
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "AC,DC",
+    @SerializedName("isActive") val isActive: Boolean = true
+) : Serializable
+
+/**
+ * Request model for creating EV owner with password
+ */
+data class CreateEVOwnerRequest(
+    @SerializedName("nic") val nic: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("dateOfBirth") val dateOfBirth: String? = null,
+    @SerializedName("gender") val gender: String = "",
+    @SerializedName("email") val email: String,
+    @SerializedName("phoneNumber") val phoneNumber: String,
+    @SerializedName("address") val address: String = "",
+    @SerializedName("password") val password: String,
+    @SerializedName("vehicleType") val vehicleType: String = "Car",
+    @SerializedName("vehicleModel") val vehicleModel: String,
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String,
+    @SerializedName("batteryCapacity") val batteryCapacity: String,
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "AC,DC"
+)
+
+/**
+ * Response model for EV owner creation
+ */
+data class EVOwnerResponse(
+    @SerializedName("message") val message: String,
+    @SerializedName("owner") val owner: EVOwner
 )

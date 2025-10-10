@@ -36,11 +36,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var repository: BookingRepository
 
+
     // Dashboard statistics views
     private lateinit var tvPendingCount: TextView
     private lateinit var tvApprovedCount: TextView
     private lateinit var tvCompletedCount: TextView
     private lateinit var tvTotalRevenue: TextView
+
 
     // Navigation buttons
     private lateinit var btnViewBookings: Button
@@ -58,7 +60,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         repository = BookingRepository(this)
+
 
         initializeViews()
         setupButtons()
@@ -79,6 +83,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     /**
      * Initialize view components
      */
@@ -88,9 +93,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         tvCompletedCount = findViewById(R.id.tvCompletedCount)
         tvTotalRevenue = findViewById(R.id.tvTotalRevenue)
 
+
         btnViewBookings = findViewById(R.id.btnViewBookings)
         btnCreateBooking = findViewById(R.id.btnCreateBooking)
     }
+
 
     /**
      * Setup button click listeners
@@ -99,6 +106,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         btnViewBookings.setOnClickListener {
             startActivity(Intent(this, BookingListActivity::class.java))
         }
+
 
         btnCreateBooking.setOnClickListener {
             val intent = Intent(this, BookingListActivity::class.java)
@@ -295,6 +303,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         lifecycleScope.launch {
             val result = repository.getAllBookings()
 
+
             result.onSuccess { bookings ->
                 val stats = DashboardStats(
                     pendingReservations = bookings.count { it.status == "Pending" },
@@ -305,6 +314,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         .sumOf { it.cost }
                 )
 
+
                 updateDashboard(stats)
             }.onFailure {
                 // Show default values on error
@@ -312,6 +322,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
 
     /**
      * Update dashboard UI with statistics
@@ -359,6 +370,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     /**
      * Reload stats when returning to activity
      */
@@ -367,3 +379,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         loadDashboardStats()
     }
 }
+
+

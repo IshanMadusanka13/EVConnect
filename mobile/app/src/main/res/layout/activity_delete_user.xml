@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/card_background_danger"
+    android:fillViewport="true"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_user_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/red_900"
+            android:gravity="center"
+            android:layout_marginBottom="30dp" />
+
+        <!-- NIC Input -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/enter_nic_label"
+                android:textColor="@color/red_800"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etNIC"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/edit_text_background"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textColor="@color/red_900"
+                android:textColorHint="@color/red_600"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </LinearLayout>
+
+        <!-- Search Button -->
+        <Button
+            android:id="@+id/btnSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/search_user_button"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/red_500"
+            android:textColor="@color/red_50" />
+
+        <!-- User Details Card (Visible after search) -->
+        <LinearLayout
+            android:id="@+id/cardUserDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone"
+            android:orientation="vertical"
+            android:background="@color/red_50"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/user_details_title"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/red_900"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/user_name_label"
+                android:textColor="@color/red_800"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvUserEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/user_email_label"
+                android:textColor="@color/red_800"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvUserVehicle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/user_vehicle_label"
+                android:textColor="@color/red_800"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Warning Message -->
+            <TextView
+                android:id="@+id/tvWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/delete_warning"
+                android:textColor="@color/red_600"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
+        </LinearLayout>
+
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/btnDeleteUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_user_permanently"
+            android:backgroundTint="@color/red_700"
+            android:textColor="@color/red_50"
+            android:visibility="gone" />
+
+        <!-- Delete All Button -->
+        <Button
+            android:id="@+id/btnDeleteAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_all_users"
+            android:backgroundTint="@color/red_700"
+            android:textColor="@color/red_50"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</ScrollView>

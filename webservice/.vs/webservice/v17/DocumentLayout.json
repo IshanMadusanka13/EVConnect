@@ -1,30 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Projects\\EVConnect\\webservice\\",
+  "WorkspaceRootPath": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:services\\slotservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\services\\SlotService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:services\\SlotService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\controllers\\slotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:controllers\\slotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\controllers\\SlotController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:controllers\\SlotController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\models\\slot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:models\\slot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\dto\\CreateSlotRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:dto\\CreateSlotRequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\dto\\createslotrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:dto\\createslotrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\StationSchedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:models\\StationSchedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\models\\stationschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:models\\stationschedule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Slot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:models\\Slot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|d:\\projects\\evconnect\\webservice\\models\\station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7F38D265-68D1-4E7A-B3EC-D4025A88FED8}|webservice.csproj|solutionrelative:models\\station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:models\\Station.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -40,11 +40,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "SlotService.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\services\\SlotService.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\services\\SlotService.cs",
               "RelativeDocumentMoniker": "services\\SlotService.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\services\\SlotService.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\services\\SlotService.cs",
               "RelativeToolTip": "services\\SlotService.cs",
-              "ViewState": "AgIAACQAAAAAAAAAAAA9wDEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACUAAAAAAAAAAAAowDEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-30T14:37:14.221Z",
               "EditorCaption": ""
@@ -53,66 +53,61 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "SlotController.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\controllers\\SlotController.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\controllers\\SlotController.cs",
               "RelativeDocumentMoniker": "controllers\\SlotController.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\controllers\\SlotController.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\controllers\\SlotController.cs",
               "RelativeToolTip": "controllers\\SlotController.cs",
               "ViewState": "AgIAAB8AAAAAAAAAAAAowDkAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-30T14:35:59.914Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "CreateSlotRequest.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\dto\\CreateSlotRequest.cs",
-              "RelativeDocumentMoniker": "dto\\CreateSlotRequest.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\dto\\CreateSlotRequest.cs",
-              "RelativeToolTip": "dto\\CreateSlotRequest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-30T14:34:01.51Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "StationSchedule.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\models\\StationSchedule.cs",
-              "RelativeDocumentMoniker": "models\\StationSchedule.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\models\\StationSchedule.cs",
-              "RelativeToolTip": "models\\StationSchedule.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAsAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-30T13:54:20.274Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-30T14:35:59.914Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "CreateSlotRequest.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\dto\\CreateSlotRequest.cs",
+              "RelativeDocumentMoniker": "dto\\CreateSlotRequest.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\dto\\CreateSlotRequest.cs",
+              "RelativeToolTip": "dto\\CreateSlotRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-30T14:34:01.51Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "StationSchedule.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\StationSchedule.cs",
+              "RelativeDocumentMoniker": "models\\StationSchedule.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\StationSchedule.cs",
+              "RelativeToolTip": "models\\StationSchedule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-30T13:54:20.274Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Slot.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\models\\Slot.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Slot.cs",
               "RelativeDocumentMoniker": "models\\Slot.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\models\\Slot.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Slot.cs",
               "RelativeToolTip": "models\\Slot.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAQAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-30T13:52:51.117Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-30T13:52:51.117Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
               "Title": "Station.cs",
-              "DocumentMoniker": "D:\\Projects\\EVConnect\\webservice\\models\\Station.cs",
+              "DocumentMoniker": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Station.cs",
               "RelativeDocumentMoniker": "models\\Station.cs",
-              "ToolTip": "D:\\Projects\\EVConnect\\webservice\\models\\Station.cs",
+              "ToolTip": "C:\\Users\\Tharushika Rukshani\\source\\repos\\EAD_Assignment\\EVConnect\\webservice\\models\\Station.cs",
               "RelativeToolTip": "models\\Station.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-30T13:30:03.593Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-30T13:30:03.593Z"
             }
           ]
         }
