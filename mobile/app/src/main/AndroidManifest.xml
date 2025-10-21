@@ -6,13 +6,9 @@
 
     <!-- Internet permission for API calls -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-
-    <!-- Camera permission for QR code scanning (if needed) -->
-<!--    <!--    <uses-permission android:name="android.permission.CAMERA" />-->-->
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -126,6 +122,12 @@
             android:exported="false"
             android:label="Nearby Stations"
             android:parentActivityName=".MainActivity" />
+
+        <!-- Add this activity declaration -->
+        <activity
+            android:name=".ui.stations.QRScanActivity"
+            android:label="Scan QR Code"
+            android:exported="false" />
 
         <!-- Google Maps API key placeholder: replace with your API key in local or gradle properties -->
         <meta-data
