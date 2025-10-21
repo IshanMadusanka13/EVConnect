@@ -224,4 +224,43 @@ interface ApiService {
      */
     @DELETE("EVOwner/{nic}")
     suspend fun deleteEVOwner(@Path("nic") nic: String): Response<MessageResponse>
+
+    /**
+     * Login with email and password
+     * @param request Login credentials
+     * @return Response containing user data and token
+     */
+    @POST("Auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    /**
+     * Register new user account
+     * @param request Registration data
+     * @return Response containing created user
+     */
+    @POST("Auth/register")
+    suspend fun register(@Body request: RegisterRequest): Response<EVOwnerResponse>
+
+    /**
+     * Send password reset email
+     * @param request Email for password reset
+     * @return Response with status message
+     */
+    @POST("Auth/forgot-password")
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<ForgotPasswordResponse>
+
+    /**
+     * Verify authentication token
+     * @param token Authentication token
+     * @return Response with validation result
+     */
+    @GET("Auth/verify")
+    suspend fun verifyToken(@Header("Authorization") token: String): Response<MessageResponse>
+
+    /**
+     * Logout user (optional - if backend supports it)
+     * @return Response with status message
+     */
+    @POST("Auth/logout")
+    suspend fun logout(): Response<MessageResponse>
 }

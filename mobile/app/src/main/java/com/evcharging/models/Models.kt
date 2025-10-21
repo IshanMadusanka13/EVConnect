@@ -229,3 +229,68 @@ data class EVOwnerResponse(
     @SerializedName("message") val message: String,
     @SerializedName("owner") val owner: EVOwner
 )
+
+/**
+ * Request model for user login
+ */
+data class LoginRequest(
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String
+)
+
+/**
+ * Response model for successful login
+ */
+data class LoginResponse(
+    @SerializedName("message") val message: String,
+    @SerializedName("token") val token: String? = null,
+    @SerializedName("owner") val owner: EVOwner,
+    @SerializedName("expiresIn") val expiresIn: Long? = null
+)
+
+/**
+ * Request model for user registration
+ */
+data class RegisterRequest(
+    @SerializedName("nic") val nic: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("phoneNumber") val phoneNumber: String,
+    @SerializedName("address") val address: String = "",
+    @SerializedName("gender") val gender: String = "",
+    @SerializedName("dateOfBirth") val dateOfBirth: String? = null,
+    @SerializedName("vehicleType") val vehicleType: String = "Car",
+    @SerializedName("vehicleModel") val vehicleModel: String,
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String,
+    @SerializedName("batteryCapacity") val batteryCapacity: String,
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "AC,DC"
+)
+
+/**
+ * Request model for password reset
+ */
+data class ForgotPasswordRequest(
+    @SerializedName("email") val email: String
+)
+
+/**
+ * Response model for password reset
+ */
+data class ForgotPasswordResponse(
+    @SerializedName("message") val message: String
+)
+
+/**
+ * Local user session data
+ */
+data class UserSession(
+    val nic: String,
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val token: String? = null,
+    val loginTime: Long = System.currentTimeMillis(),
+    val isRemembered: Boolean = false
+)
