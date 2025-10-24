@@ -5,16 +5,16 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
-    
+
     // ============ BOOKING ENDPOINTS ============
-    
+
     /**
      * Get all bookings from the server
      * @return Response containing list of all bookings
      */
     @GET("Booking")
     suspend fun getAllBookings(): Response<List<Booking>>
-    
+
     /**
      * Get booking by ID
      * @param id Booking ID
@@ -22,7 +22,7 @@ interface ApiService {
      */
     @GET("Booking/{id}")
     suspend fun getBookingById(@Path("id") id: String): Response<Booking>
-    
+
     /**
      * Get bookings by station ID
      * @param stationId Station ID
@@ -30,7 +30,7 @@ interface ApiService {
      */
     @GET("Booking/station/{stationId}")
     suspend fun getBookingsByStation(@Path("stationId") stationId: String): Response<List<Booking>>
-    
+
     /**
      * Get bookings by status
      * @param status Booking status (Pending, Approved, Completed, etc.)
@@ -38,7 +38,7 @@ interface ApiService {
      */
     @GET("Booking/status/{status}")
     suspend fun getBookingsByStatus(@Path("status") status: String): Response<List<Booking>>
-    
+
     /**
      * Check slot availability for booking
      * @param stationId Station ID
@@ -56,7 +56,7 @@ interface ApiService {
         @Query("endTime") endTime: String,
         @Query("chargerType") chargerType: String
     ): Response<List<Slot>>
-    
+
     /**
      * Create a new booking
      * @param request Booking creation request
@@ -64,7 +64,7 @@ interface ApiService {
      */
     @POST("Booking/create")
     suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
-    
+
     /**
      * Update existing booking
      * @param id Booking ID
@@ -76,7 +76,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateBookingRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Cancel booking
      * @param id Booking ID
@@ -88,7 +88,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: CancelBookingRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Update booking status
      * @param id Booking ID
@@ -100,7 +100,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateStatusRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Scan QR code for booking
      * @param id Booking ID
@@ -108,7 +108,7 @@ interface ApiService {
      */
     @POST("Booking/{id}/scan-qr")
     suspend fun scanQRCode(@Path("id") id: String): Response<MessageResponse>
-    
+
     /**
      * Update energy consumed and cost
      * @param id Booking ID
@@ -120,7 +120,7 @@ interface ApiService {
         @Path("id") id: String,
         @Body request: UpdateEnergyCostRequest
     ): Response<MessageResponse>
-    
+
     /**
      * Get charging rate for a booking
      * @param id Booking ID
@@ -128,16 +128,16 @@ interface ApiService {
      */
     @GET("Booking/{id}/charging-rate")
     suspend fun getChargingRate(@Path("id") id: String): Response<ChargingRateResponse>
-    
+
     // ============ STATION ENDPOINTS ============
-    
+
     /**
      * Get all charging stations
      * @return Response containing list of all stations
      */
     @GET("Station")
     suspend fun getAllStations(): Response<List<Station>>
-    
+
     /**
      * Get station by ID
      * @param id Station ID
@@ -145,7 +145,7 @@ interface ApiService {
      */
     @GET("Station/{id}")
     suspend fun getStationById(@Path("id") id: String): Response<Station>
-    
+
     /**
      * Get all station details including slots and schedules
      * @param id Station ID
@@ -192,6 +192,14 @@ interface ApiService {
     ): Response<MessageResponse>
 
     /**
+     * DELETE EV owner account permanently
+     * @param nic National Identity Card number
+     * @return Response with status message
+     */
+    @DELETE("api/EVOwner/{nic}")
+    suspend fun deleteEVOwner(@Path("nic") nic: String): Response<MessageResponse>
+
+    /**
      * Activate EV owner account
      * @param nic National Identity Card number
      * @return Response with status message
@@ -215,11 +223,10 @@ interface ApiService {
 
     @GET("api/EVOwner/search")
     suspend fun searchEVOwners(@Query("searchTerm") searchTerm: String): Response<List<EVOwner>>
+
     @PATCH("api/EVOwner/{nic}/change-password-mobile")
     suspend fun changePasswordMobile(
         @Path("nic") nic: String,
         @Body request: ChangePasswordRequest
     ): Response<MessageResponse>
-
-
 }

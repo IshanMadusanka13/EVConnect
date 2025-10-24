@@ -255,6 +255,26 @@
     <string name="status_inactive">Inactive</string>
     <string name="current_status_placeholder">Status: Not Loaded</string>
 
+    <!-- Filter options -->
+    <string name="filter_status_options_all">All Users</string>
+    <string name="filter_status_options_active">Active Only</string>
+    <string name="filter_status_options_inactive">Inactive Only</string>
 
+    <string name="filter_vehicle_options_all">All Vehicles</string>
+    <string name="filter_vehicle_options_car">Car</string>
+    <string name="filter_vehicle_options_bike">Bike</string>
+
+    <!-- Empty state messages -->
+    <string name="no_users_found">No users found</string>
+    <string name="loading_users">Loading users…</string>
+
+    <!-- Button texts -->
+    <string name="button_cancel">Cancel</string>
+    <string name="button_search">Search</string>
+
+
+    <!-- User item display -->
+    <string name="label_nic">NIC: %s</string>
+    <string name="label_vehicle">%s - %s</string>
 
 </resources>

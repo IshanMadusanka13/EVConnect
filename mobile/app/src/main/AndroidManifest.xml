@@ -105,7 +105,19 @@
         <activity
             android:name=".ui.users.UpdateUserActivity"
             android:exported="false"
-            android:label="Update"
+            android:label="Update Account"
+            android:parentActivityName=".ui.users.UserActivity" />
+
+        <activity
+            android:name=".ui.users.DeactivateUserActivity"
+            android:exported="false"
+            android:label="Deactivate Account"
+            android:parentActivityName=".ui.users.UserActivity" />
+
+        <activity
+            android:name=".ui.users.DeleteUserActivity"
+            android:exported="false"
+            android:label="Delete Account"
             android:parentActivityName=".ui.users.UserActivity" />
 
     </application>

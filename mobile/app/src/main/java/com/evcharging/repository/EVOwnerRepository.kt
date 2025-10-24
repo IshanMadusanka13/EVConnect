@@ -1,198 +1,3 @@
-//package com.evcharging.repository
-//
-//import android.content.Context
-//import android.util.Log
-//import com.evcharging.api.RetrofitClient
-//import com.evcharging.database.DatabaseHelper
-//import com.evcharging.models.*
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.withContext
-//
-//class EVOwnerRepository(context: Context) {
-//    private val dbHelper = DatabaseHelper(context)
-//    private val api = RetrofitClient.apiService
-//
-//    // --- LOCAL OPERATIONS ---
-//
-//    fun insertLocal(owner: EVOwner): Boolean {
-//        try {
-//            println("=== ATTEMPTING LOCAL DATABASE INSERTION ===")
-//            println("NIC: ${owner.nic}")
-//            println("Name: ${owner.firstName} ${owner.lastName}")
-//            println("Email: ${owner.email}")
-//            println("Date of Birth: ${owner.dateOfBirth}")
-//            println("Table status: ${dbHelper.debugEVOwnerTable()}")
-//
-//            val values = dbHelper.debugInsertEVOwner(owner)
-//            println("ContentValues: $values")
-//
-//            val result = dbHelper.insertEVOwner(owner)
-//            val success = result != -1L
-//
-//            println("Insert result: $result, Success: $success")
-//            println("Table status after insert: ${dbHelper.debugEVOwnerTable()}")
-//
-//            return success
-//        } catch (e: Exception) {
-//            println("=== LOCAL DATABASE ERROR ===")
-//            println("Error: ${e.message}")
-//            e.printStackTrace()
-//            return false
-//        }
-//    }
-//
-//    fun getLocalOwner(nic: String): EVOwner? = dbHelper.getEVOwnerByNIC(nic)
-//    fun updateLocal(owner: EVOwner): Boolean {
-//        return try {
-//            val result = dbHelper.updateEVOwner(owner)
-//            result > 0
-//        } catch (e: Exception) {
-//            Log.e("EVOwnerRepository", "Local update error: ${e.message}")
-//            false
-//        }
-//    }
-//    fun deactivateLocal(nic: String): Boolean = dbHelper.deactivateEVOwner(nic) > 0
-//    fun getAllLocalOwners(): List<EVOwner> = dbHelper.getAllEVOwners()
-//    fun deleteLocal(nic: String): Boolean = dbHelper.deleteEVOwner(nic) > 0
-//    fun deleteAllLocal(): Boolean = dbHelper.deleteAllEVOwners() > 0
-//
-//    fun toggleActivationStatus(nic: String, isActive: Boolean): Boolean {
-//        val affectedRows = dbHelper.toggleEVOwnerStatus(nic, isActive)
-//        return affectedRows > 0
-//    }
-//
-//    // --- REMOTE OPERATIONS ---
-//
-//    suspend fun getEVOwnerByNIC(nic: String): Result<EVOwner> = withContext(Dispatchers.IO) {
-//        try {
-//            val response = api.getEVOwnerByNIC(nic)
-//            if (response.isSuccessful && response.body() != null) {
-//                Result.success(response.body()!!)
-//            } else {
-//                Result.failure(Exception("User not found or server error: ${response.code()}"))
-//            }
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-//
-//    // Update EV Owner method
-//    suspend fun updateEVOwner(nic: String, updatedOwner: EVOwner): Result<MessageResponse> = withContext(Dispatchers.IO) {
-//        try {
-//            Log.d("EVOwnerRepository", "Starting update for NIC: $nic")
-//
-//            // Convert EVOwner to UpdateEVOwnerRequest - FIXED: Include password
-//            val updateRequest = UpdateEVOwnerRequest(
-//                firstName = updatedOwner.firstName,
-//                lastName = updatedOwner.lastName,
-//                dateOfBirth = updatedOwner.dateOfBirth,
-//                gender = updatedOwner.gender,
-//                email = updatedOwner.email,
-//                phoneNumber = updatedOwner.phoneNumber,
-//                address = updatedOwner.address,
-//                vehicleType = updatedOwner.vehicleType,
-//                vehicleModel = updatedOwner.vehicleModel,
-//                vehiclePlateNumber = updatedOwner.vehiclePlateNumber,
-//                batteryCapacity = updatedOwner.batteryCapacity,
-//                compatibleChargerTypes = updatedOwner.compatibleChargerTypes
-//            )
-//
-//            Log.d("EVOwnerRepository", "Sending update request: $updateRequest")
-//
-//            val response = api.updateEVOwner(nic, updateRequest)
-//
-//            if (response.isSuccessful) {
-//                val responseBody = response.body()
-//                Log.d("EVOwnerRepository", "Update successful: ${responseBody?.message}")
-//
-//                // Also update local database
-//                val localSuccess = updateLocal(updatedOwner)
-//                Log.d("EVOwnerRepository", "Local update result: $localSuccess")
-//
-//                if (responseBody != null) {
-//                    Result.success(responseBody)
-//                } else {
-//                    Result.success(MessageResponse("Updated successfully"))
-//                }
-//            } else {
-//                val errorBody = response.errorBody()?.string() ?: "Update failed: ${response.code()}"
-//                Log.e("EVOwnerRepository", "Update failed: $errorBody")
-//                Result.failure(Exception(errorBody))
-//            }
-//        } catch (e: Exception) {
-//            Log.e("EVOwnerRepository", "Network error: ${e.message}")
-//            // If network fails, update locally only
-//            val localSuccess = updateLocal(updatedOwner)
-//            if (localSuccess) {
-//                Log.d("EVOwnerRepository", "Updated locally due to network failure")
-//                Result.success(MessageResponse("Updated locally - will sync when online"))
-//            } else {
-//                Result.failure(Exception("Failed to update locally: ${e.message}"))
-//            }
-//        }
-//    }
-//
-//    suspend fun syncWithServer(request: CreateEVOwnerRequest) = withContext(Dispatchers.IO) {
-//        try {
-//            println("=== SENDING REQUEST TO SERVER ===")
-//            println("NIC: ${request.nic}")
-//            println("Name: ${request.firstName} ${request.lastName}")
-//            println("Email: ${request.email}")
-//            println("Date of Birth: ${request.dateOfBirth}")
-//            println("Full request: $request")
-//
-//            val response = api.createEVOwner(request)
-//
-//            println("=== SERVER RESPONSE ===")
-//            println("Code: ${response.code()}")
-//            println("Message: ${response.message()}")
-//            println("Is Successful: ${response.isSuccessful}")
-//
-//            if (!response.isSuccessful) {
-//                val errorBody = response.errorBody()?.string()
-//                println("Error Body: $errorBody")
-//            } else {
-//                println("Success Body: ${response.body()}")
-//            }
-//
-//            response
-//        } catch (e: Exception) {
-//            println("=== NETWORK ERROR ===")
-//            println("Error: ${e.message}")
-//            e.printStackTrace()
-//            null
-//        }
-//    }
-//
-//    suspend fun deactivateRemote(nic: String) = withContext(Dispatchers.IO) {
-//        try {
-//            api.deactivateEVOwner(nic)
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    suspend fun activateRemote(nic: String) = withContext(Dispatchers.IO) {
-//        try {
-//            api.activateEVOwner(nic)
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    suspend fun toggleStatusRemote(nic: String, isActive: Boolean) = withContext(Dispatchers.IO) {
-//        try {
-//            if (isActive) {
-//                api.activateEVOwner(nic)
-//            } else {
-//                api.deactivateEVOwner(nic)
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//}
-
 package com.evcharging.repository
 
 import android.content.Context
@@ -202,6 +7,7 @@ import com.evcharging.database.DatabaseHelper
 import com.evcharging.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
 class EVOwnerRepository(context: Context) {
     private val dbHelper = DatabaseHelper(context)
     private val api = RetrofitClient.apiService
@@ -281,6 +87,48 @@ class EVOwnerRepository(context: Context) {
     }
 
     // --- REMOTE OPERATIONS ---
+
+    // NEW: Get all EV owners (local + remote)
+    suspend fun getAllEVOwners(): Result<List<EVOwner>> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("EVOwnerRepository", "=== GETTING ALL EV OWNERS ===")
+
+            // First get local owners
+            val localOwners = getAllLocalOwners()
+            Log.d("EVOwnerRepository", "Found ${localOwners.size} local owners")
+
+            // Then try to get from server for sync
+            try {
+                val response = api.getAllEVOwners()
+                if (response.isSuccessful && response.body() != null) {
+                    val serverOwners = response.body()!!
+                    Log.d("EVOwnerRepository", "Found ${serverOwners.size} server owners")
+
+                    // Sync server data to local
+                    serverOwners.forEach { serverOwner ->
+                        val localOwner = searchLocalOwner(serverOwner.nic)
+                        if (localOwner == null) {
+                            // Insert if not exists locally
+                            insertLocal(serverOwner)
+                        }
+                    }
+
+                    // Return combined list (prioritize local for offline access)
+                    val allOwners = if (localOwners.isNotEmpty()) localOwners else serverOwners
+                    Result.success(allOwners)
+                } else {
+                    // Return local owners if server fails
+                    Result.success(localOwners)
+                }
+            } catch (e: Exception) {
+                Log.e("EVOwnerRepository", "Server fetch failed, returning local owners: ${e.message}")
+                Result.success(localOwners)
+            }
+        } catch (e: Exception) {
+            Log.e("EVOwnerRepository", "Error getting all owners: ${e.message}")
+            Result.failure(Exception("Failed to load EV owners: ${e.message}"))
+        }
+    }
 
     // NEW: Enhanced search that tries local first, then server
     suspend fun searchEVOwnerByNIC(nic: String, searchLocalFirst: Boolean = true): Result<EVOwner> = withContext(Dispatchers.IO) {
@@ -371,6 +219,43 @@ class EVOwnerRepository(context: Context) {
         searchFromServer(nic)
     }
 
+    // NEW: Deactivate EV Owner
+    suspend fun deactivateEVOwner(nic: String): Result<MessageResponse> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("EVOwnerRepository", "=== DEACTIVATING USER: $nic ===")
+
+            // Step 1: Deactivate locally first
+            Log.d("EVOwnerRepository", "Step 1: Deactivating locally...")
+            val localSuccess = deactivateLocal(nic)
+
+            if (!localSuccess) {
+                Log.e("EVOwnerRepository", "❌ LOCAL DEACTIVATION FAILED")
+                return@withContext Result.failure(Exception("Failed to deactivate user locally"))
+            }
+
+            Log.d("EVOwnerRepository", "✅ LOCAL DEACTIVATION SUCCESS")
+
+            // Step 2: Try to deactivate on server
+            Log.d("EVOwnerRepository", "Step 2: Attempting server deactivation...")
+            val response = api.deactivateEVOwner(nic)
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                Log.d("EVOwnerRepository", "✅ SERVER DEACTIVATION SUCCESS: ${responseBody?.message}")
+                Result.success(responseBody ?: MessageResponse("User deactivated successfully"))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Server error: ${response.code()}"
+                Log.e("EVOwnerRepository", "❌ SERVER DEACTIVATION FAILED: $errorBody")
+                // Still return success since local deactivation worked
+                Result.success(MessageResponse("User deactivated locally - will sync when online"))
+            }
+        } catch (e: Exception) {
+            Log.e("EVOwnerRepository", "🌐 NETWORK ERROR: ${e.message}")
+            // Return success since local deactivation should have worked
+            Result.success(MessageResponse("User deactivated locally - network error: ${e.message}"))
+        }
+    }
+
     // Update EV Owner method
     suspend fun updateEVOwner(nic: String, updatedOwner: EVOwner): Result<MessageResponse> = withContext(Dispatchers.IO) {
         try {
@@ -459,34 +344,6 @@ class EVOwnerRepository(context: Context) {
         }
     }
 
-    suspend fun deactivateRemote(nic: String) = withContext(Dispatchers.IO) {
-        try {
-            api.deactivateEVOwner(nic)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun activateRemote(nic: String) = withContext(Dispatchers.IO) {
-        try {
-            api.activateEVOwner(nic)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun toggleStatusRemote(nic: String, isActive: Boolean) = withContext(Dispatchers.IO) {
-        try {
-            if (isActive) {
-                api.activateEVOwner(nic)
-            } else {
-                api.deactivateEVOwner(nic)
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     suspend fun changePassword(nic: String, currentPassword: String, newPassword: String): Result<MessageResponse> = withContext(Dispatchers.IO) {
         try {
             Log.d("EVOwnerRepository", "Changing password for NIC: $nic")
@@ -537,5 +394,41 @@ class EVOwnerRepository(context: Context) {
         }
     }
 
+    // Add this to EVOwnerRepository class
+    suspend fun deleteEVOwner(nic: String): Result<MessageResponse> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("EVOwnerRepository", "=== DELETING USER: $nic ===")
+
+            // Step 1: Delete locally first
+            Log.d("EVOwnerRepository", "Step 1: Deleting from local database...")
+            val localSuccess = deleteLocal(nic)
+
+            if (!localSuccess) {
+                Log.e("EVOwnerRepository", "❌ LOCAL DELETION FAILED")
+                return@withContext Result.failure(Exception("Failed to delete user locally"))
+            }
+
+            Log.d("EVOwnerRepository", "✅ LOCAL DELETION SUCCESS")
+
+            // Step 2: Try to delete from server
+            Log.d("EVOwnerRepository", "Step 2: Attempting server deletion...")
+            val response = api.deleteEVOwner(nic)
+
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                Log.d("EVOwnerRepository", "✅ SERVER DELETION SUCCESS: ${responseBody?.message}")
+                Result.success(responseBody ?: MessageResponse("User deleted successfully"))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Server error: ${response.code()}"
+                Log.e("EVOwnerRepository", "❌ SERVER DELETION FAILED: $errorBody")
+                // Still return success since local deletion worked
+                Result.success(MessageResponse("User deleted locally - will sync when online"))
+            }
+        } catch (e: Exception) {
+            Log.e("EVOwnerRepository", "🌐 NETWORK ERROR: ${e.message}")
+            // Return success since local deletion should have worked
+            Result.success(MessageResponse("User deleted locally - network error: ${e.message}"))
+        }
+    }
 
 }

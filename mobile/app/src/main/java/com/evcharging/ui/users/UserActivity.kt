@@ -21,14 +21,14 @@ class UserActivity : AppCompatActivity() {
             startActivity(Intent(this, UpdateUserActivity::class.java))
         }
 
-//        // Deactivate User Card
-//        findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
-//            startActivity(Intent(this, ActivateUserActivity::class.java))
-//        }
-//
-//        // Delete User Card
-//        findViewById<LinearLayout>(R.id.btnDeleteUser).setOnClickListener {
-//            startActivity(Intent(this, DeleteUserActivity::class.java))
-//        }
+        // Deactivate User Card
+        findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
+            startActivity(Intent(this, DeactivateUserActivity::class.java))
+        }
+
+        // Delete User Card
+        findViewById<LinearLayout>(R.id.btnDeleteUser).setOnClickListener {
+            startActivity(Intent(this, DeleteUserActivity::class.java))
+        }
     }
 }
