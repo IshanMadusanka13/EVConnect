@@ -17,10 +17,10 @@ class UserActivity : AppCompatActivity() {
         }
 
         // Update User Card
-//        findViewById<LinearLayout>(R.id.btnUpdateUser).setOnClickListener {
-//            startActivity(Intent(this, UpdateUserActivity::class.java))
-//        }
-//
+        findViewById<LinearLayout>(R.id.btnUpdateUser).setOnClickListener {
+            startActivity(Intent(this, UpdateUserActivity::class.java))
+        }
+
 //        // Deactivate User Card
 //        findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
 //            startActivity(Intent(this, ActivateUserActivity::class.java))

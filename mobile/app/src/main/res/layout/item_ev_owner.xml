@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/orange_50"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- User Name -->
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="User Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/orange_900"
+            android:layout_marginBottom="8dp" />
+
+        <!-- NIC -->
+        <TextView
+            android:id="@+id/tvNIC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="NIC: 123456789V"
+            android:textSize="14sp"
+            android:textColor="@color/orange_800"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Email -->
+        <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="user@example.com"
+            android:textSize="14sp"
+            android:textColor="@color/orange_800"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Vehicle Info -->
+        <TextView
+            android:id="@+id/tvVehicle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Car - Tesla Model 3"
+            android:textSize="14sp"
+            android:textColor="@color/orange_800"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Active"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:background="@drawable/bg_status_orange"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -30,42 +30,66 @@ namespace webservice.controllers
         public async Task<ActionResult<EVOwner>> GetByNIC(string nic)
         {
             var evOwner = await _service.GetEVOwnerByNICAsync(nic);
-            if(evOwner == null) return NotFound(new {message = "EV Owner not found"});
+            if (evOwner == null) return NotFound(new { message = "EV Owner not found" });
             return Ok(evOwner);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] EVOwner evOwner)
+        public async Task<ActionResult> Create([FromBody] CreateEVOwnerRequest createRequest)
         {
-            var result = await _service.CreateEVOwnerAsync(evOwner);
-
-            if(!result.Success)
+            try
             {
-                return BadRequest(new { message = result.Message });
-            }
+                // Parse date string to DateTime
+                DateTime dateOfBirth;
+                bool dateParsed = DateTime.TryParse(createRequest.DateOfBirth, out dateOfBirth);
 
-            return CreatedAtAction(nameof(GetByNIC),
-                new { nic = evOwner.NIC},
-                new
+                if (!dateParsed)
                 {
-                    message = result.Message,
-                    evOwner = evOwner
+                    return BadRequest(new { message = "Invalid date format for DateOfBirth. Use YYYY-MM-DD format." });
                 }
-            );
-        }
 
-//        [HttpPut("{nic}")]
-//        public async Task<ActionResult> Update(string nic, [FromBody] EVOwner evOwner)
-//        {
-//            var result = await _service.UpdateEVOwnerAsync(nic, evOwner);
-//
-//            if(!result.Success)
-//            {
-//                return BadRequest(new { message = result.Message });
-//            }
-//
-//            return Ok(new { message = result.Message });
-//        }
+                // Map CreateEVOwnerRequest to EVOwner model
+                var evOwner = new EVOwner
+                {
+                    NIC = createRequest.NIC,
+                    FirstName = createRequest.FirstName,
+                    LastName = createRequest.LastName,
+                    DateOfBirth = dateOfBirth, // Use parsed DateTime
+                    Gender = createRequest.Gender,
+                    Email = createRequest.Email,
+                    PhoneNumber = createRequest.PhoneNumber,
+                    Address = createRequest.Address,
+                    Password = createRequest.Password,
+                    VehicleType = createRequest.VehicleType,
+                    VehicleModel = createRequest.VehicleModel,
+                    VehiclePlateNumber = createRequest.VehiclePlateNumber,
+                    BatteryCapacity = createRequest.BatteryCapacity,
+                    CompatibleChargerTypes = createRequest.CompatibleChargerTypes,
+                    RegistrationDate = DateTime.Now,
+                    IsActive = true
+                };
+
+                var result = await _service.CreateEVOwnerAsync(evOwner);
+
+                if (!result.Success)
+                {
+                    return BadRequest(new { message = result.Message });
+                }
+
+                return CreatedAtAction(nameof(GetByNIC),
+                    new { nic = evOwner.NIC },
+                    new
+                    {
+                        message = result.Message,
+                        evOwner = evOwner
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error creating EV owner: {ex.Message}" });
+            }
+        }
 
         [HttpPut("{nic}")]
         public async Task<ActionResult> Update(string nic, [FromBody] UpdateEVOwnerRequest updateRequest)
@@ -84,8 +108,19 @@ namespace webservice.controllers
                 if (!string.IsNullOrEmpty(updateRequest.LastName))
                     existingOwner.LastName = updateRequest.LastName;
 
-                if (updateRequest.DateOfBirth != default(DateTime))
-                    existingOwner.DateOfBirth = updateRequest.DateOfBirth;
+                // Handle date conversion for update
+                if (!string.IsNullOrEmpty(updateRequest.DateOfBirth))
+                {
+                    DateTime dateOfBirth;
+                    if (DateTime.TryParse(updateRequest.DateOfBirth, out dateOfBirth))
+                    {
+                        existingOwner.DateOfBirth = dateOfBirth;
+                    }
+                    else
+                    {
+                        return BadRequest(new { message = "Invalid date format for DateOfBirth. Use YYYY-MM-DD format." });
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(updateRequest.Gender))
                     existingOwner.Gender = updateRequest.Gender;
@@ -132,7 +167,7 @@ namespace webservice.controllers
         {
             var result = await _service.DeleteEVOwnerAsync(nic);
 
-            if(!result.Success)
+            if (!result.Success)
             {
                 return BadRequest(new { message = result.Message });
             }
@@ -141,8 +176,8 @@ namespace webservice.controllers
         }
 
         [HttpPatch("{nic}/activate")]
-         public async Task<ActionResult> Activate(string nic)
-         {
+        public async Task<ActionResult> Activate(string nic)
+        {
             var result = await _service.ActivateEVOwnerAsync(nic);
 
             if (!result.Success)
@@ -151,41 +186,40 @@ namespace webservice.controllers
             }
 
             return Ok(new { message = result.Message });
-         }
+        }
 
-         [HttpPatch("{nic}/deactivate")]
-         public async Task<ActionResult> Deactivate(string nic)
-         {
-             var result = await _service.DeactivateEVOwnerAsync(nic);
+        [HttpPatch("{nic}/deactivate")]
+        public async Task<ActionResult> Deactivate(string nic)
+        {
+            var result = await _service.DeactivateEVOwnerAsync(nic);
 
-             if (!result.Success)
-             {
-                 return BadRequest(new { message = result.Message });
-             }
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.Message });
+            }
 
-             return Ok(new { message = result.Message });
-         }
+            return Ok(new { message = result.Message });
+        }
 
-         [HttpGet("active")]
-         public async Task<ActionResult<List<EVOwner>>> GetActive()
-         {
+        [HttpGet("active")]
+        public async Task<ActionResult<List<EVOwner>>> GetActive()
+        {
             var activeOwners = await _service.GetActiveEVOwnersAsync();
             return Ok(activeOwners);
-         }
+        }
 
-         [HttpGet("inactive")]
-         public async Task<ActionResult<List<EVOwner>>> GetInactive()
-         {
-             var inactiveOwners = await _service.GetInactiveEVOwnersAsync();
-             return Ok(inactiveOwners);
-         }
+        [HttpGet("inactive")]
+        public async Task<ActionResult<List<EVOwner>>> GetInactive()
+        {
+            var inactiveOwners = await _service.GetInactiveEVOwnersAsync();
+            return Ok(inactiveOwners);
+        }
 
-         [HttpGet("search")]
-         public async Task<ActionResult<List<EVOwner>>> Search([FromQuery] string searchTerm)
-         {
+        [HttpGet("search")]
+        public async Task<ActionResult<List<EVOwner>>> Search([FromQuery] string searchTerm)
+        {
             var evOwners = await _service.SearchEVOwnersAsync(searchTerm);
             return Ok(evOwners);
-         }
-
+        }
     }
 }

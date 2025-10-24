@@ -222,3 +222,26 @@ data class CreateEVOwnerRequest(
     @SerializedName("batteryCapacity") val batteryCapacity: String,
     @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String
 )
+
+/**
+ * Request DTO for updating EV owner
+ */
+data class UpdateEVOwnerRequest(
+    @SerializedName("firstName") val firstName: String = "",
+    @SerializedName("lastName") val lastName: String = "",
+    @SerializedName("dateOfBirth") val dateOfBirth: String = "",
+    @SerializedName("gender") val gender: String = "",
+    @SerializedName("email") val email: String = "",
+    @SerializedName("phoneNumber") val phoneNumber: String = "",
+    @SerializedName("address") val address: String = "",
+    @SerializedName("vehicleType") val vehicleType: String = "",
+    @SerializedName("vehicleModel") val vehicleModel: String = "",
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String = "",
+    @SerializedName("batteryCapacity") val batteryCapacity: String = "",
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = ""
+)
+
+data class ChangePasswordRequest(
+    @SerializedName("currentPassword") val currentPassword: String,
+    @SerializedName("newPassword") val newPassword: String
+)

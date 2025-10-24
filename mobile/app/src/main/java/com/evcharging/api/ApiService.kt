@@ -153,7 +153,7 @@ interface ApiService {
      */
     @GET("Station/all/{id}")
     suspend fun getStationAllDetails(@Path("id") id: String): Response<StationDetails>
-    
+
     // ============ EV OWNER ENDPOINTS ============
 
     /**
@@ -172,7 +172,7 @@ interface ApiService {
     suspend fun getEVOwnerByNIC(@Path("nic") nic: String): Response<EVOwner>
 
     /**
-     * Create new EV owner profile - UPDATED to match .NET backend DTO
+     * Create new EV owner profile
      * @param request Create EV owner request DTO
      * @return Response containing created EV owner
      */
@@ -180,15 +180,15 @@ interface ApiService {
     suspend fun createEVOwner(@Body request: CreateEVOwnerRequest): Response<EVOwner>
 
     /**
-     * Update EV owner profile - UPDATED to match .NET backend
+     * Update EV owner profile - UPDATED to use UpdateEVOwnerRequest
      * @param nic National Identity Card number
-     * @param owner Updated EV owner data
+     * @param request Updated EV owner data
      * @return Response with status message
      */
     @PUT("api/EVOwner/{nic}")
     suspend fun updateEVOwner(
         @Path("nic") nic: String,
-        @Body owner: EVOwner
+        @Body request: UpdateEVOwnerRequest
     ): Response<MessageResponse>
 
     /**
@@ -207,7 +207,6 @@ interface ApiService {
     @PATCH("api/EVOwner/{nic}/deactivate")
     suspend fun deactivateEVOwner(@Path("nic") nic: String): Response<MessageResponse>
 
-    // Add other endpoints to match your .NET controller
     @GET("api/EVOwner/active")
     suspend fun getActiveEVOwners(): Response<List<EVOwner>>
 
@@ -216,4 +215,11 @@ interface ApiService {
 
     @GET("api/EVOwner/search")
     suspend fun searchEVOwners(@Query("searchTerm") searchTerm: String): Response<List<EVOwner>>
+    @PATCH("api/EVOwner/{nic}/change-password-mobile")
+    suspend fun changePasswordMobile(
+        @Path("nic") nic: String,
+        @Body request: ChangePasswordRequest
+    ): Response<MessageResponse>
+
+
 }
