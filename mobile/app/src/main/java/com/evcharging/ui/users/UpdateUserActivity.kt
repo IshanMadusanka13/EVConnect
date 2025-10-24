@@ -2,6 +2,8 @@ package com.evcharging.ui.users
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -10,21 +12,24 @@ import androidx.lifecycle.lifecycleScope
 import com.evcharging.R
 import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
+import com.evcharging.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Activity for updating existing EV owner profiles
+ * Activity for updating current user's profile
  */
 class UpdateUserActivity : AppCompatActivity() {
 
     private lateinit var repository: EVOwnerRepository
+    private lateinit var sharedPrefs: SharedPreferencesManager
 
-    // Search Section
-    private lateinit var etSearchNIC: EditText
-    private lateinit var btnSearch: Button
-    private lateinit var progressBarSearch: ProgressBar
+    // User Info Header
+    private lateinit var tvCurrentUser: TextView
+
+    // Loading Section
+    private lateinit var progressBarLoading: ProgressBar
 
     // User Details Section
     private lateinit var userDetailsContainer: LinearLayout
@@ -57,6 +62,20 @@ class UpdateUserActivity : AppCompatActivity() {
     private lateinit var btnUpdate: Button
     private lateinit var progressBarUpdate: ProgressBar
 
+    // Validation states (excluding required validation)
+    private var isFirstNameValid = true
+    private var isLastNameValid = true
+    private var isEmailValid = true
+    private var isPhoneValid = true
+    private var isVehicleModelValid = true
+    private var isVehiclePlateValid = true
+    private var isBatteryCapacityValid = true
+    private var isPasswordValid = true
+    private var isConfirmPasswordValid = true
+    private var isDOBValid = true
+    private var isGenderValid = true
+    private var isVehicleTypeValid = true
+
     private val calendar = Calendar.getInstance()
     private var currentOwner: EVOwner? = null
 
@@ -65,20 +84,31 @@ class UpdateUserActivity : AppCompatActivity() {
         setContentView(R.layout.activity_update_user)
 
         repository = EVOwnerRepository(this)
+        sharedPrefs = SharedPreferencesManager(this)
+
+        // Check if user is logged in
+        if (!sharedPrefs.isLoggedIn()) {
+            finish()
+            return
+        }
+
         initializeViews()
         setupListeners()
+        setupRealTimeValidations()
+        loadCurrentUserData()
 
         supportActionBar?.apply {
-            title = "Update EV Owner"
+            title = "Update My Profile"
             setDisplayHomeAsUpEnabled(true)
         }
     }
 
     private fun initializeViews() {
-        // Search Section
-        etSearchNIC = findViewById(R.id.etSearchNIC)
-        btnSearch = findViewById(R.id.btnSearch)
-        progressBarSearch = findViewById(R.id.progressBarSearch)
+        // User Info Header
+        tvCurrentUser = findViewById(R.id.tvCurrentUser)
+
+        // Loading Section
+        progressBarLoading = findViewById(R.id.progressBarLoading)
 
         // User Details Section
         userDetailsContainer = findViewById(R.id.userDetailsContainer)
@@ -111,16 +141,12 @@ class UpdateUserActivity : AppCompatActivity() {
         btnUpdate = findViewById(R.id.btnUpdate)
         progressBarUpdate = findViewById(R.id.progressBarUpdate)
 
-        // Initially hide user details
+        // Initially show loading, hide form
         userDetailsContainer.visibility = View.GONE
+        progressBarLoading.visibility = View.VISIBLE
     }
 
     private fun setupListeners() {
-        // Search Button
-        btnSearch.setOnClickListener {
-            searchUser()
-        }
-
         // Date of Birth Picker
         etDateOfBirth.setOnClickListener {
             showDatePicker()
@@ -144,41 +170,210 @@ class UpdateUserActivity : AppCompatActivity() {
         }
     }
 
-//    private fun searchUser() {
-//        val nic = etSearchNIC.text.toString().trim()
-//        if (nic.isEmpty()) {
-//            etSearchNIC.error = "Please enter NIC to search"
-//            return
-//        }
-//
-//        progressBarSearch.visibility = View.VISIBLE
-//        btnSearch.isEnabled = false
-//
-//        lifecycleScope.launch {
-//            val result = repository.getEVOwnerByNIC(nic)
-//
-//            progressBarSearch.visibility = View.GONE
-//            btnSearch.isEnabled = true
-//
-//            result.onSuccess { owner ->
-//                currentOwner = owner
-//                populateUserDetails(owner)
-//                userDetailsContainer.visibility = View.VISIBLE
-//                Toast.makeText(
-//                    this@UpdateUserActivity,
-//                    "User found!",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            }.onFailure { error ->
-//                Toast.makeText(
-//                    this@UpdateUserActivity,
-//                    "User not found: ${error.message}",
-//                    Toast.LENGTH_LONG
-//                ).show()
-//                userDetailsContainer.visibility = View.GONE
-//            }
-//        }
-//    }
+    private fun setupRealTimeValidations() {
+        // First Name Watcher (letters only, not required)
+        etFirstName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val name = s.toString().trim()
+                isFirstNameValid = name.isEmpty() || name.matches(Regex("^[a-zA-Z ]+$"))
+                updateError(etFirstName, !isFirstNameValid, getString(R.string.error_first_name_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Last Name Watcher (letters only, not required)
+        etLastName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val name = s.toString().trim()
+                isLastNameValid = name.isEmpty() || name.matches(Regex("^[a-zA-Z ]+$"))
+                updateError(etLastName, !isLastNameValid, getString(R.string.error_last_name_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Email Watcher (valid format if provided)
+        etEmail.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val email = s.toString().trim()
+                isEmailValid = email.isEmpty() || android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                updateError(etEmail, !isEmailValid, getString(R.string.error_email_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Phone Watcher (Sri Lankan format if provided)
+        etPhone.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val phone = s.toString().trim()
+                isPhoneValid = phone.isEmpty() || phone.matches(Regex("^0\\d{9}$"))
+                updateError(etPhone, !isPhoneValid, getString(R.string.error_phone_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Vehicle Model Watcher (alphanumeric if provided)
+        etVehicleModel.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val model = s.toString().trim()
+                isVehicleModelValid = model.isEmpty() || model.matches(Regex("^[a-zA-Z0-9 ]+$"))
+                updateError(etVehicleModel, !isVehicleModelValid, getString(R.string.error_vehicle_model_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Vehicle Plate Watcher (alphanumeric if provided)
+        etVehiclePlate.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val plate = s.toString().trim().uppercase()
+                isVehiclePlateValid = plate.isEmpty() || plate.matches(Regex("^[A-Z0-9/]+$"))
+                updateError(etVehiclePlate, !isVehiclePlateValid, getString(R.string.error_vehicle_plate_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Battery Capacity Watcher (positive decimal if provided)
+        etBatteryCapacity.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val capacity = s.toString().trim()
+                val valid = capacity.isEmpty() || (capacity.toDoubleOrNull() != null && capacity.toDouble() > 0)
+                isBatteryCapacityValid = valid
+                updateError(etBatteryCapacity, !valid, getString(R.string.error_battery_capacity_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Password Watcher (min 6 chars if provided)
+        etPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                isPasswordValid = password.isEmpty() || password.length >= 6
+                updateError(etPassword, !isPasswordValid, getString(R.string.error_password_length))
+                validateConfirmPassword()
+            }
+        })
+
+        // Confirm Password Watcher
+        etConfirmPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                validateConfirmPassword()
+            }
+        })
+
+        // Gender validation on text change (though it's set via dialog)
+        etGender.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val gender = s.toString().trim()
+                isGenderValid = gender.isEmpty() || gender in listOf("Male", "Female", "Other")
+                updateError(etGender, !isGenderValid, getString(R.string.error_gender_invalid))
+                updateButtonState()
+            }
+        })
+
+        // Vehicle Type validation on text change
+        etVehicleType.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val vType = s.toString().trim()
+                isVehicleTypeValid = vType.isEmpty() || vType in listOf("Car", "Bike")
+                updateError(etVehicleType, !isVehicleTypeValid, getString(R.string.error_vehicle_type_invalid))
+                updateButtonState()
+            }
+        })
+    }
+
+    private fun validateConfirmPassword() {
+        val password = etPassword.text.toString()
+        val confirm = etConfirmPassword.text.toString()
+        isConfirmPasswordValid = password.isEmpty() || (password == confirm && password.isNotEmpty())
+        updateError(etConfirmPassword, !isConfirmPasswordValid, getString(R.string.error_passwords_mismatch))
+        updateButtonState()
+    }
+
+    private fun updateError(editText: EditText, hasError: Boolean, message: String?) {
+        if (hasError && message != null) {
+            editText.error = message
+        } else {
+            editText.error = null
+        }
+    }
+
+    private fun updateButtonState() {
+        val allValid = isFirstNameValid && isLastNameValid && isEmailValid &&
+                isPhoneValid && isVehicleModelValid && isVehiclePlateValid && isBatteryCapacityValid &&
+                isPasswordValid && isConfirmPasswordValid && isDOBValid && isGenderValid && isVehicleTypeValid
+        btnUpdate.isEnabled = allValid
+        btnUpdate.alpha = if (allValid) 1.0f else 0.5f
+    }
+
+    private fun loadCurrentUserData() {
+        val currentUserNIC = sharedPrefs.getCurrentUserNIC()
+
+        if (currentUserNIC.isEmpty()) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        tvCurrentUser.text = "Loading profile for NIC: $currentUserNIC"
+
+        lifecycleScope.launch {
+            try {
+                val result = repository.searchEVOwnerFlexible(currentUserNIC)
+
+                result.onSuccess { owner ->
+                    currentOwner = owner
+                    populateUserDetails(owner)
+                    userDetailsContainer.visibility = View.VISIBLE
+                    progressBarLoading.visibility = View.GONE
+
+                    tvCurrentUser.text = "Updating: ${owner.firstName} ${owner.lastName} (${owner.nic})"
+
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Profile loaded successfully!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.onFailure { error ->
+                    progressBarLoading.visibility = View.GONE
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Failed to load profile: ${error.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    finish()
+                }
+            } catch (e: Exception) {
+                progressBarLoading.visibility = View.GONE
+                Toast.makeText(
+                    this@UpdateUserActivity,
+                    "Error loading profile: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+                finish()
+            }
+        }
+    }
 
     private fun populateUserDetails(owner: EVOwner) {
         // Personal Information
@@ -215,18 +410,53 @@ class UpdateUserActivity : AppCompatActivity() {
     }
 
     private fun showDatePicker() {
-        val datePicker = DatePickerDialog(
+        val currentYear = calendar.get(Calendar.YEAR)
+        val currentMonth = calendar.get(Calendar.MONTH)
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(
             this,
             { _, year, month, dayOfMonth ->
-                calendar.set(year, month, dayOfMonth)
-                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                etDateOfBirth.setText(sdf.format(calendar.time))
+                val selectedDate = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+
+                // Validate age (must be at least 16 years old) - only if date is selected
+                val today = Calendar.getInstance()
+                val age = today.get(Calendar.YEAR) - year
+                val isAdult = if (today.get(Calendar.MONTH) < month ||
+                    (today.get(Calendar.MONTH) == month && today.get(Calendar.DAY_OF_MONTH) < dayOfMonth)) {
+                    age - 1 >= 16
+                } else {
+                    age >= 16
+                }
+
+                if (!isAdult) {
+                    Toast.makeText(this, getString(R.string.error_dob_underage), Toast.LENGTH_SHORT).show()
+                    isDOBValid = false
+                    updateError(etDateOfBirth, true, getString(R.string.error_dob_underage))
+                } else {
+                    isDOBValid = true
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    etDateOfBirth.setText(dateFormat.format(selectedDate.time))
+                    updateError(etDateOfBirth, false, null)
+                }
+                updateButtonState()
             },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
+            currentYear - 30, // Default to 30 years ago
+            currentMonth,
+            currentDay
         )
-        datePicker.show()
+
+        // Set max date to today
+        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+
+        // Set min date to 100 years ago
+        val minCalendar = Calendar.getInstance()
+        minCalendar.add(Calendar.YEAR, -100)
+        datePickerDialog.datePicker.minDate = minCalendar.timeInMillis
+
+        datePickerDialog.show()
     }
 
     private fun showGenderDialog() {
@@ -251,71 +481,19 @@ class UpdateUserActivity : AppCompatActivity() {
 
     private fun validateForm(): Boolean {
         if (currentOwner == null) {
-            Toast.makeText(this, "Please search for a user first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Profile not loaded", Toast.LENGTH_SHORT).show()
             return false
         }
 
-        // Name Validation
-        if (etFirstName.text.toString().trim().isEmpty()) {
-            etFirstName.error = "First name is required"
-            return false
+        // Since real-time validation is in place, just check if all flags are true
+        val allValid = isFirstNameValid && isLastNameValid && isEmailValid &&
+                isPhoneValid && isVehicleModelValid && isVehiclePlateValid && isBatteryCapacityValid &&
+                isPasswordValid && isConfirmPasswordValid && isDOBValid && isGenderValid && isVehicleTypeValid
+
+        if (!allValid) {
+            Toast.makeText(this, "Please fix validation errors", Toast.LENGTH_SHORT).show()
         }
-
-        if (etLastName.text.toString().trim().isEmpty()) {
-            etLastName.error = "Last name is required"
-            return false
-        }
-
-        // Email Validation
-        if (etEmail.text.toString().trim().isEmpty()) {
-            etEmail.error = "Email is required"
-            return false
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(etEmail.text.toString().trim()).matches()) {
-            etEmail.error = "Valid email is required"
-            return false
-        }
-
-        // Phone Validation
-        if (etPhone.text.toString().trim().isEmpty()) {
-            etPhone.error = "Phone number is required"
-            return false
-        }
-
-        // Vehicle Validation
-        if (etVehicleModel.text.toString().trim().isEmpty()) {
-            etVehicleModel.error = "Vehicle model is required"
-            return false
-        }
-
-        if (etVehiclePlate.text.toString().trim().isEmpty()) {
-            etVehiclePlate.error = "Vehicle plate is required"
-            return false
-        }
-
-        if (etBatteryCapacity.text.toString().trim().isEmpty()) {
-            etBatteryCapacity.error = "Battery capacity is required"
-            return false
-        }
-
-        // Password Validation (optional)
-        val password = etPassword.text.toString()
-        val confirmPassword = etConfirmPassword.text.toString()
-
-        if (password.isNotEmpty()) {
-            if (password.length < 6) {
-                etPassword.error = "Password must be at least 6 characters"
-                return false
-            }
-
-            if (password != confirmPassword) {
-                etConfirmPassword.error = "Passwords do not match"
-                return false
-            }
-        }
-
-        return true
+        return allValid
     }
 
     private fun updateEVOwner() {
@@ -359,19 +537,25 @@ class UpdateUserActivity : AppCompatActivity() {
 
                 if (response.message.contains("locally", ignoreCase = true)) {
                     AlertDialog.Builder(this@UpdateUserActivity)
-                        .setTitle("Updated Locally")
-                        .setMessage("EV Owner has been updated locally and will sync with server when online.")
+                        .setTitle("Profile Updated Locally")
+                        .setMessage("Your profile has been updated locally and will sync with server when online.")
                         .setPositiveButton("OK") { dialog, _ ->
                             dialog.dismiss()
+                            finish()
                         }
                         .show()
                 } else {
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Profile updated successfully!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     finish()
                 }
             }.onFailure { error ->
                 Toast.makeText(
                     this@UpdateUserActivity,
-                    "Failed to update EV Owner: ${error.message}",
+                    "Failed to update profile: ${error.message}",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -385,70 +569,6 @@ class UpdateUserActivity : AppCompatActivity() {
             R.id.rbACDC -> "AC,DC"
             R.id.rbAll -> "AC,DC,Super"
             else -> "AC,DC"
-        }
-    }
-
-    private fun searchUser() {
-        val nic = etSearchNIC.text.toString().trim()
-        if (nic.isEmpty()) {
-            etSearchNIC.error = "Please enter NIC to search"
-            return
-        }
-
-        progressBarSearch.visibility = View.VISIBLE
-        btnSearch.isEnabled = false
-
-        lifecycleScope.launch {
-            // Use the new flexible search that tries local first, then server
-            val result = repository.searchEVOwnerFlexible(nic)
-
-            progressBarSearch.visibility = View.GONE
-            btnSearch.isEnabled = true
-
-            result.onSuccess { owner ->
-                currentOwner = owner
-                populateUserDetails(owner)
-                userDetailsContainer.visibility = View.VISIBLE
-
-                // Show where the user was found
-                val localOwner = repository.searchLocalOwner(nic)
-                val source = if (localOwner != null) "local database" else "server"
-
-                Toast.makeText(
-                    this@UpdateUserActivity,
-                    "User found in $source!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }.onFailure { error ->
-                Toast.makeText(
-                    this@UpdateUserActivity,
-                    "User not found: ${error.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-                userDetailsContainer.visibility = View.GONE
-            }
-        }
-    }
-
-    // Alternative: Search local only (for testing)
-    private fun searchUserLocalOnly() {
-        val nic = etSearchNIC.text.toString().trim()
-        if (nic.isEmpty()) {
-            etSearchNIC.error = "Please enter NIC to search"
-            return
-        }
-
-        // Search in local database only (synchronous, no need for coroutines)
-        val owner = repository.searchLocalOwnerWithLogging(nic)
-
-        if (owner != null) {
-            currentOwner = owner
-            populateUserDetails(owner)
-            userDetailsContainer.visibility = View.VISIBLE
-            Toast.makeText(this, "User found in local database!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "User not found in local database", Toast.LENGTH_LONG).show()
-            userDetailsContainer.visibility = View.GONE
         }
     }
 

@@ -18,60 +18,43 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/update_ev_owner_title"
+            android:text="Update My Profile"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/purple_800"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp" />
 
-        <!-- Search Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/search_user_section"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/purple_600"
-            android:layout_marginBottom="16dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/searchNICInputLayout"
+        <!-- User Info Header -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:errorEnabled="true"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:orientation="vertical"
+            android:background="@drawable/card_background_primary"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etSearchNIC"
+            <TextView
+                android:id="@+id/tvCurrentUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/enter_nic_hint"
-                android:inputType="text"
-                android:textColor="@color/purple_900"
-                android:textColorHint="@color/purple_400" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="Loading your profile..."
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
-        <!-- Progress Bar for Search -->
+        </LinearLayout>
+
+        <!-- Progress Bar for Loading -->
         <ProgressBar
-            android:id="@+id/progressBarSearch"
+            android:id="@+id/progressBarLoading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/search_user_button"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:backgroundTint="@color/purple_500"
-            android:paddingVertical="12dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="16dp" />
 
         <!-- Form Container -->
         <LinearLayout
@@ -81,20 +64,7 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Status Display -->
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/current_status_placeholder"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:padding="8dp"
-                android:gravity="center"
-                android:layout_marginBottom="12dp"
-                android:background="@color/purple_600" />
-
+            <!-- Rest of your existing form fields remain the same -->
             <!-- Personal Information Section -->
             <TextView
                 android:layout_width="wrap_content"
@@ -438,7 +408,7 @@
                 android:id="@+id/btnUpdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/update_ev_owner_button"
+                android:text="Update My Profile"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:backgroundTint="@color/purple_500"

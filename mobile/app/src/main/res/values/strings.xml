@@ -290,6 +290,11 @@
     <!-- Validation Messages -->
     <string name="login_success">Welcome back!</string>
     <string name="login_failed">Login failed. Please check your credentials.</string>
-
+    <string name="error_first_name_invalid">First name can only contain letters and spaces</string>
+    <string name="error_last_name_invalid">Last name can only contain letters and spaces</string>
+    <string name="error_vehicle_model_invalid">Vehicle model can only contain letters, numbers and spaces</string>
+    <string name="error_vehicle_plate_invalid">Plate number can only contain letters, numbers and /</string>
+    <string name="error_gender_invalid">Please select a valid gender</string>
+    <string name="error_vehicle_type_invalid">Please select a valid vehicle type</string>
 
 </resources>

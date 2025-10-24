@@ -11,13 +11,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- User Info Header -->
+        <!-- User Profile Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/card_background_primary"
-            android:padding="20dp"
             android:layout_marginBottom="24dp"
             android:elevation="8dp">
 
@@ -27,200 +25,334 @@
                 android:layout_height="wrap_content"
                 android:text="Welcome!"
                 android:textColor="@color/white"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
-            <TextView
-                android:id="@+id/tvUserInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Loading user information..."
-                android:textColor="@color/primary_light"
-                android:textSize="14sp"
-                android:layout_marginBottom="12dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/primary_light"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="User Management Portal"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
         </LinearLayout>
 
-        <!-- Update User Card -->
+        <!-- Profile Details Card -->
         <LinearLayout
-            android:id="@+id/btnUpdateUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:orientation="horizontal"
-            android:padding="20dp"
+            android:orientation="vertical"
             android:background="@drawable/card_background_secondary"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground">
-
-            <!-- Icon using Text/Emoji -->
-            <TextView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:text="✏️"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Update User"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Modify existing user profile"
-                    android:textColor="@color/purple_700"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Arrow using Text -->
-            <TextView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:text="›"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <!-- Deactivate User Card -->
-        <LinearLayout
-            android:id="@+id/btnDeactivateUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:orientation="horizontal"
             android:padding="20dp"
-            android:background="@drawable/card_background_warning"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground">
-
-            <!-- Icon using Text/Emoji -->
-            <TextView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:text="⏸️"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Activate/Deactivate"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Activate or deactivate user accounts"
-                    android:textColor="@color/orange_700"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Arrow using Text -->
-            <TextView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:text="›"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:gravity="center" />
-
-        </LinearLayout>
-
-        <!-- Delete User Card -->
-        <LinearLayout
-            android:id="@+id/btnDeleteUser"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            android:background="@drawable/card_background_danger"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground">
+            android:elevation="4dp">
 
-            <!-- Icon using Text/Emoji -->
             <TextView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:text="🗑️"
-                android:textSize="18sp"
-                android:gravity="center"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="Personal Information"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Name -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Delete User"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
+                    android:layout_weight="1"
+                    android:text="Full Name:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvFullName"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Permanently remove user accounts"
-                    android:textColor="@color/red_700"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp" />
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Arrow using Text -->
+            <!-- NIC -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="NIC:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvNIC"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Email -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Email:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Phone -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Phone:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Address -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Address:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Status:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Vehicle Information Card -->
+        <LinearLayout
+            android:id="@+id/vehicleCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background_secondary"
+            android:padding="20dp"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
+            android:visibility="gone">
+
             <TextView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:text="›"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Vehicle Information"
                 android:textColor="@color/white"
-                android:textSize="14sp"
-                android:gravity="center" />
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Vehicle Model -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Vehicle Model:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvVehicleModel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Battery Capacity -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Battery Capacity:"
+                    android:textColor="@color/purple_700"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvBatteryCapacity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Loading..."
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <!-- Edit Profile Button -->
+            <LinearLayout
+                android:id="@+id/btnEditProfile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:text="✏️"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit Profile"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Change Password Button -->
+            <LinearLayout
+                android:id="@+id/btnChangePassword"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:text="🔒"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Change Password"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -229,7 +361,7 @@
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_background_secondary"
+            android:background="@drawable/card_background_warning"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
@@ -237,7 +369,6 @@
             android:padding="16dp"
             android:gravity="center">
 
-            <!-- Logout Icon -->
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"

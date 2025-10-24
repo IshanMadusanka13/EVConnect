@@ -2,8 +2,10 @@ package com.evcharging.ui.users
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.evcharging.R
@@ -18,9 +20,23 @@ class UserActivity : AppCompatActivity() {
 
     private lateinit var repository: EVOwnerRepository
     private lateinit var sharedPrefs: SharedPreferencesManager
+
+    // TextViews for user details
     private lateinit var tvWelcome: TextView
-    private lateinit var tvUserInfo: TextView
+    private lateinit var tvFullName: TextView
+    private lateinit var tvNIC: TextView
+    private lateinit var tvEmail: TextView
+    private lateinit var tvPhone: TextView
+    private lateinit var tvAddress: TextView
+    private lateinit var tvStatus: TextView
+    private lateinit var tvVehicleModel: TextView
+    private lateinit var tvBatteryCapacity: TextView
+
+    // Layouts
     private lateinit var btnLogout: LinearLayout
+    private lateinit var btnEditProfile: LinearLayout
+    private lateinit var btnChangePassword: LinearLayout
+    private lateinit var vehicleCard: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,20 +59,22 @@ class UserActivity : AppCompatActivity() {
     private fun initializeViews() {
         // User info header views
         tvWelcome = findViewById(R.id.tvWelcome)
-        tvUserInfo = findViewById(R.id.tvUserInfo)
+
+        // Profile detail views
+        tvFullName = findViewById(R.id.tvFullName)
+        tvNIC = findViewById(R.id.tvNIC)
+        tvEmail = findViewById(R.id.tvEmail)
+        tvPhone = findViewById(R.id.tvPhone)
+        tvAddress = findViewById(R.id.tvAddress)
+        tvStatus = findViewById(R.id.tvStatus)
+        tvVehicleModel = findViewById(R.id.tvVehicleModel)
+        tvBatteryCapacity = findViewById(R.id.tvBatteryCapacity)
+
+        // Layouts
         btnLogout = findViewById(R.id.btnLogout)
-
-        // Your existing card buttons
-
-        findViewById<LinearLayout>(R.id.btnUpdateUser).setOnClickListener {
-            startActivity(Intent(this, UpdateUserActivity::class.java))
-        }
-        findViewById<LinearLayout>(R.id.btnDeactivateUser).setOnClickListener {
-            startActivity(Intent(this, DeactivateUserActivity::class.java))
-        }
-        findViewById<LinearLayout>(R.id.btnDeleteUser).setOnClickListener {
-            startActivity(Intent(this, DeleteUserActivity::class.java))
-        }
+        btnEditProfile = findViewById(R.id.btnEditProfile)
+        btnChangePassword = findViewById(R.id.btnChangePassword)
+        vehicleCard = findViewById(R.id.vehicleCard)
     }
 
     private fun setupUserInfo() {
@@ -64,7 +82,14 @@ class UserActivity : AppCompatActivity() {
 
         // Display basic user info immediately
         tvWelcome.text = "Welcome!"
-        tvUserInfo.text = "NIC: $currentUserNIC"
+
+        // Set initial values for profile fields
+        tvNIC.text = currentUserNIC
+        tvFullName.text = "Loading..."
+        tvEmail.text = "Loading..."
+        tvPhone.text = "Loading..."
+        tvAddress.text = "Loading..."
+        tvStatus.text = "Loading..."
 
         // Load full user details from repository asynchronously
         loadUserDetails(currentUserNIC)
@@ -76,23 +101,65 @@ class UserActivity : AppCompatActivity() {
                 val result = repository.searchEVOwnerFlexible(nic)
                 withContext(Dispatchers.Main) {
                     result.onSuccess { user ->
+                        // Update header
                         tvWelcome.text = "Welcome, ${user.firstName}!"
-                        tvUserInfo.text = "${user.firstName} ${user.lastName}\n${user.email}\nNIC: ${user.nic}"
+
+                        // Update profile details
+                        tvFullName.text = "${user.firstName} ${user.lastName}"
+                        tvNIC.text = user.nic
+                        tvEmail.text = user.email
+                        tvPhone.text = user.phoneNumber ?: "Not provided"
+                        tvAddress.text = user.address ?: "Not provided"
+                        tvStatus.text = if (user.isActive == true) "Active" else "Inactive"
+
+                        // Show vehicle information if available
+                        user.vehicleModel?.let { model ->
+                            vehicleCard.visibility = View.VISIBLE
+                            tvVehicleModel.text = model
+                            tvBatteryCapacity.text = user.batteryCapacity?.let {
+                                if (it.contains("kWh")) it else "$it kWh"
+                            } ?: "Not specified"
+                        } ?: run {
+                            vehicleCard.visibility = View.GONE
+                        }
+
                     }.onFailure { error ->
                         tvWelcome.text = "Welcome!"
-                        tvUserInfo.text = "NIC: $nic\n(User details not available: ${error.message})"
+                        setErrorState()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     tvWelcome.text = "Welcome!"
-                    tvUserInfo.text = "NIC: $nic\n(Error loading details)"
+                    setErrorState()
                 }
             }
         }
     }
 
+    private fun setErrorState() {
+        tvFullName.text = "Error loading"
+        tvEmail.text = "Error loading"
+        tvPhone.text = "Error loading"
+        tvAddress.text = "Error loading"
+        tvStatus.text = "Unknown"
+        vehicleCard.visibility = View.GONE
+    }
+
     private fun setupClickListeners() {
+        // Edit Profile
+        btnEditProfile.setOnClickListener {
+            startActivity(Intent(this, UpdateUserActivity::class.java))
+        }
+
+        // Change Password
+        btnChangePassword.setOnClickListener {
+            // Start ChangePasswordActivity (you'll need to create this)
+            // startActivity(Intent(this, ChangePasswordActivity::class.java))
+            // For now, show a message
+            Toast.makeText(this, "Change Password feature coming soon", Toast.LENGTH_SHORT).show()
+        }
+
         // Logout functionality
         btnLogout.setOnClickListener {
             logout()
@@ -110,5 +177,14 @@ class UserActivity : AppCompatActivity() {
         }
         startActivity(intent)
         finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh user data when returning from Edit Profile
+        val currentUserNIC = sharedPrefs.getCurrentUserNIC()
+        if (currentUserNIC.isNotEmpty()) {
+            loadUserDetails(currentUserNIC)
+        }
     }
 }
