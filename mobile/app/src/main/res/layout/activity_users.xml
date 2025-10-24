@@ -9,85 +9,54 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:orientation="vertical">
 
-        <!-- App Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_title"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/user_management_portal"
-            android:textColor="@color/primary_light"
-            android:textSize="16sp"
-            android:layout_marginBottom="40dp" />
-
-        <!-- Create User Card -->
-
-        <!-- Update User Card -->
+        <!-- User Info Header -->
         <LinearLayout
-            android:id="@+id/btnCreateUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
             android:background="@drawable/card_background_primary"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:padding="20dp">
+            android:padding="20dp"
+            android:layout_marginBottom="24dp"
+            android:elevation="8dp">
 
-            <!-- Icon using Text/Emoji -->
             <TextView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="center"
-                android:text="@string/create_user_icon"
-                android:textSize="18sp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
+                android:id="@+id/tvWelcome"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_user_title"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/create_user_description"
-                    android:textColor="@color/green_700"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <!-- Arrow using Text -->
-            <TextView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:gravity="center"
-                android:text="@string/arrow_icon"
+                android:text="Welcome!"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvUserInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading user information..."
+                android:textColor="@color/primary_light"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/primary_light"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="User Management Portal"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
+        <!-- Update User Card -->
         <LinearLayout
             android:id="@+id/btnUpdateUser"
             android:layout_width="match_parent"
@@ -104,7 +73,7 @@
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:text="@string/update_user_icon"
+                android:text="✏️"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_marginEnd="16dp" />
@@ -118,7 +87,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/update_user_title"
+                    android:text="Update User"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -126,7 +95,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/update_user_description"
+                    android:text="Modify existing user profile"
                     android:textColor="@color/purple_700"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
@@ -136,7 +105,7 @@
             <TextView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:text="@string/arrow_icon"
+                android:text="›"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:gravity="center" />
@@ -160,7 +129,7 @@
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:text="@string/deactivate_user_icon"
+                android:text="⏸️"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_marginEnd="16dp" />
@@ -174,7 +143,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/activate_user_title_header"
+                    android:text="Activate/Deactivate"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -182,7 +151,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/deactivate_user_description"
+                    android:text="Activate or deactivate user accounts"
                     android:textColor="@color/orange_700"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
@@ -192,7 +161,7 @@
             <TextView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:text="@string/arrow_icon"
+                android:text="›"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:gravity="center" />
@@ -204,6 +173,7 @@
             android:id="@+id/btnDeleteUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             android:orientation="horizontal"
             android:padding="20dp"
             android:background="@drawable/card_background_danger"
@@ -215,7 +185,7 @@
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:text="@string/delete_user_icon"
+                android:text="🗑️"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_marginEnd="16dp" />
@@ -229,7 +199,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/delete_user_title"
+                    android:text="Delete User"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -237,7 +207,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/delete_user_description"
+                    android:text="Permanently remove user accounts"
                     android:textColor="@color/red_700"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
@@ -247,10 +217,42 @@
             <TextView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:text="@string/arrow_icon"
+                android:text="›"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Logout Button -->
+        <LinearLayout
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background_secondary"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center">
+
+            <!-- Logout Icon -->
+            <TextView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
+                android:gravity="center"
+                android:text="🚪"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logout"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

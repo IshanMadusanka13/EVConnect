@@ -431,4 +431,127 @@ class EVOwnerRepository(context: Context) {
         }
     }
 
+    // FIXED: Authentication methods without lifecycleScope
+
+    /**
+     * Authenticate user with both local and server verification
+     * Strategy: Try local first (fast), then server (for sync and verification)
+     */
+    suspend fun authenticateUser(nic: String, password: String): Result<EVOwner> = withContext(Dispatchers.IO) {
+        try {
+            Log.d("EVOwnerRepository", "=== AUTHENTICATING USER: $nic ===")
+
+            // Step 1: Try local authentication first (fast, works offline)
+            Log.d("EVOwnerRepository", "Step 1: Attempting local authentication...")
+            val localUser = dbHelper.authenticateEVOwner(nic, password)
+
+            if (localUser != null) {
+                Log.d("EVOwnerRepository", "✅ LOCAL AUTHENTICATION SUCCESS: ${localUser.firstName}")
+
+                // Step 2: Try to sync with server in background (fire and forget)
+                // Note: This runs in the same coroutine scope but doesn't block the authentication
+                syncUserWithServer(nic)
+
+                return@withContext Result.success(localUser)
+            }
+
+            Log.d("EVOwnerRepository", "❌ LOCAL AUTHENTICATION FAILED: User not found or invalid credentials")
+
+            // Step 3: If local fails, try server authentication
+            Log.d("EVOwnerRepository", "Step 2: Attempting server authentication...")
+            return@withContext authenticateWithServer(nic, password)
+
+        } catch (e: Exception) {
+            Log.e("EVOwnerRepository", "🌐 AUTHENTICATION ERROR: ${e.message}")
+            Result.failure(Exception("Authentication failed: ${e.message}"))
+        }
+    }
+
+    /**
+     * Authenticate with server and sync data to local database
+     */
+    private suspend fun authenticateWithServer(nic: String, password: String): Result<EVOwner> {
+        return try {
+            Log.d("EVOwnerRepository", "🔐 SERVER AUTHENTICATION: $nic")
+
+            // Get user from server
+            val response = api.getEVOwnerByNIC(nic)
+
+            if (response.isSuccessful && response.body() != null) {
+                val serverUser = response.body()!!
+
+                // Verify password matches
+                if (serverUser.password == password) {
+                    if (serverUser.isActive) {
+                        Log.d("EVOwnerRepository", "✅ SERVER AUTHENTICATION SUCCESS: ${serverUser.firstName}")
+
+                        // Save user to local database for future offline access
+                        Log.d("EVOwnerRepository", "💾 Saving user to local database...")
+                        val saveSuccess = insertLocal(serverUser)
+
+                        if (saveSuccess) {
+                            Log.d("EVOwnerRepository", "✅ User saved locally for offline access")
+                        } else {
+                            Log.e("EVOwnerRepository", "❌ Failed to save user locally")
+                        }
+
+                        return Result.success(serverUser)
+                    } else {
+                        Log.e("EVOwnerRepository", "❌ ACCOUNT INACTIVE: User account is deactivated")
+                        return Result.failure(Exception("Your account is deactivated. Please contact support."))
+                    }
+                } else {
+                    Log.e("EVOwnerRepository", "❌ INVALID PASSWORD: Password does not match")
+                    return Result.failure(Exception("Invalid NIC or password"))
+                }
+            } else {
+                val errorMsg = when {
+                    response.code() == 404 -> "User not found. Please check your NIC."
+                    !response.isSuccessful -> "Server error: ${response.code()}"
+                    else -> "Authentication failed"
+                }
+                Log.e("EVOwnerRepository", "❌ SERVER AUTHENTICATION FAILED: $errorMsg")
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Log.e("EVOwnerRepository", "🌐 NETWORK ERROR: ${e.message}")
+            Result.failure(Exception("Network error. Please check your connection and try again."))
+        }
+    }
+
+    /**
+     * Sync user data with server in background
+     * This runs as part of the authentication coroutine but doesn't block the main flow
+     */
+    private suspend fun syncUserWithServer(nic: String) {
+        try {
+            Log.d("EVOwnerRepository", "🔄 BACKGROUND SYNC: Syncing user data with server...")
+
+            val response = api.getEVOwnerByNIC(nic)
+
+            if (response.isSuccessful && response.body() != null) {
+                val serverUser = response.body()!!
+
+                // Update local database with latest server data
+                if (serverUser.isActive) {
+                    val updateSuccess = updateLocal(serverUser)
+                    if (updateSuccess) {
+                        Log.d("EVOwnerRepository", "✅ BACKGROUND SYNC: User data updated from server")
+                    } else {
+                        Log.e("EVOwnerRepository", "❌ BACKGROUND SYNC: Failed to update local data")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("EVOwnerRepository", "⚠️ BACKGROUND SYNC: Network unavailable, using local data")
+        }
+    }
+
+    /**
+     * Logout user - clear local session but keep data for offline use
+     */
+    fun logout() {
+        // Clear login state but keep user data in local database
+        Log.d("EVOwnerRepository", "🚪 USER LOGOUT: Clearing session")
+    }
 }

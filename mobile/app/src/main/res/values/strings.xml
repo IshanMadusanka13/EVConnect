@@ -38,7 +38,7 @@
     <!-- ==== activity_create_user ==== -->
     <string name="create_ev_owner_title">Create EV Owner</string>
     <string name="create_ev_owner_subtitle">Add a new electric vehicle owner to the system</string>
-    <string name="create_button_text">Create EV Owner Account</string>
+    <string name="create_button_text">Create Account</string>
 
     <!-- Personal Information Section -->
     <string name="personal_info_title">Personal Information</string>
@@ -276,5 +276,20 @@
     <!-- User item display -->
     <string name="label_nic">NIC: %s</string>
     <string name="label_vehicle">%s - %s</string>
+
+    <!-- Login Activity Strings -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_to_account">Sign in to your account</string>
+    <string name="nic_number">NIC Number</string>
+    <string name="password">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+
+    <!-- Validation Messages -->
+    <string name="login_success">Welcome back!</string>
+    <string name="login_failed">Login failed. Please check your credentials.</string>
+
 
 </resources>

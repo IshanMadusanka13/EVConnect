@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_create_user"
+    android:background="@color/white"
     android:fillViewport="true"
     android:scrollbars="vertical"
     android:fadeScrollbars="false">
@@ -21,12 +21,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:background="@drawable/card_background_transparent"
+            android:background="@drawable/card_background_primary"
             android:orientation="vertical"
             android:padding="24dp"
             android:elevation="2dp">
 
-            <!-- Icon and Title Row -->
+            <!-- Title Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -34,35 +34,27 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="16dp">
 
-                <!-- Application Icon -->
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_user_plus"
-                    app:tint="@color/text_green_darkest"
-                    android:layout_marginEnd="12dp" />
+                <!-- Logo Section - Using Text/Emoji instead of image -->
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:text="⚡"
+                    android:textSize="24sp"
+                    android:textColor="@color/white" />
 
                 <!-- Main Screen Title -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/create_ev_owner_title"
+                    android:text="Create Your Account"
                     android:textSize="20sp"
+                    android:textAlignment="center"
                     android:textStyle="bold"
-                    android:textColor="@color/text_green_darkest" />
+                    android:textColor="@color/white" />
 
             </LinearLayout>
-
-            <!-- Screen Description -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/create_ev_owner_subtitle"
-                android:textSize="14sp"
-                android:textColor="@color/text_green_darkest"
-                android:alpha="0.8"
-                android:lineSpacingExtra="4dp" />
 
         </LinearLayout>
 
@@ -71,7 +63,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_background_transparent"
+            android:background="@drawable/card_background"
             android:orientation="vertical"
             android:padding="0dp"
             android:elevation="2dp"
@@ -93,11 +85,12 @@
                     android:layout_marginBottom="16dp">
 
                     <!-- Section Icon -->
-                    <ImageView
+                    <TextView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_personal_info"
-                        app:tint="@color/text_green_darkest"
+                        android:text="ℹ️"
+                        android:textSize="14sp"
+                        android:gravity="center"
                         android:layout_marginEnd="8dp" />
 
                     <!-- Section Title -->
@@ -105,10 +98,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/personal_info_title"
+                        android:text="Personal Information"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_green_darkest" />
+                        android:textColor="@color/primary_color" />
 
                 </LinearLayout>
 
@@ -117,204 +110,180 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="16dp">
 
                     <!-- First Name Input -->
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color">
 
-                        <EditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etFirstName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/first_name_hint"
+                            android:hint="First Name"
                             android:inputType="textCapWords"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            android:alpha="0.9"
-                            android:background="@drawable/edittext_transparent_background"
-                            android:padding="16dp" />
+                            android:textSize="14sp" />
 
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Last Name Input -->
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color">
 
-                        <EditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etLastName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/last_name_hint"
+                            android:hint="Last Name"
                             android:inputType="textCapWords"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            android:alpha="0.9"
-                            android:background="@drawable/edittext_transparent_background"
-                            android:padding="16dp" />
+                            android:textSize="14sp" />
 
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
                 <!-- National ID Card Number Input -->
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etNIC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/nic_hint"
+                        android:hint="NIC Number"
                         android:inputType="text"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
+                        android:textSize="14sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Gender and Date of Birth Row - Two Column Layout -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="16dp">
 
                     <!-- Gender Selection -->
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color">
 
-                        <EditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etGender"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/gender_hint"
+                            android:hint="Gender"
                             android:inputType="text"
                             android:focusable="false"
                             android:clickable="true"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            android:alpha="0.9"
-                            android:background="@drawable/edittext_transparent_background"
-                            android:padding="16dp" />
+                            android:textSize="14sp" />
 
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Date of Birth Picker -->
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color">
 
-                        <EditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etDateOfBirth"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/dob_hint"
+                            android:hint="Date of Birth"
                             android:inputType="text"
                             android:focusable="false"
                             android:clickable="true"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            android:alpha="0.9"
-                            android:background="@drawable/edittext_transparent_background"
-                            android:padding="16dp" />
+                            android:textSize="14sp" />
 
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
                 <!-- Email Address Input -->
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/email_hint"
+                        android:hint="Email Address"
                         android:inputType="textEmailAddress"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
+                        android:textSize="14sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Phone Number Input -->
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/phone_hint"
+                        android:hint="Phone Number"
                         android:inputType="phone"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
+                        android:textSize="14sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Address Input (Multi-line) -->
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="8dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/address_hint"
+                        android:hint="Address"
                         android:inputType="textMultiLine"
                         android:minLines="3"
                         android:gravity="top"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
+                        android:textSize="14sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
@@ -322,8 +291,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/green_800"
-                android:alpha="0.5"
+                android:background="@color/gray_200"
                 android:layout_marginHorizontal="20dp" />
 
             <!-- ===== VEHICLE INFORMATION SECTION ===== -->
@@ -342,11 +310,12 @@
                     android:layout_marginBottom="16dp">
 
                     <!-- Vehicle Section Icon -->
-                    <ImageView
+                    <TextView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_car"
-                        app:tint="@color/text_green_darkest"
+                        android:text="🚗"
+                        android:textSize="14sp"
+                        android:gravity="center"
                         android:layout_marginEnd="8dp" />
 
                     <!-- Vehicle Section Title -->
@@ -354,111 +323,99 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/vehicle_info_title"
+                        android:text="Vehicle Information"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_green_darkest" />
+                        android:textColor="@color/primary_color" />
 
                 </LinearLayout>
 
                 <!-- Vehicle Type Input -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/etVehicleType"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/vehicle_type_hint"
-                        android:inputType="text"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
-
-                </LinearLayout>
-
-                <!-- Vehicle Model Input -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/etVehicleModel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/vehicle_model_hint"
-                        android:inputType="text"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
-
-                </LinearLayout>
-
-                <!-- License Plate Input -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <EditText
-                        android:id="@+id/etVehiclePlate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/vehicle_plate_hint"
-                        android:inputType="textCapCharacters"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
-
-                </LinearLayout>
-
-                <!-- Battery Capacity Input -->
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:orientation="vertical">
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etVehicleType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Vehicle Type"
+                        android:inputType="text"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Vehicle Model Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etVehicleModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Vehicle Model"
+                        android:inputType="text"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- License Plate Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etVehiclePlate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="License Plate"
+                        android:inputType="textCapCharacters"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Battery Capacity Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:boxStrokeColor="@color/primary_color"
+                    app:hintTextColor="@color/primary_color">
+
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etBatteryCapacity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/battery_capacity_hint"
+                        android:hint="Battery Capacity (kWh)"
                         android:inputType="numberDecimal"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_green_darkest"
-                        android:textColorHint="@color/text_green_darkest"
-                        android:alpha="0.9"
-                        android:background="@drawable/edittext_transparent_background"
-                        android:padding="16dp" />
+                        android:textSize="14sp" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Charger Types Selection Title -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/charger_types_title"
+                    android:text="Compatible Charger Types"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text_green_darkest"
+                    android:textColor="@color/primary_color"
                     android:layout_marginBottom="8dp" />
 
                 <!-- Charger Types Options Container -->
@@ -466,78 +423,50 @@
                     android:id="@+id/llChargerTypes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background_light"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
 
                     <!-- AC Charging Option -->
-                    <LinearLayout
+                    <RadioButton
+                        android:id="@+id/radioAC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/radio_transparent_background"
-                        android:padding="16dp">
-
-                        <RadioButton
-                            android:id="@+id/radioAC"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/charger_ac"
-                            android:textSize="13sp"
-                            android:textColor="@color/text_green_darkest" />
-
-                    </LinearLayout>
+                        android:text="AC Charger (Slow)"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_700"
+                        android:paddingVertical="8dp" />
 
                     <!-- DC Fast Charging Option -->
-                    <LinearLayout
+                    <RadioButton
+                        android:id="@+id/radioDC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/radio_transparent_background"
-                        android:padding="16dp">
-
-                        <RadioButton
-                            android:id="@+id/radioDC"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/charger_dc"
-                            android:textSize="13sp"
-                            android:textColor="@color/text_green_darkest" />
-
-                    </LinearLayout>
+                        android:text="DC Fast Charger"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_700"
+                        android:paddingVertical="8dp" />
 
                     <!-- AC and DC Dual Compatible Option -->
-                    <LinearLayout
+                    <RadioButton
+                        android:id="@+id/radioACDC"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:background="@drawable/radio_transparent_background"
-                        android:padding="16dp">
-
-                        <RadioButton
-                            android:id="@+id/radioACDC"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/charger_ac_dc"
-                            android:textSize="13sp"
-                            android:textColor="@color/text_green_darkest" />
-
-                    </LinearLayout>
+                        android:text="AC + DC Compatible"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_700"
+                        android:paddingVertical="8dp" />
 
                     <!-- All Types Compatible Option -->
-                    <LinearLayout
+                    <RadioButton
+                        android:id="@+id/radioAll"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/radio_transparent_background"
-                        android:padding="16dp">
-
-                        <RadioButton
-                            android:id="@+id/radioAll"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/charger_all"
-                            android:textSize="13sp"
-                            android:textColor="@color/text_green_darkest" />
-
-                    </LinearLayout>
+                        android:text="All Charger Types"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray_700"
+                        android:paddingVertical="8dp" />
 
                 </LinearLayout>
 
@@ -547,8 +476,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/green_800"
-                android:alpha="0.5"
+                android:background="@color/gray_200"
                 android:layout_marginHorizontal="20dp" />
 
             <!-- ===== ACCOUNT SECURITY SECTION ===== -->
@@ -567,11 +495,12 @@
                     android:layout_marginBottom="16dp">
 
                     <!-- Security Section Icon -->
-                    <ImageView
+                    <TextView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_shield"
-                        app:tint="@color/text_green_darkest"
+                        android:text="🔒"
+                        android:textSize="14sp"
+                        android:gravity="center"
                         android:layout_marginEnd="8dp" />
 
                     <!-- Security Section Title -->
@@ -579,10 +508,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/account_security_title"
+                        android:text="Account Security"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/text_green_darkest" />
+                        android:textColor="@color/primary_color" />
 
                 </LinearLayout>
 
@@ -590,81 +519,52 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
 
-                    <!-- Password Input with Toggle Visibility -->
-                    <LinearLayout
+                    <!-- Password Input -->
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color"
+                        app:passwordToggleEnabled="true"
+                        app:passwordToggleTint="@color/primary_color">
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:endIconMode="password_toggle"
-                            app:endIconTint="@color/text_green_darkest"
-                            app:boxBackgroundMode="outline"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/text_green_darkest"
-                            app:hintTextColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            app:startIconTint="@color/text_green_darkest">
+                            android:hint="Password"
+                            android:inputType="textPassword"
+                            android:textSize="14sp" />
 
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etPassword"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="@string/password_hint"
-                                android:inputType="textPassword"
-                                android:textSize="14sp"
-                                android:textColor="@color/text_green_darkest"
-                                android:padding="12dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <!-- Confirm Password Input with Toggle Visibility -->
-                    <LinearLayout
+                    <!-- Confirm Password Input -->
+                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="8dp"
-                        android:orientation="vertical">
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:hintTextColor="@color/primary_color"
+                        app:passwordToggleEnabled="true"
+                        app:passwordToggleTint="@color/primary_color">
 
-                        <com.google.android.material.textfield.TextInputLayout
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etConfirmPassword"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:endIconMode="password_toggle"
-                            app:endIconTint="@color/text_green_darkest"
-                            app:boxBackgroundMode="outline"
-                            app:boxCornerRadiusTopStart="8dp"
-                            app:boxCornerRadiusTopEnd="8dp"
-                            app:boxCornerRadiusBottomStart="8dp"
-                            app:boxCornerRadiusBottomEnd="8dp"
-                            app:boxStrokeColor="@color/text_green_darkest"
-                            app:hintTextColor="@color/text_green_darkest"
-                            android:textColorHint="@color/text_green_darkest"
-                            app:startIconTint="@color/text_green_darkest">
+                            android:hint="Confirm Password"
+                            android:inputType="textPassword"
+                            android:textSize="14sp" />
 
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etConfirmPassword"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="@string/confirm_password_hint"
-                                android:inputType="textPassword"
-                                android:textSize="14sp"
-                                android:textColor="@color/text_green_darkest"
-                                android:padding="12dp" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
@@ -673,17 +573,16 @@
         </LinearLayout>
 
         <!-- ===== CREATE ACCOUNT BUTTON ===== -->
-        <!-- Primary action button to submit the form -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_button_text"
+            android:text="Create Account"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:backgroundTint="@color/green_800"
+            app:backgroundTint="@color/primary_color"
             app:cornerRadius="8dp"
-            android:paddingVertical="18dp"
+            android:paddingVertical="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
             android:elevation="4dp" />

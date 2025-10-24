@@ -1,6 +1,7 @@
 package com.evcharging.ui.users
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -14,10 +15,12 @@ import com.evcharging.R
 import com.evcharging.models.CreateEVOwnerRequest
 import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
+import com.evcharging.ui.auth.LoginActivity
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.delay
 
 class CreateUserActivity : AppCompatActivity() {
     private lateinit var repo: EVOwnerRepository
@@ -531,8 +534,7 @@ class CreateUserActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("CreateUserActivity", "Error preparing data", e)
             Toast.makeText(this, "Error preparing data: ${e.message}", Toast.LENGTH_SHORT).show()
-            btnCreate.isEnabled = true
-            btnCreate.text = getString(R.string.create_button_text)
+            resetButtonState()
             return
         }
 
@@ -556,7 +558,9 @@ class CreateUserActivity : AppCompatActivity() {
                     if (response != null && response.isSuccessful) {
                         Log.d("CreateUserActivity", "Server sync SUCCESS")
                         Toast.makeText(this@CreateUserActivity, getString(R.string.toast_synced_server), Toast.LENGTH_SHORT).show()
-                        finish()
+
+                        // SUCCESS: Redirect to login page
+                        redirectToLoginWithSuccessMessage()
                     } else {
                         val errorMessage = if (response != null) {
                             "Server error: ${response.code()} - ${response.message()}"
@@ -565,21 +569,56 @@ class CreateUserActivity : AppCompatActivity() {
                         }
                         Log.e("CreateUserActivity", "Server sync FAILED: $errorMessage")
                         Toast.makeText(this@CreateUserActivity, "Failed to sync: $errorMessage", Toast.LENGTH_LONG).show()
-                        btnCreate.isEnabled = true
-                        btnCreate.text = getString(R.string.create_button_text)
+
+                        // FAILED: Remain on same page and reset button
+                        resetButtonState()
                     }
                 } catch (e: Exception) {
                     Log.e("CreateUserActivity", "Network error during sync", e)
                     Toast.makeText(this@CreateUserActivity, "Network error: ${e.message}", Toast.LENGTH_LONG).show()
-                    btnCreate.isEnabled = true
-                    btnCreate.text = getString(R.string.create_button_text)
+
+                    // FAILED: Remain on same page and reset button
+                    resetButtonState()
                 }
             }
         } else {
             Log.e("CreateUserActivity", "Local database insertion FAILED")
             Toast.makeText(this, "Failed to save locally. Check logs for details.", Toast.LENGTH_SHORT).show()
-            btnCreate.isEnabled = true
-            btnCreate.text = getString(R.string.create_button_text)
+
+            // FAILED: Remain on same page and reset button
+            resetButtonState()
+        }
+    }
+
+    /**
+     * Reset the create button to its original state
+     */
+    private fun resetButtonState() {
+        btnCreate.isEnabled = true
+        btnCreate.text = getString(R.string.create_button_text)
+    }
+
+    /**
+     * Redirect to login page with success message
+     */
+    private fun redirectToLoginWithSuccessMessage() {
+        // Show final success message
+        Toast.makeText(this, "User created successfully! You can now login.", Toast.LENGTH_LONG).show()
+
+        // Delay a bit to show the success message, then redirect
+        scope.launch {
+            delay(1500) // 1.5 second delay to show the success message
+
+            withContext(Dispatchers.Main) {
+                // Create intent to go back to login
+                val intent = Intent(this@CreateUserActivity, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    // Optionally, you can pass data to pre-fill the NIC field
+                    putExtra("CREATED_NIC", etNIC.text.toString().trim())
+                }
+                startActivity(intent)
+                finish() // Close the current activity
+            }
         }
     }
 
