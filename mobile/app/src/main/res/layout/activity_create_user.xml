@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_create_user"
+    android:fillViewport="true"
+    android:scrollbars="vertical"
+    android:fadeScrollbars="false">
+
+    <!-- Main Container Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- ===== HEADER CARD ===== -->
+        <!-- Displays the main title and description of the screen -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/card_background_transparent"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:elevation="2dp">
+
+            <!-- Icon and Title Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <!-- Application Icon -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_user_plus"
+                    app:tint="@color/text_green_darkest"
+                    android:layout_marginEnd="12dp" />
+
+                <!-- Main Screen Title -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/create_ev_owner_title"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_green_darkest" />
+
+            </LinearLayout>
+
+            <!-- Screen Description -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_ev_owner_subtitle"
+                android:textSize="14sp"
+                android:textColor="@color/text_green_darkest"
+                android:alpha="0.8"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+        <!-- ===== MAIN DATA CARD ===== -->
+        <!-- Combined card for all data gathering sections -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background_transparent"
+            android:orientation="vertical"
+            android:padding="0dp"
+            android:elevation="2dp"
+            android:layout_marginBottom="24dp">
+
+            <!-- ===== PERSONAL INFORMATION SECTION ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Section Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Section Icon -->
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_personal_info"
+                        app:tint="@color/text_green_darkest"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Section Title -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/personal_info_title"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_green_darkest" />
+
+                </LinearLayout>
+
+                <!-- Name Fields Row - Two Column Layout -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <!-- First Name Input -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/etFirstName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/first_name_hint"
+                            android:inputType="textCapWords"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            android:alpha="0.9"
+                            android:background="@drawable/edittext_transparent_background"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
+
+                    <!-- Last Name Input -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/etLastName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/last_name_hint"
+                            android:inputType="textCapWords"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            android:alpha="0.9"
+                            android:background="@drawable/edittext_transparent_background"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- National ID Card Number Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etNIC"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/nic_hint"
+                        android:inputType="text"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Gender and Date of Birth Row - Two Column Layout -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <!-- Gender Selection -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/etGender"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/gender_hint"
+                            android:inputType="text"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            android:alpha="0.9"
+                            android:background="@drawable/edittext_transparent_background"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
+
+                    <!-- Date of Birth Picker -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/etDateOfBirth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/dob_hint"
+                            android:inputType="text"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            android:alpha="0.9"
+                            android:background="@drawable/edittext_transparent_background"
+                            android:padding="16dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Email Address Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email_hint"
+                        android:inputType="textEmailAddress"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Phone Number Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/phone_hint"
+                        android:inputType="phone"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Address Input (Multi-line) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/etAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/address_hint"
+                        android:inputType="textMultiLine"
+                        android:minLines="3"
+                        android:gravity="top"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Divider between sections -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/green_800"
+                android:alpha="0.5"
+                android:layout_marginHorizontal="20dp" />
+
+            <!-- ===== VEHICLE INFORMATION SECTION ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Section Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Vehicle Section Icon -->
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_car"
+                        app:tint="@color/text_green_darkest"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Vehicle Section Title -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/vehicle_info_title"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_green_darkest" />
+
+                </LinearLayout>
+
+                <!-- Vehicle Type Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etVehicleType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/vehicle_type_hint"
+                        android:inputType="text"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Vehicle Model Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etVehicleModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/vehicle_model_hint"
+                        android:inputType="text"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- License Plate Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etVehiclePlate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/vehicle_plate_hint"
+                        android:inputType="textCapCharacters"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Battery Capacity Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/etBatteryCapacity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/battery_capacity_hint"
+                        android:inputType="numberDecimal"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_green_darkest"
+                        android:textColorHint="@color/text_green_darkest"
+                        android:alpha="0.9"
+                        android:background="@drawable/edittext_transparent_background"
+                        android:padding="16dp" />
+
+                </LinearLayout>
+
+                <!-- Charger Types Selection Title -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/charger_types_title"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_green_darkest"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Charger Types Options Container -->
+                <LinearLayout
+                    android:id="@+id/llChargerTypes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- AC Charging Option -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/radio_transparent_background"
+                        android:padding="16dp">
+
+                        <RadioButton
+                            android:id="@+id/radioAC"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/charger_ac"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_green_darkest" />
+
+                    </LinearLayout>
+
+                    <!-- DC Fast Charging Option -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/radio_transparent_background"
+                        android:padding="16dp">
+
+                        <RadioButton
+                            android:id="@+id/radioDC"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/charger_dc"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_green_darkest" />
+
+                    </LinearLayout>
+
+                    <!-- AC and DC Dual Compatible Option -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/radio_transparent_background"
+                        android:padding="16dp">
+
+                        <RadioButton
+                            android:id="@+id/radioACDC"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/charger_ac_dc"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_green_darkest" />
+
+                    </LinearLayout>
+
+                    <!-- All Types Compatible Option -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/radio_transparent_background"
+                        android:padding="16dp">
+
+                        <RadioButton
+                            android:id="@+id/radioAll"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/charger_all"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_green_darkest" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Divider between sections -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/green_800"
+                android:alpha="0.5"
+                android:layout_marginHorizontal="20dp" />
+
+            <!-- ===== ACCOUNT SECURITY SECTION ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Section Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Security Section Icon -->
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="@color/text_green_darkest"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Security Section Title -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/account_security_title"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_green_darkest" />
+
+                </LinearLayout>
+
+                <!-- Password Fields Row - Two Column Layout -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Password Input with Toggle Visibility -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:endIconMode="password_toggle"
+                            app:endIconTint="@color/text_green_darkest"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxStrokeColor="@color/text_green_darkest"
+                            app:hintTextColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            app:startIconTint="@color/text_green_darkest">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etPassword"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/password_hint"
+                                android:inputType="textPassword"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_green_darkest"
+                                android:padding="12dp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                    <!-- Confirm Password Input with Toggle Visibility -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:endIconMode="password_toggle"
+                            app:endIconTint="@color/text_green_darkest"
+                            app:boxBackgroundMode="outline"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp"
+                            app:boxStrokeColor="@color/text_green_darkest"
+                            app:hintTextColor="@color/text_green_darkest"
+                            android:textColorHint="@color/text_green_darkest"
+                            app:startIconTint="@color/text_green_darkest">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etConfirmPassword"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/confirm_password_hint"
+                                android:inputType="textPassword"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_green_darkest"
+                                android:padding="12dp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ===== CREATE ACCOUNT BUTTON ===== -->
+        <!-- Primary action button to submit the form -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_button_text"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/green_800"
+            app:cornerRadius="8dp"
+            android:paddingVertical="18dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:elevation="4dp" />
+
+    </LinearLayout>
+</ScrollView>

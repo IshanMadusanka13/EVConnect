@@ -155,55 +155,65 @@ interface ApiService {
     suspend fun getStationAllDetails(@Path("id") id: String): Response<StationDetails>
     
     // ============ EV OWNER ENDPOINTS ============
-    
+
     /**
      * Get all EV owners
      * @return Response containing list of all EV owners
      */
-    @GET("EVOwner")
+    @GET("api/EVOwner")
     suspend fun getAllEVOwners(): Response<List<EVOwner>>
-    
+
     /**
      * Get EV owner by NIC
      * @param nic National Identity Card number
      * @return Response containing EV owner details
      */
-    @GET("EVOwner/{nic}")
+    @GET("api/EVOwner/{nic}")
     suspend fun getEVOwnerByNIC(@Path("nic") nic: String): Response<EVOwner>
-    
+
     /**
-     * Create new EV owner profile
-     * @param owner EV owner data
+     * Create new EV owner profile - UPDATED to match .NET backend DTO
+     * @param request Create EV owner request DTO
      * @return Response containing created EV owner
      */
-    @POST("EVOwner")
-    suspend fun createEVOwner(@Body owner: EVOwner): Response<EVOwner>
-    
+    @POST("api/EVOwner")
+    suspend fun createEVOwner(@Body request: CreateEVOwnerRequest): Response<EVOwner>
+
     /**
-     * Update EV owner profile
+     * Update EV owner profile - UPDATED to match .NET backend
      * @param nic National Identity Card number
      * @param owner Updated EV owner data
      * @return Response with status message
      */
-    @PUT("EVOwner/{nic}")
+    @PUT("api/EVOwner/{nic}")
     suspend fun updateEVOwner(
         @Path("nic") nic: String,
         @Body owner: EVOwner
     ): Response<MessageResponse>
-    
+
     /**
      * Activate EV owner account
      * @param nic National Identity Card number
      * @return Response with status message
      */
-    @PATCH("EVOwner/{nic}/activate")
+    @PATCH("api/EVOwner/{nic}/activate")
     suspend fun activateEVOwner(@Path("nic") nic: String): Response<MessageResponse>
-    
+
     /**
      * Deactivate EV owner account
      * @param nic National Identity Card number
      * @return Response with status message
      */
-    @PATCH("EVOwner/{nic}/deactivate")
+    @PATCH("api/EVOwner/{nic}/deactivate")
     suspend fun deactivateEVOwner(@Path("nic") nic: String): Response<MessageResponse>
+
+    // Add other endpoints to match your .NET controller
+    @GET("api/EVOwner/active")
+    suspend fun getActiveEVOwners(): Response<List<EVOwner>>
+
+    @GET("api/EVOwner/inactive")
+    suspend fun getInactiveEVOwners(): Response<List<EVOwner>>
+
+    @GET("api/EVOwner/search")
+    suspend fun searchEVOwners(@Query("searchTerm") searchTerm: String): Response<List<EVOwner>>
 }

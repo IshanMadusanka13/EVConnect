@@ -4,6 +4,28 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /**
+ * EV Owner entity - UPDATED with all fields from the create user form
+ */
+data class EVOwner(
+    @SerializedName("nic") val nic: String = "",
+    @SerializedName("firstName") val firstName: String = "",
+    @SerializedName("lastName") val lastName: String = "",
+    @SerializedName("dateOfBirth") val dateOfBirth: String = "",
+    @SerializedName("gender") val gender: String = "",
+    @SerializedName("email") val email: String = "",
+    @SerializedName("phoneNumber") val phoneNumber: String = "",
+    @SerializedName("address") val address: String = "",
+    @SerializedName("password") val password: String = "",
+    @SerializedName("vehicleType") val vehicleType: String = "",
+    @SerializedName("vehicleModel") val vehicleModel: String = "",
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String = "",
+    @SerializedName("batteryCapacity") val batteryCapacity: String = "",
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "",
+    @SerializedName("isActive") val isActive: Boolean = true,
+    @SerializedName("registrationDate") val registrationDate: String = ""
+) : Serializable
+
+/**
  * Booking entity representing a charging reservation
  */
 data class Booking(
@@ -56,23 +78,6 @@ data class Slot(
     @SerializedName("powerOutput") val powerOutput: Double = 0.0,
     @SerializedName("isOperational") val isOperational: Boolean = true,
     @SerializedName("slotTypeId") val slotTypeId: String = ""
-) : Serializable
-
-/**
- * EV Owner entity
- */
-data class EVOwner(
-    @SerializedName("nic") val nic: String = "",
-    @SerializedName("firstName") val firstName: String = "",
-    @SerializedName("lastName") val lastName: String = "",
-    @SerializedName("email") val email: String = "",
-    @SerializedName("phoneNumber") val phoneNumber: String = "",
-    @SerializedName("vehicleModel") val vehicleModel: String = "",
-    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String = "",
-    @SerializedName("batteryCapacity") val batteryCapacity: String = "",
-    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String = "",
-    @SerializedName("gender") val gender: String = "",
-    @SerializedName("isActive") val isActive: Boolean = true
 ) : Serializable
 
 /**
@@ -196,4 +201,24 @@ data class DashboardStats(
     val approvedReservations: Int = 0,
     val completedReservations: Int = 0,
     val totalRevenue: Double = 0.0
+)
+
+/**
+ * Request DTO for creating EV owner
+ */
+data class CreateEVOwnerRequest(
+    @SerializedName("nic") val nic: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("dateOfBirth") val dateOfBirth: String, // Send as ISO string
+    @SerializedName("gender") val gender: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("phoneNumber") val phoneNumber: String,
+    @SerializedName("address") val address: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("vehicleType") val vehicleType: String,
+    @SerializedName("vehicleModel") val vehicleModel: String,
+    @SerializedName("vehiclePlateNumber") val vehiclePlateNumber: String,
+    @SerializedName("batteryCapacity") val batteryCapacity: String,
+    @SerializedName("compatibleChargerTypes") val compatibleChargerTypes: String
 )
