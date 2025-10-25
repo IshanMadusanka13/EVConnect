@@ -35,7 +35,6 @@ class UserActivity : AppCompatActivity() {
     // Layouts
     private lateinit var btnLogout: LinearLayout
     private lateinit var btnEditProfile: LinearLayout
-    private lateinit var btnChangePassword: LinearLayout
     private lateinit var vehicleCard: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +72,6 @@ class UserActivity : AppCompatActivity() {
         // Layouts
         btnLogout = findViewById(R.id.btnLogout)
         btnEditProfile = findViewById(R.id.btnEditProfile)
-        btnChangePassword = findViewById(R.id.btnChangePassword)
         vehicleCard = findViewById(R.id.vehicleCard)
     }
 
@@ -150,14 +148,6 @@ class UserActivity : AppCompatActivity() {
         // Edit Profile
         btnEditProfile.setOnClickListener {
             startActivity(Intent(this, UpdateUserActivity::class.java))
-        }
-
-        // Change Password
-        btnChangePassword.setOnClickListener {
-            // Start ChangePasswordActivity (you'll need to create this)
-            // startActivity(Intent(this, ChangePasswordActivity::class.java))
-            // For now, show a message
-            Toast.makeText(this, "Change Password feature coming soon", Toast.LENGTH_SHORT).show()
         }
 
         // Logout functionality

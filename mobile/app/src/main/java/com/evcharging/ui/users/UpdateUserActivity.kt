@@ -1,6 +1,7 @@
 package com.evcharging.ui.users
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.evcharging.R
 import com.evcharging.models.EVOwner
 import com.evcharging.repository.EVOwnerRepository
+import com.evcharging.ui.auth.LoginActivity
 import com.evcharging.utils.SharedPreferencesManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,6 +63,8 @@ class UpdateUserActivity : AppCompatActivity() {
     // Action Buttons
     private lateinit var btnUpdate: Button
     private lateinit var progressBarUpdate: ProgressBar
+    private lateinit var btnDeactivateAccount: LinearLayout
+    private lateinit var btnDeleteAccount: LinearLayout
 
     // Validation states (excluding required validation)
     private var isFirstNameValid = true
@@ -139,6 +143,8 @@ class UpdateUserActivity : AppCompatActivity() {
 
         // Action Buttons
         btnUpdate = findViewById(R.id.btnUpdate)
+        btnDeactivateAccount = findViewById(R.id.btnDeactivateAccount)
+        btnDeleteAccount = findViewById(R.id.btnDeleteAccount)
         progressBarUpdate = findViewById(R.id.progressBarUpdate)
 
         // Initially show loading, hide form
@@ -168,6 +174,15 @@ class UpdateUserActivity : AppCompatActivity() {
                 updateEVOwner()
             }
         }
+
+        btnDeactivateAccount.setOnClickListener {
+            showDeactivateConfirmation()
+        }
+
+        btnDeleteAccount.setOnClickListener {
+            showDeleteConfirmation()
+        }
+
     }
 
     private fun setupRealTimeValidations() {
@@ -570,6 +585,159 @@ class UpdateUserActivity : AppCompatActivity() {
             R.id.rbAll -> "AC,DC,Super"
             else -> "AC,DC"
         }
+    }
+
+    private fun showDeactivateConfirmation() {
+        val owner = currentOwner ?: return
+
+        // Check if already deactivated
+        if (!owner.isActive) {
+            Toast.makeText(this, "Your account is already deactivated", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Deactivate Account")
+            .setMessage(
+                "Are you sure you want to deactivate your account?\n\n" +
+                        "⚠️ Warning: \n" +
+                        "• You won't be able to make new bookings\n" +
+                        "• Your profile will be temporarily disabled\n" +
+                        "• You can reactivate your account later by logging in\n\n" +
+                        "This action will log you out immediately."
+            )
+            .setPositiveButton("Deactivate") { dialog, _ ->
+                deactivateAccount()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun deactivateAccount() {
+        val owner = currentOwner ?: return
+
+        progressBarUpdate.visibility = View.VISIBLE
+        btnDeactivateAccount.isEnabled = false
+
+        lifecycleScope.launch {
+            try {
+                val result = repository.deactivateEVOwner(owner.nic)
+
+                progressBarUpdate.visibility = View.GONE
+                btnDeactivateAccount.isEnabled = true
+
+                result.onSuccess { response ->
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Account deactivated successfully",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    // Logout user after deactivation
+                    logoutUser()
+                }.onFailure { error ->
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Failed to deactivate account: ${error.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                progressBarUpdate.visibility = View.GONE
+                btnDeactivateAccount.isEnabled = true
+                Toast.makeText(
+                    this@UpdateUserActivity,
+                    "Error: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun showDeleteConfirmation() {
+        val owner = currentOwner ?: return
+
+        AlertDialog.Builder(this)
+            .setTitle("Delete Account")
+            .setMessage(
+                "⚠️ DANGER: This action cannot be undone!\n\n" +
+                        "Permanently deleting your account will:\n" +
+                        "• Remove all your personal information\n" +
+                        "• Delete all your booking history\n" +
+                        "• Remove your vehicle details\n" +
+                        "• Delete your account permanently\n\n" +
+                        "Are you absolutely sure you want to proceed?\n\n" +
+                        "Type \"DELETE\" to confirm:"
+            )
+            .setView(EditText(this).apply {
+                hint = "Type DELETE to confirm"
+            })
+            .setPositiveButton("Delete") { dialog, _ ->
+                val input = (dialog as AlertDialog).findViewById<EditText>(android.R.id.text1)?.text.toString()
+                if (input.equals("DELETE", ignoreCase = true)) {
+                    deleteAccount()
+                } else {
+                    Toast.makeText(this, "Confirmation text did not match", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun deleteAccount() {
+        val owner = currentOwner ?: return
+
+        progressBarUpdate.visibility = View.VISIBLE
+        btnDeleteAccount.isEnabled = false
+
+        lifecycleScope.launch {
+            try {
+                val result = repository.deleteEVOwner(owner.nic)
+
+                progressBarUpdate.visibility = View.GONE
+                btnDeleteAccount.isEnabled = true
+
+                result.onSuccess { response ->
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Account deleted successfully",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    // Logout user after deletion
+                    logoutUser()
+                }.onFailure { error ->
+                    Toast.makeText(
+                        this@UpdateUserActivity,
+                        "Failed to delete account: ${error.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                progressBarUpdate.visibility = View.GONE
+                btnDeleteAccount.isEnabled = true
+                Toast.makeText(
+                    this@UpdateUserActivity,
+                    "Error: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun logoutUser() {
+        sharedPrefs.clearLoginState()
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
     }
 
     override fun onSupportNavigateUp(): Boolean {

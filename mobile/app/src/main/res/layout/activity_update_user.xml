@@ -64,7 +64,6 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- Rest of your existing form fields remain the same -->
             <!-- Personal Information Section -->
             <TextView
                 android:layout_width="wrap_content"
@@ -393,6 +392,80 @@
                     android:textColor="@color/purple_900"
                     android:textColorHint="@color/purple_400" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Account Actions Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Account Actions"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/purple_600"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Deactivate Account Button -->
+            <LinearLayout
+                android:id="@+id/btnDeactivateAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background_warning"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:text="⏸️"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Deactivate Account"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Delete Account Button -->
+            <LinearLayout
+                android:id="@+id/btnDeleteAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/card_background_danger"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:text="🗑️"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Delete Account"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <!-- Progress Bar for Update -->
             <ProgressBar
