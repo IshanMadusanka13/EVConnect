@@ -11,7 +11,7 @@ const Sidebar = ({ activePath = '/admin' }) => {
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
     { label: 'Profile', path: '/profile', icon: UserCircle },
     { label: 'Add User', path: '/user', icon: UserCircle },
-    { label: 'EV Owner', path: '/ev-owner', icon: User },
+    { label: 'EV Owner', path: '/ev-owners', icon: User },
     { label: 'Charging Station', path: '/station', icon: Building },
     { label: 'Booking', path: '/booking', icon: Calendar },
     { label: 'Logout', path: '/logout', icon: LogOut },
